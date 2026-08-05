@@ -4777,3 +4777,9 @@ html[data-scheme="dark"] .home-profile-layout .home-profile__avatar {
     display: block;
 }
 
+/* List cards: fixed card-cover height like hand-drawn covers */
+.article-list article .article-image--auto svg {
+    height: var(--article-image-height);
+    max-height: none;
+}
+
