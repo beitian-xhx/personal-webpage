@@ -19,6 +19,10 @@
             ) }}
         </a>
     </div>
+    {{ else }}
+    <div class="article-image article-image--auto">
+        {{ partial "article/auto-cover" $Page }}
+    </div>
     {{ end }}
 
     {{ partial "article/components/details" (dict "Page" $Page "IsList" $IsList) }}

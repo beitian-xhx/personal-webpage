@@ -4770,3 +4770,9 @@ html[data-scheme="dark"] .home-profile-layout .home-profile__avatar {
         height: 44px;
     }
 }
+.article-image--auto svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
