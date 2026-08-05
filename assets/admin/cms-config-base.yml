@@ -5,7 +5,7 @@
 # repository is public, so never store credentials or private user data here.
 backend:
   name: github
-  repo: northernday/personal-webpage
+  repo: beitian-xhx/personal-webpage
   branch: main
   auth_methods: [token]
 

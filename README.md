@@ -24,7 +24,7 @@ hugo --minify --cleanDestinationDir --ignoreCache
 
 - `hugo.yaml`：站点标题、简介、社交链接（当前使用 `yourname` / `you@example.com` 占位）
 - `content/page/about/`：关于页中的姓名（“我的名字”）与联系方式
-- `assets/admin/cms-config-base.yml`：CMS 的 GitHub 仓库地址（当前为 `northernday/personal-webpage`，按实际部署仓库修改）
+- `assets/admin/cms-config-base.yml`：CMS 的 GitHub 仓库地址（当前为 `beitian-xhx/personal-webpage`，按实际部署仓库修改）
 - `static/img/`：头像等图片资源
 
 ## 内容目录
