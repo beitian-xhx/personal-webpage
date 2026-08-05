@@ -4,11 +4,13 @@
 {{- $g := index $groups (mod $seed (len $groups)) -}}
 {{- $id := printf "ac-%s" (md5 $page.RelPermalink) | truncate 14 "" -}}
 {{- $cat := "" -}}
-{{- with $page.Params.categories }}{{ $cat = delimit . " / " }}{{ end -}}
-{{- $kicker := printf "%s 路 %s" $page.Site.Title (cond (gt (len $cat) 0) $cat $page.Section) -}}
+{{- with $page.Params.categories }}{{ $cat = delimit . " / " | htmlEscape }}{{ end -}}
+{{- $kicker := printf "Beitian · %s" (cond (gt (len $cat) 0) $cat $page.Section) -}}
 {{- $title := truncate 22 $page.Title | htmlEscape -}}
+{{- $desc := "" -}}
+{{- with $page.Description }}{{ $desc = truncate 40 . | htmlEscape }}{{ end -}}
 {{- $tags := "" -}}
-{{- with $page.Params.tags }}{{ $tags = delimit . " 路 " }}{{ end -}}
+{{- with $page.Params.tags }}{{ $tags = delimit . " · " | htmlEscape }}{{ end -}}
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="{{ $id }}t {{ $id }}d" preserveAspectRatio="xMidYMid slice">
 <title id="{{ $id }}t">{{ $title }}</title>
 <desc id="{{ $id }}d">{{ $kicker }}</desc>
@@ -19,5 +21,6 @@
 <path d="M0 560C220 470 340 640 560 520s350-105 640 0v110H0z" fill="#fff" fill-opacity=".08"/>
 <text x="78" y="135" fill="#fff" fill-opacity=".82" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="30" letter-spacing="5">{{ $kicker }}</text>
 <text x="80" y="300" fill="#fff" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="54" font-weight="800">{{ $title }}</text>
-{{ if $tags }}<text x="82" y="372" fill="#fff" fill-opacity=".92" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="26">{{ $tags }}</text>{{ end }}
+{{ if $desc }}<text x="82" y="372" fill="#fff" fill-opacity=".92" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="26">{{ $desc }}</text>{{ end }}
+{{ if $tags }}<text x="82" y="485" fill="#fff" fill-opacity=".84" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="28">{{ $tags }}</text>{{ end }}
 </svg>

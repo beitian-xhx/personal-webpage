@@ -5,6 +5,7 @@ theme: stack
 copyright: "北天"
 defaultContentLanguage: en
 hasCJKLanguage: true
+timeZone: Asia/Shanghai
 mediaTypes:
   application/yaml:
     suffixes: [yml]
