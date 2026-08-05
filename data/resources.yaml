@@ -1,6 +1,9 @@
 - name: GitHub
   url: https://github.com
-- name: 少数派
-  url: https://sspai.com
+  icon: ''
+- name: Poe
+  url: https://poe.com
+  icon: ''
 - name: MDN Web Docs
   url: https://developer.mozilla.org
+  icon: ''
