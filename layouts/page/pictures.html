@@ -1,0 +1,95 @@
+{{ define "body-class" }}article-page pictures-page{{ end }}
+
+{{ define "main" }}
+    {{ $isChinese := hasPrefix .Language.Lang "zh" }}
+    {{ $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
+    {{ $notHidden := where $pages "Params.hidden" "!=" true }}
+    {{ $configuredPictures := slice }}
+    {{ with index hugo.Data "photo-wall" }}
+        {{ range . }}
+            {{ $configuredPictures = $configuredPictures | append . }}
+        {{ end }}
+    {{ end }}
+    {{ $configuredPictures = sort $configuredPictures "order" }}
+    {{ $gallery := slice }}
+
+    {{ if gt (len $configuredPictures) 0 }}
+        {{ range $index, $picture := $configuredPictures }}
+            {{ with $picture.image }}
+                {{ $imageURL := . }}
+                {{ $parsedURL := urls.Parse $imageURL }}
+                {{ $permalink := cond (or (eq $parsedURL.Scheme "http") (eq $parsedURL.Scheme "https")) $imageURL (relURL $imageURL) }}
+                {{ $title := default (printf "Photo %d" (add $index 1)) $picture.title }}
+                {{ with $picture.titleZh }}
+                    {{ if $isChinese }}{{ $title = . }}{{ end }}
+                {{ end }}
+                {{ $description := default "" $picture.description }}
+                {{ with $picture.descriptionZh }}
+                    {{ if $isChinese }}{{ $description = . }}{{ end }}
+                {{ end }}
+                {{ $gallery = $gallery | append (dict
+                    "Id" (default (printf "picture-%d" $index) $picture.id)
+                    "Title" $title
+                    "Description" $description
+                    "Date" (default "" $picture.date)
+                    "Link" (default "" $picture.link)
+                    "ImagePermalink" $permalink
+                ) }}
+            {{ end }}
+        {{ end }}
+    {{ else }}
+        {{ range $notHidden.ByDate.Reverse }}
+            {{ if .Params.image }}
+                {{ $image := partial "helper/image" (dict "Image" .Params.image "Resources" .Resources "Context" .) }}
+                {{ if $image }}
+                    {{ $gallery = $gallery | append (dict
+                        "Id" .RelPermalink
+                        "Title" .Title
+                        "Description" .Description
+                        "Date" (.Date.Format "2006-01-02")
+                        "Link" .RelPermalink
+                        "ImagePermalink" $image.Permalink
+                    ) }}
+                {{ end }}
+            {{ end }}
+        {{ end }}
+    {{ end }}
+
+    <article class="main-article pictures-article">
+        {{ if gt (len $gallery) 0 }}
+            <section class="photo-gallery" data-photo-gallery aria-label="{{ .Title }}">
+                <div class="photo-gallery__backdrop" data-gallery-close hidden></div>
+
+                {{ range $index, $item := $gallery }}
+                    <figure class="photo-gallery__item" data-gallery-item data-gallery-id="{{ printf "%s-%d" $item.Id $index }}" style="--gallery-order: {{ $index }};">
+                        <div class="photo-gallery__image-frame">
+                            <img
+                                src="{{ $item.ImagePermalink }}"
+                                alt="{{ $item.Title }}"
+                                loading="{{ cond (lt $index 6) "eager" "lazy" }}"
+                                decoding="async"
+                            >
+                        </div>
+                        <figcaption class="photo-gallery__caption">
+                            {{ if $item.Link }}
+                                <a href="{{ $item.Link }}">{{ $item.Title }}</a>
+                            {{ else }}
+                                <strong>{{ $item.Title }}</strong>
+                            {{ end }}
+                            {{ with $item.Date }}<time class="photo-gallery__date" datetime="{{ . }}" data-gallery-date>{{ . }}</time>{{ end }}
+                            {{ with $item.Description }}<p>{{ . }}</p>{{ end }}
+                        </figcaption>
+                    </figure>
+                {{ end }}
+            </section>
+        {{ else }}
+            <div class="photo-gallery-empty">
+                {{ cond $isChinese "还没有添加照片。" "No photos have been added yet." }}
+            </div>
+        {{ end }}
+    </article>
+
+    {{ partial "footer/footer" . }}
+{{ end }}
+
+{{ define "right-sidebar" }}{{ end }}

@@ -1,0 +1,27 @@
+<div class="wl-card-item">
+    <div class="wl-user" aria-hidden="true">
+        <img class="wl-user-avatar" src="{{ cond .isAuthor "/img/liquid-stack/logo-transparent.png" "/img/comment-guest-avatar.svg" | relURL }}" alt="">
+        {{ if .isAuthor }}<span class="administrator-icon"></span>{{ end }}
+    </div>
+    <div class="wl-card">
+        <div class="wl-head">
+            <span class="wl-nick">{{ .name }}</span>
+            {{ if .isAuthor }}<span class="wl-badge">Author</span>{{ end }}
+            <span class="wl-time">{{ .time }}</span>
+            <div class="wl-comment-actions">
+                <button class="wl-like" type="button" aria-disabled="true" title="{{ cond .isChinese "喜欢" "Like" }}">{{ .likes }}</button>
+                <button class="wl-reply" type="button" aria-disabled="true" title="{{ cond .isChinese "回复" "Reply" }}"></button>
+            </div>
+        </div>
+        <div class="wl-meta" aria-hidden="true"></div>
+        <div class="wl-content">
+            {{ with .replyTo }}<p class="wl-reply-to"><span>@{{ . }}: </span></p>{{ end }}
+            <div><p>{{ .content }}</p></div>
+        </div>
+        {{ with .children }}
+            <div class="wl-quote">
+                {{ range . }}{{ partial "comments/demo-comment" . }}{{ end }}
+            </div>
+        {{ end }}
+    </div>
+</div>

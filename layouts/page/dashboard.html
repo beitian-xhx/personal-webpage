@@ -1,0 +1,249 @@
+{{ define "body-class" }}article-page dashboard-page{{ end }}
+
+{{ define "main" }}
+    {{- $isChinese := hasPrefix .Language.Lang "zh" -}}
+    {{- $posts := where .Site.RegularPages "Section" "post" -}}
+    {{- $posts = where $posts "Params.hidden" "!=" true -}}
+    {{- $totalWords := 0 -}}
+    {{- $activityDates := slice -}}
+    {{- range $posts -}}
+        {{- $totalWords = add $totalWords .WordCount -}}
+        {{- $activityDates = $activityDates | append (.Date.Format "2006-01-02T15:04:05") -}}
+    {{- end -}}
+    {{- $maxCategoryCount := 1 -}}
+    {{- if gt (len $posts) 0 -}}
+        {{- range .Site.Taxonomies.categories -}}
+            {{- if gt .Count $maxCategoryCount }}{{ $maxCategoryCount = .Count }}{{ end -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $launchDate := default "2026-08-01" .Site.Params.footer.launchDate -}}
+    {{- $dashboardData := dict
+        "dates" $activityDates
+        "locale" (cond $isChinese "zh-CN" "en-US")
+        "weekdays" (cond $isChinese (slice "周日" "周一" "周二" "周三" "周四" "周五" "周六") (slice "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat"))
+        "postSingular" (cond $isChinese "篇文章" "post")
+        "postPlural" (cond $isChinese "篇文章" "posts")
+        "emptyHours" (cond $isChinese "暂无按小时统计的数据" "No hourly activity yet")
+    -}}
+
+    <article class="main-article dashboard-article">
+        <div class="dashboard-shell">
+            <header class="dashboard-topbar">
+                <div class="dashboard-admin-link" data-dashboard-admin-gesture>
+                    <span class="dashboard-admin-gear" aria-hidden="true">
+                        {{ partial "helper/icon" "settings" }}
+                    </span>
+                    <select
+                        id="dashboard-admin-menu"
+                        class="dashboard-admin-select"
+                        aria-label="{{ cond $isChinese "管理选单" "Management menu" }}"
+                        onchange="if (this.value) window.location.href = this.value"
+                    >
+                        <option value="" selected>{{ cond $isChinese "管理" "Manage" }}</option>
+                        {{- range hugo.Data.management_links }}
+                            <option value="{{ .url }}">{{ cond $isChinese .titleZh .title }}</option>
+                        {{- end }}
+                    </select>
+                </div>
+            </header>
+
+            <section class="dashboard-section dashboard-about" aria-labelledby="dashboard-about-title">
+                <h2 class="dashboard-section-title" id="dashboard-about-title">
+                    {{ partial "helper/icon" "info" }}
+                    {{ cond $isChinese "关于网站" "About this website" }}
+                </h2>
+
+                <div class="dashboard-about-card">
+                    <div class="dashboard-site-identity">
+                        <img
+                            class="dashboard-site-identity__logo"
+                            src="{{ "img/github.png" | relURL }}"
+                            width="512"
+                            height="512"
+                            alt=""
+                        >
+                        <strong>{{ .Site.Title }}</strong>
+                        <span>Hugo {{ hugo.Version }} · Stack 4.0.3</span>
+                    </div>
+
+                    <dl class="dashboard-system-list">
+                        <div class="dashboard-system-row">
+                            <dt>{{ cond $isChinese "框架" "Framework" }}</dt>
+                            <dd>
+                                <img class="dashboard-hugo-logo" src="{{ "img/dashboard/hugo-logo-wide.svg" | relURL }}" alt="Hugo">
+                                <span>v{{ hugo.Version }}</span>
+                            </dd>
+                        </div>
+                        <div class="dashboard-system-row">
+                            <dt>{{ cond $isChinese "主题" "Theme" }}</dt>
+                            <dd>
+                                <span class="dashboard-system-row__icon" aria-hidden="true">{{ partial "helper/icon" "layers" }}</span>
+                                <span>Stack v4.0.3</span>
+                            </dd>
+                        </div>
+                        <div class="dashboard-system-row">
+                            <dt>{{ cond $isChinese "部署平台" "Deployment" }}</dt>
+                            <dd>
+                                <span class="dashboard-system-row__icon" aria-hidden="true">{{ partial "helper/icon" "brand-github" }}</span>
+                                <span>GitHub Pages</span>
+                            </dd>
+                        </div>
+                        <div class="dashboard-system-row">
+                            <dt>{{ cond $isChinese "评论系统" "Comments" }}</dt>
+                            <dd>
+                                <span class="dashboard-system-row__icon" aria-hidden="true">{{ partial "helper/icon" "messages" }}</span>
+                                <span>{{ cond $isChinese "未启用" "Disabled" }}</span>
+                            </dd>
+                        </div>
+                        <div class="dashboard-system-row">
+                            <dt>{{ cond $isChinese "内容系统" "Content system" }}</dt>
+                            <dd>
+                                <span class="dashboard-system-row__icon" aria-hidden="true">{{ partial "helper/icon" "database" }}</span>
+                                <span>Sveltia CMS · GitHub</span>
+                            </dd>
+                        </div>
+                        <div class="dashboard-system-row">
+                            <dt>{{ cond $isChinese "友链申请" "Friend links" }}</dt>
+                            <dd>
+                                <span class="dashboard-system-row__icon" aria-hidden="true">{{ partial "helper/icon" "articles" }}</span>
+                                <span>{{ cond $isChinese "邮箱申请" "Via email" }}</span>
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </section>
+
+            <section class="dashboard-section dashboard-statistics" aria-labelledby="dashboard-statistics-title">
+                <header class="dashboard-section-heading">
+                    <h2 class="dashboard-section-title" id="dashboard-statistics-title">
+                        {{ partial "helper/icon" "dashboard" }}
+                        {{ cond $isChinese "内容统计" "Content statistics" }}
+                    </h2>
+                    <p>{{ cond $isChinese "记录本站的内容规模与发布节奏" "A live record of the site's publishing footprint" }}</p>
+                </header>
+
+                <div class="dashboard-summary-grid">
+                    <article class="dashboard-summary-card">
+                        <span class="dashboard-summary-card__icon dashboard-summary-card__icon--posts" aria-hidden="true">
+                            {{ partial "helper/icon" "articles" }}
+                        </span>
+                        <div>
+                            <strong data-dashboard-number="{{ len $posts }}">{{ len $posts }}</strong>
+                            <span>{{ cond $isChinese "篇文章" "Published posts" }}</span>
+                        </div>
+                    </article>
+                    <article class="dashboard-summary-card">
+                        <span class="dashboard-summary-card__icon dashboard-summary-card__icon--words" aria-hidden="true">
+                            {{ partial "helper/icon" "sum" }}
+                        </span>
+                        <div>
+                            <strong data-dashboard-number="{{ $totalWords }}">{{ $totalWords }}</strong>
+                            <span>{{ cond $isChinese "总字数" "Total words" }}</span>
+                        </div>
+                    </article>
+                    <article class="dashboard-summary-card">
+                        <span class="dashboard-summary-card__icon dashboard-summary-card__icon--runtime" aria-hidden="true">
+                            {{ partial "helper/icon" "history" }}
+                        </span>
+                        <div>
+                            <strong data-site-runtime data-launch-date="{{ $launchDate }}">0</strong>
+                            <span>{{ cond $isChinese "运行天数" "Days online" }}</span>
+                        </div>
+                    </article>
+                </div>
+
+                {{ $categoryTaxonomy := dict }}
+                {{ $tagTaxonomy := dict }}
+                {{ if gt (len $posts) 0 }}
+                    {{ $categoryTaxonomy = default (dict) .Site.Taxonomies.categories }}
+                    {{ $tagTaxonomy = default (dict) .Site.Taxonomies.tags }}
+                {{ end }}
+                <div class="dashboard-two-column-grid">
+                    <section class="dashboard-panel" aria-labelledby="dashboard-categories-title">
+                        <h3 id="dashboard-categories-title">
+                            {{ partial "helper/icon" "categories" }}
+                            {{ cond $isChinese "分类分布" "Category distribution" }}
+                        </h3>
+                        {{ if gt (len $categoryTaxonomy) 0 }}
+                            <ol class="dashboard-category-list">
+                                {{ range $categoryTaxonomy.ByCount }}
+                                    <li>
+                                        <a href="{{ .Page.RelPermalink }}">
+                                            <span>{{ .Page.Title }}</span>
+                                            <span class="dashboard-category-list__track" aria-hidden="true">
+                                                <span style="--dashboard-progress: {{ mul (div (float .Count) (float $maxCategoryCount)) 100 }}%;"></span>
+                                            </span>
+                                            <strong>{{ .Count }}</strong>
+                                        </a>
+                                    </li>
+                                {{ end }}
+                            </ol>
+                        {{ else }}
+                            <p class="dashboard-empty">{{ cond $isChinese "暂无分类" "No categories yet" }}</p>
+                        {{ end }}
+                    </section>
+
+                    <section class="dashboard-panel" aria-labelledby="dashboard-tags-title">
+                        <h3 id="dashboard-tags-title">
+                            {{ partial "helper/icon" "tag" }}
+                            {{ cond $isChinese "热门标签" "Popular tags" }}
+                        </h3>
+                        {{ if gt (len $tagTaxonomy) 0 }}
+                            <div class="dashboard-tag-cloud">
+                                {{ range first 30 $tagTaxonomy.ByCount }}
+                                    <a href="{{ .Page.RelPermalink }}">
+                                        <span>{{ .Page.Title }}</span>
+                                        <strong>{{ .Count }}</strong>
+                                    </a>
+                                {{ end }}
+                            </div>
+                        {{ else }}
+                            <p class="dashboard-empty">{{ cond $isChinese "暂无标签" "No tags yet" }}</p>
+                        {{ end }}
+                    </section>
+                </div>
+
+                <div class="dashboard-two-column-grid">
+                    <section class="dashboard-panel" aria-labelledby="dashboard-weekly-title">
+                        <h3 id="dashboard-weekly-title">
+                            {{ partial "helper/icon" "calendar" }}
+                            {{ cond $isChinese "每周发布活跃度" "Publishing by weekday" }}
+                        </h3>
+                        <div class="dashboard-habit-chart" data-dashboard-weekly></div>
+                    </section>
+                    <section class="dashboard-panel" aria-labelledby="dashboard-hourly-title">
+                        <h3 id="dashboard-hourly-title">
+                            {{ partial "helper/icon" "clock" }}
+                            {{ cond $isChinese "每小时发布活跃度" "Publishing by hour" }}
+                        </h3>
+                        <div class="dashboard-habit-chart dashboard-habit-chart--hourly" data-dashboard-hourly></div>
+                    </section>
+                </div>
+
+                <section class="dashboard-panel dashboard-heatmap-panel" aria-labelledby="dashboard-heatmap-title">
+                    <h3 id="dashboard-heatmap-title">
+                        {{ partial "helper/icon" "heatmap" }}
+                        {{ cond $isChinese "年度文章贡献热力图" "Annual publishing heatmap" }}
+                    </h3>
+                    <div class="dashboard-heatmap-scroll" data-dashboard-heatmap-scroll>
+                        <div class="dashboard-heatmap" data-dashboard-heatmap></div>
+                    </div>
+                    <footer class="dashboard-heatmap-legend" aria-hidden="true">
+                        <span>{{ cond $isChinese "少" "Less" }}</span>
+                        <i class="dashboard-heatmap-cell dashboard-heatmap-cell--0"></i>
+                        <i class="dashboard-heatmap-cell dashboard-heatmap-cell--1"></i>
+                        <i class="dashboard-heatmap-cell dashboard-heatmap-cell--2"></i>
+                        <i class="dashboard-heatmap-cell dashboard-heatmap-cell--3"></i>
+                        <i class="dashboard-heatmap-cell dashboard-heatmap-cell--4"></i>
+                        <span>{{ cond $isChinese "多" "More" }}</span>
+                    </footer>
+                </section>
+            </section>
+        </div>
+    </article>
+
+    <script id="dashboard-data" type="application/json">{{ jsonify $dashboardData | safeHTML }}</script>
+    {{ partial "footer/footer" . }}
+{{ end }}
+
+{{ define "right-sidebar" }}{{ end }}

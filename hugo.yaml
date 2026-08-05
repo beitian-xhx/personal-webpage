@@ -1,0 +1,112 @@
+baseURL: "https://beitian.netlify.app/"
+canonifyURLs: false
+title: "北天"
+theme: stack
+copyright: "北天"
+defaultContentLanguage: en
+hasCJKLanguage: true
+mediaTypes:
+  application/yaml:
+    suffixes: [yml]
+outputFormats:
+  CMSConfig:
+    mediaType: application/yaml
+    baseName: config
+    isPlainText: true
+    notAlternative: true
+  sitemapflat:
+    mediaType: application/xml
+    baseName: sitemap-flat
+    isPlainText: true
+    notAlternative: true
+languages:
+  en: { label: English, locale: en-US, weight: 1 }
+  zh:
+    label: 简体中文
+    locale: zh-Hans
+    weight: 2
+    copyright: "北天"
+    params:
+      sidebar:
+        subtitle: 做点有意思的东西
+pagination: { pagerSize: 10 }
+permalinks:
+  post: /p/:slug/
+  page: /:slug/
+params:
+  mainSections: [post]
+  description: "你好，欢迎来到我的个人网站。我热爱用代码、设计与内容创作来表达想法，也享受不断学习新事物的过程。这里记录我的项目、笔记与思考。"
+  favicon: /favicon.svg
+  dateFormat:
+    published: 02/Jan/2006
+    lastUpdated: 02/Jan/2006 15:04 MST
+  sidebar:
+    emoji: "😄"
+    subtitle: Building interesting things — projects, notes, and ideas.
+    avatar: /img/uploads/b_22cb441f64208eaff55e9670d85922ab.jpg
+  footer:
+    since: 2026
+    launchDate: "2026-08-01"
+  article:
+    list: { showTags: true }
+    math: true
+    toc: true
+    readingTime: true
+    license: { enabled: true, default: Licensed under CC BY-SA 4.0 }
+  comments:
+    enabled: false
+    provider: waline
+    waline:
+      serverURL: https://example.invalid/waline
+      demoMode: true
+  widgets:
+    homepage:
+      - { type: search }
+      - { type: recent-projects }
+      - type: archives
+        params: { limit: 5 }
+      - { type: resources }
+      - type: categories
+        params: { limit: 10 }
+      - type: tag-cloud
+        params: { limit: 10 }
+    page: [{ type: toc }]
+  defaultImage:
+    opengraph: { enabled: true, local: true, src: /img/liquid-stack/featured.png }
+  colorScheme: { toggle: true, default: auto }
+  imageProcessing:
+    thumbnail: { enabled: true }
+    content: { enabled: true }
+menu:
+  social:
+    - identifier: github
+      name: GitHub
+      url: "https://github.com/northernday"
+      weight: 1
+      params: { icon: brand-github, newTab: true }
+    - identifier: bilibili
+      name: Bilibili
+      url: "https://space.bilibili.com/1824409989"
+      weight: 2
+      params: { icon: brand-bilibili, newTab: true }
+    - identifier: email
+      name: Email
+      url: "mailto:xhx1234569@163.com"
+      weight: 3
+      params: { icon: mail, newTab: true }
+    - identifier: rss
+      name: RSS
+      url: /index.xml
+      weight: 4
+      params: { icon: rss, newTab: true }
+related:
+  includeNewer: true
+  threshold: 60
+  indices: [{ name: tags, weight: 100 }, { name: categories, weight: 200 }]
+markup:
+  goldmark:
+    renderer: { unsafe: true }
+  tableOfContents: { endLevel: 4, ordered: true, startLevel: 2 }
+  highlight: { noClasses: false, lineNos: true }
+outputs:
+  home: [HTML, RSS, sitemapflat]

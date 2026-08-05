@@ -1,0 +1,65 @@
+{{- $loaderParts := split (os.ReadFile "assets/admin/cms-config-base.yml") "__SINGLE_LANGUAGE_LOADERS__" -}}
+{{- $configParts := split (index $loaderParts 1) "__SINGLE_LANGUAGE_COLLECTION__" -}}
+{{ index $loaderParts 0 }}
+{{- /*
+Sveltia assigns each physical file to the first matching entry folder. These
+hidden, exact-path collections are emitted before the multilingual collection,
+so a Chinese-only index.zh.md is retained instead of being discarded for
+lacking the default English locale. The directory name is part of subPath,
+which also gives every entry a unique editor route.
+*/ -}}
+{{- range os.ReadDir "content/post" }}
+  {{- if and .IsDir (os.FileExists (printf "content/post/%s/index.zh.md" .Name)) (not (os.FileExists (printf "content/post/%s/index.md" .Name))) }}
+  - name: {{ printf "single_language_loader_%s" (replaceRE "[^a-z0-9_]" "_" (lower .Name)) }}
+    label: {{ printf "Single-language loader: %s" (.Name | humanize | title) | jsonify }}
+    folder: content/post
+    path: {{ .Name }}/index.zh
+    extension: md
+    format: {{ cond (hasPrefix (os.ReadFile (printf "content/post/%s/index.zh.md" .Name)) "+++") "toml-frontmatter" "yaml-frontmatter" }}
+    i18n: false
+    create: false
+    hide: true
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: URL slug, name: slug, widget: string, required: false }
+      - { label: Description, name: description, widget: text, required: false }
+      - { label: Published date, name: date, widget: datetime, required: false }
+      - { label: Cover image, name: image, widget: image, required: false }
+      - { label: Categories, name: categories, widget: list, required: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Article, name: body, widget: markdown }
+  {{- end }}
+{{- end }}
+
+{{ index $configParts 0 }}
+{{- $singleLanguagePosts := slice -}}
+{{- range os.ReadDir "content/post" }}
+  {{- if and .IsDir (os.FileExists (printf "content/post/%s/index.zh.md" .Name)) (not (os.FileExists (printf "content/post/%s/index.md" .Name))) }}
+    {{- $singleLanguagePosts = $singleLanguagePosts | append .Name -}}
+  {{- end }}
+{{- end }}
+{{- if gt (len $singleLanguagePosts) 0 }}
+  - name: single_language_posts
+    label: Create or edit single-language posts
+    label_singular: Single-language post
+    i18n: false
+    files:
+{{- range $singleLanguagePosts }}
+      - name: {{ printf "zh_%s" (replaceRE "[^a-z0-9_]" "_" (lower .)) }}
+        label: {{ . | humanize | title | jsonify }}
+        file: content/post/{{ . }}/index.zh.md
+        format: {{ cond (hasPrefix (os.ReadFile (printf "content/post/%s/index.zh.md" .)) "+++") "toml-frontmatter" "yaml-frontmatter" }}
+{{ os.ReadFile "assets/admin/single-language-fields.yml" }}
+{{- end }}
+{{- end }}
+
+{{ index $configParts 1 }}
+asset_collections:
+{{- range os.ReadDir "static/img" }}
+  {{- if .IsDir }}
+  - name: {{ printf "img_%s" (replaceRE "[^a-z0-9_]" "_" (lower .Name)) }}
+    label: {{ .Name | jsonify }}
+    media_folder: /static/img/{{ .Name }}
+    public_folder: /img/{{ .Name }}
+  {{- end }}
+{{- end }}

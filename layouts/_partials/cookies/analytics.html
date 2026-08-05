@@ -1,0 +1,49 @@
+{{- $clarityID := site.Params.analytics.clarity.id -}}
+{{- $gaID := site.Config.Services.GoogleAnalytics.ID -}}
+{{- if or $gaID $clarityID -}}
+<script>
+(function() {
+    var loaded = false;
+    var respectDNT = {{ site.Config.Privacy.GoogleAnalytics.RespectDoNotTrack }};
+
+    function doNotTrackEnabled() {
+        if (!respectDNT) return false;
+        var dnt = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+        return dnt == "1" || dnt == "yes";
+    }
+
+    function loadAnalytics() {
+        if (loaded || doNotTrackEnabled()) return;
+        loaded = true;
+
+        {{- with $gaID }}
+        var gaScript = document.createElement('script');
+        gaScript.async = true;
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id={{ . }}';
+        document.head.appendChild(gaScript);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ . }}');
+        {{- end }}
+
+        {{- with $clarityID }}
+        window.clarity = window.clarity || function(){(window.clarity.q = window.clarity.q || []).push(arguments);};
+        var clarityScript = document.createElement('script');
+        clarityScript.async = true;
+        clarityScript.src = 'https://www.clarity.ms/tag/{{ . }}';
+        document.head.appendChild(clarityScript);
+        {{- end }}
+    }
+
+    {{- if site.Params.cookies.enabled }}
+    window.addEventListener('onCookieConsentChange', function(e) {
+        if (e.detail && e.detail.analytics) loadAnalytics();
+    });
+    if (window.cookieConsent && window.cookieConsent.hasConsent('analytics')) loadAnalytics();
+    {{- else }}
+    loadAnalytics();
+    {{- end }}
+})();
+</script>
+{{- end -}}

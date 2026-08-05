@@ -1,0 +1,13 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+<title id="title">时光相册 · 个人摄影站点</title>
+<desc id="desc">Beitian · Web 开发</desc>
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0f4c5c"/><stop offset="1" stop-color="#5fbdb0"/></linearGradient></defs>
+<rect width="1200" height="630" fill="url(#bg)"/>
+<circle cx="1030" cy="100" r="190" fill="#fff" fill-opacity=".13"/>
+<circle cx="1120" cy="560" r="230" fill="#fff" fill-opacity=".09"/>
+<path d="M0 560C220 470 340 640 560 520s350-105 640 0v110H0z" fill="#fff" fill-opacity=".08"/>
+<text x="78" y="135" fill="#fff" fill-opacity=".82" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="30" letter-spacing="5">Beitian · Web 开发</text>
+<text x="80" y="310" fill="#fff" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="52" font-weight="800">时光相册 · 个人摄影站点</text>
+<text x="82" y="380" fill="#fff" fill-opacity=".92" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="26">用 Astro 搭建的静态摄影站</text>
+<text x="82" y="485" fill="#fff" fill-opacity=".84" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="28">内容路由 · 响应式画廊 · 深浅主题</text>
+</svg>

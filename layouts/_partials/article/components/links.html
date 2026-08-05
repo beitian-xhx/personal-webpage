@@ -1,0 +1,160 @@
+{{ with .Params.links }}
+    <section class="link-hub" aria-labelledby="link-hub-title">
+        {{ with $.Params.linkhub }}
+            <header class="link-hub__header">
+                {{ with .label }}<p class="link-hub__eyebrow">{{ . }}</p>{{ end }}
+                <h2 id="link-hub-title">{{ .title }}</h2>
+                {{ with .description }}<p>{{ . }}</p>{{ end }}
+            </header>
+        {{ end }}
+        <div class="article-list--compact links link-hub__platforms">
+            {{ range $link := . }}
+                <article>
+                    <a href="{{ $link.website }}" target="_blank" rel="noopener noreferrer">
+                        <div class="article-details">
+                            <h2 class="article-title">
+                                {{- $link.title -}}
+                            </h2>
+                            <footer class="article-meta">
+                                {{ with $link.description }}
+                                    {{ . }}
+                                {{ else }}
+                                    {{ $link.website }}
+                                {{ end }}
+                            </footer>
+                        </div>
+
+                        {{- $image := partial "helper/image" (dict "Image" $link.image "Resources" $.Resources "Context" $link) -}}
+                        {{- with $image -}}
+                            <div class="article-image">
+                                {{ partial "helper/thumbnail-image" (dict
+                                    "Resource" .Resource
+                                    "Width" 60
+                                    "Height" 60
+                                    "Resize" $.Site.Params.ImageProcessing.Thumbnail.Enabled
+                                    "Attributes" (dict
+                                        "src" $image.Permalink
+                                        "alt" $link.title
+                                        "loading" "lazy"
+                                        "width" .Width
+                                        "height" .Height
+                                    )
+                                ) }}
+                            </div>
+                        {{ end }}
+                    </a>
+                </article>
+            {{ end }}
+        </div>
+    </section>
+{{ end }}
+
+{{ with .Params.friendlinks }}
+    {{- $isChinese := hasPrefix $.Language.Lang "zh" -}}
+    {{- $friendItems := slice -}}
+    {{- with index hugo.Data "friend-links" -}}
+        {{- range . -}}
+            {{- $friendItems = $friendItems | append . -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $friendItems = sort $friendItems "order" -}}
+    <section class="friend-links" aria-labelledby="friend-links-title">
+        <header class="friend-links__header">
+            {{ with .label }}<p class="friend-links__eyebrow">{{ . }}</p>{{ end }}
+            <h2 id="friend-links-title">{{ .title }}</h2>
+            {{ with .description }}<p>{{ . }}</p>{{ end }}
+        </header>
+
+        {{ with $friendItems }}
+            <div class="friend-links__grid">
+                {{ range $friend := . }}
+                    {{- $parsedURL := urls.Parse $friend.website -}}
+                    {{- $host := strings.TrimPrefix "www." $parsedURL.Host -}}
+                    {{- $friendTitle := $friend.title -}}
+                    {{- $friendDescription := default "" $friend.description -}}
+                    {{- if $isChinese -}}
+                        {{- $friendTitle = default $friendTitle $friend.titleZh -}}
+                        {{- $friendDescription = default $friendDescription $friend.descriptionZh -}}
+                    {{- else -}}
+                        {{- $friendTitle = default $friendTitle $friend.titleEn -}}
+                        {{- $friendDescription = default $friendDescription $friend.descriptionEn -}}
+                    {{- end -}}
+                    <a class="friend-link-card" href="{{ $friend.website }}" target="_blank" rel="noopener noreferrer">
+                        <div class="friend-link-card__avatar">
+                            {{- with $friend.image -}}
+                                {{- $image := partial "helper/image" (dict "Image" . "Resources" $.Resources "Context" $friend) -}}
+                                {{- with $image -}}
+                                    {{ partial "helper/thumbnail-image" (dict
+                                        "Resource" .Resource
+                                        "Width" 68
+                                        "Height" 68
+                                        "Resize" $.Site.Params.ImageProcessing.Thumbnail.Enabled
+                                        "Attributes" (dict
+                                            "src" $image.Permalink
+                                            "alt" $friendTitle
+                                            "loading" "lazy"
+                                            "width" .Width
+                                            "height" .Height
+                                        )
+                                    ) }}
+                                {{- end -}}
+                            {{- else -}}
+                                {{ partial "helper/icon" "link" }}
+                            {{- end -}}
+                        </div>
+                        <div class="friend-link-card__copy">
+                            <h3>{{ $friendTitle }}</h3>
+                            {{ with $friendDescription }}<p>{{ . }}</p>{{ end }}
+                            <span>{{ default $friend.website $host }}</span>
+                        </div>
+                    </a>
+                {{ end }}
+            </div>
+        {{ end }}
+
+        <a class="friend-links__rules" href="{{ .rulesURL | relLangURL }}">
+            <span class="friend-links__rules-kicker">{{ .rulesPrompt }}</span>
+            <span class="friend-links__rules-copy">
+                <strong>{{ .rulesTitle }}</strong>
+                <span>{{ .rulesDescription }}</span>
+            </span>
+            <span class="friend-links__rules-cta">{{ .rulesCTA }}</span>
+        </a>
+
+        <div class="friend-links__empty friend-links__request">
+            <span class="friend-links__mark" aria-hidden="true">{{ partial "helper/icon" "link" }}</span>
+            <span class="friend-links__empty-copy">
+                <strong>{{ default .emptyTitle .requestTitle }}</strong>
+                <span>{{ default .emptyDescription .requestDescription }}</span>
+            </span>
+            <span class="friend-links__actions">
+                <a class="friend-links__cta" href="{{ .ctaURL }}" target="_blank" rel="noopener noreferrer">{{ .cta }}</a>
+                <a class="friend-links__cta friend-links__cta--secondary" href="{{ .emailURL }}" target="_blank" rel="noopener noreferrer">{{ .emailCTA }}</a>
+            </span>
+        </div>
+
+        {{ with .applicationURL }}
+            <section id="friend-link-application" class="friend-links__application" aria-labelledby="friend-link-application-title">
+                <header>
+                    <h3 id="friend-link-application-title">{{ $.Params.friendlinks.applicationTitle }}</h3>
+                    {{ with $.Params.friendlinks.applicationDescription }}<p>{{ . }}</p>{{ end }}
+                </header>
+                <iframe
+                    src="{{ . }}"
+                    title="{{ $.Params.friendlinks.applicationTitle }}"
+                    width="640"
+                    height="760"
+                    frameborder="0"
+                    marginwidth="0"
+                    marginheight="0"
+                    loading="lazy"
+                    allowfullscreen
+                    webkitallowfullscreen
+                    mozallowfullscreen
+                    msallowfullscreen>
+                </iframe>
+            </section>
+        {{ end }}
+    </section>
+    <span id="friend-link-comments" class="friend-links__comment-anchor" aria-hidden="true"></span>
+{{ end }}

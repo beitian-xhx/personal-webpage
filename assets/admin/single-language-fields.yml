@@ -1,0 +1,27 @@
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: URL slug, name: slug, widget: string, required: false }
+          - { label: Description, name: description, widget: text, required: false }
+          - { label: Published date, name: date, widget: datetime, required: false }
+          - { label: Cover image, name: image, widget: image, required: false }
+          - label: Categories
+            name: categories
+            widget: relation
+            required: false
+            collection: taxonomies
+            file: categories
+            multiple: true
+            value_field: '{{categories.*.name}}'
+            display_fields: ['{{categories.*.name}}']
+            search_fields: ['{{categories.*.name}}']
+          - label: Tags
+            name: tags
+            widget: relation
+            required: false
+            collection: taxonomies
+            file: tags
+            multiple: true
+            value_field: '{{tags.*.name}}'
+            display_fields: ['{{tags.*.name}}']
+            search_fields: ['{{tags.*.name}}']
+          - { label: Article, name: body, widget: markdown }

@@ -1,0 +1,169 @@
+{{- with .Site.Params.comments.waline -}}
+    {{- $isChinese := hasPrefix $.Language.Lang "zh" -}}
+    {{- $demoMode := default false .demoMode -}}
+    {{- $serverResolver := resources.Get "js/waline-server.js" | minify | fingerprint -}}
+    <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+    <section class="waline-container">
+        <aside class="waline-comments-notice" aria-labelledby="comments-notice-title">
+            <div>
+                <h3 id="comments-notice-title">{{ cond $isChinese "评论须知" "Before commenting" }}</h3>
+                <p>
+                    {{ if $demoMode }}
+                        {{ cond $isChinese
+                            "此网页为演示，没有连接后端数据库，仅供展示。评论不会被本站记录，请勿填写真实邮箱或其他敏感信息。"
+                            "This page is a demonstration without a backend database. Comments are shown for preview only and are not recorded by this site. Do not enter a real email address or other sensitive information."
+                        }}
+                    {{ else }}
+                        {{ cond $isChinese
+                            "本站支持访客评论。如果您希望获得评论回复通知，可以填写您的邮箱，收到回复时系统会自动发送通知。"
+                            "Guest comments are welcome. Add your email address if you would like to receive an automatic notification when someone replies."
+                        }}
+                    {{ end }}
+                </p>
+            </div>
+            <div class="waline-comments-stats" aria-label="{{ cond $isChinese "文章互动统计" "Article engagement statistics" }}">
+                <span title="{{ cond $isChinese "浏览量" "Page views" }}">
+                    {{ partial "helper/icon" "eye" }}
+                    <span class="waline-pageview-count" data-path="{{ $.RelPermalink }}">{{ if $demoMode }}128{{ else }}—{{ end }}</span>
+                </span>
+                <span title="{{ cond $isChinese "评论数" "Comments" }}">
+                    {{ partial "helper/icon" "messages" }}
+                    <span class="waline-comment-count" data-path="{{ $.RelPermalink }}">{{ if $demoMode }}4{{ else }}—{{ end }}</span>
+                </span>
+            </div>
+        </aside>
+        {{ if $demoMode }}
+            <div id="waline-comments-root" aria-label="{{ cond $isChinese "演示评论区" "Demo comments" }}">
+                <div data-waline>
+                    <div class="wl-reaction">
+                        <div class="wl-reaction-title">{{ cond $isChinese "这篇文章对你有帮助吗？" "Was this article helpful?" }}</div>
+                        <ul class="wl-reaction-list">
+                            <li class="wl-reaction-item"><div class="wl-reaction-img"><img src="https://unpkg.com/@waline/emojis@1.4.0/tw-emoji/1f60d.png" alt="{{ cond $isChinese "喜欢" "Love it" }}"><div class="wl-reaction-votes">6</div></div><div class="wl-reaction-text">{{ cond $isChinese "喜欢" "Love it" }}</div></li>
+                            <li class="wl-reaction-item"><div class="wl-reaction-img"><img src="https://unpkg.com/@waline/emojis@1.4.0/tw-emoji/1f602.png" alt="{{ cond $isChinese "好笑" "Funny" }}"><div class="wl-reaction-votes">2</div></div><div class="wl-reaction-text">{{ cond $isChinese "好笑" "Funny" }}</div></li>
+                            <li class="wl-reaction-item"><div class="wl-reaction-img"><img src="https://unpkg.com/@waline/emojis@1.4.0/tw-emoji/1f914.png" alt="{{ cond $isChinese "思考" "Thought-provoking" }}"><div class="wl-reaction-votes">4</div></div><div class="wl-reaction-text">{{ cond $isChinese "思考" "Thought-provoking" }}</div></li>
+                            <li class="wl-reaction-item"><div class="wl-reaction-img"><img src="https://unpkg.com/@waline/emojis@1.4.0/tw-emoji/1f62e.png" alt="{{ cond $isChinese "惊讶" "Surprising" }}"><div class="wl-reaction-votes">1</div></div><div class="wl-reaction-text">{{ cond $isChinese "惊讶" "Surprising" }}</div></li>
+                            <li class="wl-reaction-item"><div class="wl-reaction-img"><img src="https://unpkg.com/@waline/emojis@1.4.0/tw-emoji/1f622.png" alt="{{ cond $isChinese "难过" "Sad" }}"><div class="wl-reaction-votes">0</div></div><div class="wl-reaction-text">{{ cond $isChinese "难过" "Sad" }}</div></li>
+                        </ul>
+                    </div>
+                    <div class="wl-comment">
+                        <div class="wl-panel">
+                            <div class="wl-header item3">
+                                <div class="wl-header-item"><label for="wl-demo-nick">{{ cond $isChinese "昵称" "NickName" }}</label><input id="wl-demo-nick" class="wl-input wl-nick" name="nick" type="text" readonly></div>
+                                <div class="wl-header-item"><label for="wl-demo-mail">{{ cond $isChinese "邮箱" "E-Mail" }}</label><input id="wl-demo-mail" class="wl-input wl-mail" name="mail" type="email" readonly></div>
+                                <div class="wl-header-item"><label for="wl-demo-link">{{ cond $isChinese "网址" "Website" }}</label><input id="wl-demo-link" class="wl-input wl-link" name="link" type="text" readonly></div>
+                            </div>
+                            <textarea class="wl-editor" readonly placeholder="{{ cond $isChinese "在此输入评论..." "Comment here..." }}"></textarea>
+                            <div class="wl-footer">
+                                <div class="wl-actions">
+                                    <a href="https://guides.github.com/features/mastering-markdown/" title="Markdown Guide" aria-label="{{ cond $isChinese "支持 Markdown" "Markdown is supported" }}" class="wl-action" target="_blank" rel="noopener noreferrer"></a>
+                                    <button type="button" class="wl-action" title="{{ cond $isChinese "表情" "Emoji" }}" aria-disabled="true"></button>
+                                    <label class="wl-action" title="{{ cond $isChinese "上传图片" "Upload Image" }}" aria-label="{{ cond $isChinese "上传图片" "Upload Image" }}"></label>
+                                    <button type="button" class="wl-action" title="{{ cond $isChinese "预览" "Preview" }}" aria-disabled="true"></button>
+                                </div>
+                                <div class="wl-info">
+                                    <div class="wl-text-number">0 &nbsp;{{ cond $isChinese "字" "Words" }}</div>
+                                    <button type="button" class="wl-btn" aria-disabled="true">{{ cond $isChinese "登录" "Login" }}</button>
+                                    <button type="button" class="primary wl-btn" aria-disabled="true">{{ cond $isChinese "提交" "Submit" }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wl-meta-head">
+                        <div class="wl-count"><span class="wl-num">4</span> {{ cond $isChinese "评论" "Comments" }}</div>
+                        <ul class="wl-sort"><li class="active">{{ cond $isChinese "按正序" "Latest" }}</li><li>{{ cond $isChinese "按倒序" "Oldest" }}</li><li>{{ cond $isChinese "按热度" "Hottest" }}</li></ul>
+                    </div>
+                    <div class="wl-cards">
+                        {{ partial "comments/demo-comment" (dict
+                            "name" "Alex"
+                            "time" (cond $isChinese "2 天前" "2 days ago")
+                            "content" (cond $isChinese "主页小组件很完整，替换示例内容后就可以直接使用。" "The homepage widgets feel complete and are ready once the sample content is replaced.")
+                            "likes" 6
+                            "isChinese" $isChinese
+                            "children" (slice
+                                (dict "name" "Liquid Stack" "time" (cond $isChinese "2 天前" "2 days ago") "content" (cond $isChinese "谢谢体验。示例内容、图片和链接都可以按自己的需要替换。" "Thanks for trying it. The sample content, images, and links can all be replaced.") "likes" 4 "isChinese" $isChinese "replyTo" "Alex" "isAuthor" true)
+                                (dict "name" "Momo" "time" (cond $isChinese "1 天前" "1 day ago") "content" (cond $isChinese "中英文页面切换很自然，文章与页面结构也保持一致。" "Switching between English and Chinese is smooth, and the page structure stays consistent.") "likes" 2 "isChinese" $isChinese "replyTo" "Liquid Stack")
+                                (dict "name" "Liquid Stack" "time" (cond $isChinese "刚刚" "Just now") "content" (cond $isChinese "评论、友链和管理后台都保留了完整入口，接入自己的服务后即可使用。" "Comments, backlinks, and the CMS keep their complete entry points and work after connecting your own services.") "likes" 8 "isChinese" $isChinese "replyTo" "Momo" "isAuthor" true)
+                            )
+                        ) }}
+                    </div>
+                    <div class="wl-meta-foot"><div class="wl-power">Powered by <a href="https://github.com/walinejs/waline" target="_blank" rel="noopener noreferrer">Waline</a></div></div>
+                </div>
+            </div>
+        {{ else }}
+            <div id="waline-comments-root"></div>
+            <template id="waline-rss-icon-template">{{ partial "helper/icon" "rss" }}</template>
+        {{ end }}
+    </section>
+    {{ if not $demoMode }}
+    <script type="module">
+        import { init, pageviewCount } from "https://unpkg.com/@waline/client@v3/dist/waline.js";
+        import { resolveWalineServerURL } from "{{ $serverResolver.RelPermalink }}";
+
+        const serverURL = await resolveWalineServerURL({
+            primaryURL: {{ .serverURL | jsonify | safeJS }},
+            fallbackURL: {{ .fallbackServerURL | jsonify | safeJS }},
+            timeoutMs: {{ default 2500 .serverProbeTimeout }},
+        });
+
+        init({
+            el: "#waline-comments-root",
+            serverURL,
+            dark: 'html[data-scheme="dark"]',
+            lang: {{ cond $isChinese "zh-CN" "en-US" | jsonify | safeJS }},
+            pageview: false,
+            comment: {{ default false .comment }},
+            reaction: {{ default false .reaction | jsonify | safeJS }},
+            {{- with .emoji }}
+            emoji: {{ . | jsonify | safeJS }},
+            {{- end }}
+            locale: {
+                reactionTitle: {{ cond $isChinese "这篇文章对你有帮助吗？" "Was this article helpful?" | jsonify | safeJS }},
+                reaction0: {{ cond $isChinese "喜欢" "Love it" | jsonify | safeJS }},
+                reaction1: {{ cond $isChinese "好笑" "Funny" | jsonify | safeJS }},
+                reaction2: {{ cond $isChinese "思考" "Thought-provoking" | jsonify | safeJS }},
+                reaction3: {{ cond $isChinese "惊讶" "Surprising" | jsonify | safeJS }},
+                reaction4: {{ cond $isChinese "难过" "Sad" | jsonify | safeJS }},
+            },
+        });
+
+        const walineRoot = document.querySelector("#waline-comments-root");
+        const rssIconTemplate = document.querySelector("#waline-rss-icon-template");
+        const enhanceWalineComments = () => {
+            if (!(walineRoot instanceof HTMLElement) || !(rssIconTemplate instanceof HTMLTemplateElement)) return;
+
+            walineRoot.querySelectorAll(".wl-meta-foot .wl-rss a").forEach((link) => {
+                if (link.dataset.siteRssIcon === "true") return;
+
+                const currentIcon = link.querySelector("svg");
+                const siteIcon = rssIconTemplate.content.firstElementChild?.cloneNode(true);
+                if (currentIcon && siteIcon instanceof Element) {
+                    currentIcon.replaceWith(siteIcon);
+                    link.dataset.siteRssIcon = "true";
+                }
+            });
+
+            walineRoot.querySelectorAll(".wl-card").forEach((card) => {
+                const head = Array.from(card.children).find((child) => child.classList.contains("wl-head"));
+                const adminActions = Array.from(card.children).find((child) => child.classList.contains("wl-admin-actions"));
+                const time = head?.querySelector(":scope > .wl-time");
+
+                if (head && adminActions && time) {
+                    time.insertAdjacentElement("afterend", adminActions);
+                }
+            });
+        };
+
+        if (walineRoot) {
+            new MutationObserver(enhanceWalineComments).observe(walineRoot, { childList: true, subtree: true });
+            enhanceWalineComments();
+        }
+
+        pageviewCount({
+            serverURL,
+            path: {{ $.RelPermalink | jsonify | safeJS }},
+            selector: ".waline-pageview-count",
+            update: false,
+        });
+    </script>
+    {{ end }}
+{{- end -}}

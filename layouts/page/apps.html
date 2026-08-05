@@ -1,0 +1,86 @@
+{{ define "body-class" }}article-page apps-page{{ end }}
+
+{{ define "main" }}
+    {{ $isChinese := hasPrefix .Language.Lang "zh" }}
+    {{ $apps := slice }}
+    {{ with hugo.Data.launchpad }}
+        {{ range . }}
+            {{ $apps = $apps | append . }}
+        {{ end }}
+    {{ end }}
+    {{ $apps = sort $apps "order" }}
+
+    <article class="main-article apps-article">
+        <section class="apps-launchpad" data-app-launchpad aria-label="{{ .Title }}">
+            <p class="apps-launchpad__demo-note" aria-hidden="true">{{ cond $isChinese "在线工具与网站入口，请自行核对服务条款和隐私政策" "Online tools and websites — check each service's terms and privacy policy" }}</p>
+            {{ if gt (len $apps) 0 }}
+                <div class="apps-launchpad__grid">
+                    {{ range $apps }}
+                        {{ $name := .name }}
+                        {{ $label := default .name .label }}
+                        {{ $screenshotAlt := default .name .screenshotAlt }}
+                        {{ $articleURL := default "" .article }}
+                        {{ if $isChinese }}
+                            {{ $name = default $name .nameZh }}
+                            {{ $label = default $label .labelZh }}
+                            {{ $screenshotAlt = default $screenshotAlt .screenshotAltZh }}
+                            {{ $articleURL = default $articleURL .articleZh }}
+                        {{ end }}
+                        <button
+                            class="launchpad-app"
+                            type="button"
+                            aria-haspopup="dialog"
+                            aria-label="{{ printf (cond $isChinese "预览 %s" "Preview %s") $name }}"
+                            data-launchpad-app
+                            data-app-title="{{ $name }}"
+                            data-app-screenshot="{{ relURL .screenshot }}"
+                            data-app-screenshot-alt="{{ $screenshotAlt }}"
+                            data-app-close-x="{{ default 7.4 .closeX }}"
+                            data-app-close-y="{{ default 7.0 .closeY }}"
+                            data-app-article="{{ $articleURL }}"
+                        >
+                            <span class="launchpad-app__icon launchpad-app__icon--{{ default "app" .iconMode }}" aria-hidden="true">
+                                <img src="{{ relURL .icon }}" alt="" width="512" height="512" loading="eager">
+                            </span>
+                            <span class="launchpad-app__label">{{ $label }}</span>
+                        </button>
+                    {{ end }}
+                </div>
+            {{ else }}
+                <p class="apps-launchpad__empty">{{ cond $isChinese "还没有添加应用。" "No apps have been added yet." }}</p>
+            {{ end }}
+        </section>
+    </article>
+
+    {{ if gt (len $apps) 0 }}
+        <div class="app-preview" data-app-preview hidden>
+            <div class="app-preview__backdrop" data-app-preview-dismiss></div>
+            <figure
+                class="app-preview__image"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="app-preview-title"
+                data-app-preview-image
+            >
+                <figcaption id="app-preview-title" class="app-preview__title" data-app-preview-title>
+                    {{ cond $isChinese "应用预览" "App preview" }}
+                </figcaption>
+                <img alt="" data-app-preview-screenshot>
+                <button
+                    class="app-preview__close"
+                    type="button"
+                    aria-label="{{ cond $isChinese "关闭应用预览" "Close app preview" }}"
+                    title="{{ cond $isChinese "关闭" "Close" }}"
+                    data-app-preview-close
+                ></button>
+                <a class="app-preview__article" href="/" data-app-preview-article>
+                    {{ cond $isChinese "打开资源" "Open resource" }}
+                </a>
+            </figure>
+        </div>
+    {{ end }}
+
+    {{ partial "footer/footer" . }}
+{{ end }}
+
+{{ define "right-sidebar" }}{{ end }}

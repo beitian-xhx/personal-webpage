@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#34495e" />
+    <link href="config.yml" type="text/yaml" rel="cms-config-url" />
+    <link rel="icon" type="image/png" href="site-logo.png" />
+    <title>我的名字 · 个人网站 CMS</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: Inter, ui-rounded, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+        background: #f5f5fa;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #f5f5fa;
+      }
+
+      .cms-access-notice {
+        position: fixed;
+        z-index: 10;
+        right: 24px;
+        bottom: 24px;
+        margin: 0;
+        max-width: min(440px, calc(100vw - 48px));
+        padding: 12px 16px;
+        border: 1px solid rgba(52, 73, 94, 0.16);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #34495e;
+        font-size: 14px;
+        line-height: 1.55;
+        text-align: center;
+        box-shadow: 0 12px 30px rgba(30, 38, 51, 0.1);
+        backdrop-filter: blur(14px);
+      }
+
+      .cms-access-notice__chinese {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.92em;
+        opacity: 0.82;
+      }
+
+      #nc-root,
+      #nc-root > .sui.app-shell {
+        --sui-primary-accent-color: #34495e;
+        --sui-primary-accent-color-text: #34495e;
+        --sui-primary-accent-color-inverted: #ffffff;
+        --sui-primary-background-color: #ffffff;
+        --sui-secondary-background-color: #f5f5fa;
+        --sui-tertiary-background-color: #ffffff;
+        --sui-hover-background-color: #e9eef2;
+        --sui-selected-background-color: #dce4e9;
+        --sui-checkbox-border-radius: 50%;
+        --sui-checkbox-height: 24px;
+        --sui-control-small-border-radius: 999px;
+        --sui-control-medium-border-radius: 18px;
+        --sui-control-large-border-radius: 28px;
+        --sui-button-small-border-radius: 999px;
+        --sui-button-medium-border-radius: 999px;
+        --sui-button-large-border-radius: 999px;
+        font-family: Inter, ui-rounded, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      }
+
+      #nc-root .sui.checkbox .button[role="checkbox"] {
+        width: var(--sui-checkbox-height);
+        min-width: var(--sui-checkbox-height);
+        height: var(--sui-checkbox-height);
+        min-height: var(--sui-checkbox-height);
+        border-radius: 50%;
+        box-shadow: none;
+        transform: none;
+        aspect-ratio: 1;
+      }
+
+      #nc-root .button:not([role="checkbox"]) {
+        min-height: 48px;
+        font-weight: 700;
+        box-shadow: 0 12px 30px rgba(30, 38, 51, 0.08);
+        transition: transform 160ms ease, box-shadow 160ms ease;
+      }
+
+      #nc-root .button:not([role="checkbox"]):hover,
+      #nc-root .button:not([role="checkbox"]):focus-visible {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 34px rgba(30, 38, 51, 0.12);
+      }
+
+      #nc-root img.logo {
+        filter: drop-shadow(0 18px 24px rgba(30, 38, 51, 0.12));
+      }
+
+      #nc-root :has(> h1) > img.logo {
+        width: 280px;
+        height: 280px;
+      }
+
+      #nc-root :has(> img.logo) > h1 {
+        font-size: 42px;
+      }
+
+      #nc-root :has(> h1) .buttons > .button {
+        width: min(600px, calc(100vw - 48px));
+        min-height: 62px;
+        font-size: 18px;
+      }
+
+      :root[data-theme="dark"],
+      :root[data-theme="dark"] body {
+        background: #303030;
+      }
+
+      :root[data-theme="dark"] .cms-access-notice {
+        border-color: rgba(174, 191, 201, 0.18);
+        background: rgba(54, 54, 54, 0.9);
+        color: #d9e1e5;
+      }
+
+      :root[data-theme="dark"] #nc-root,
+      :root[data-theme="dark"] #nc-root > .sui.app-shell {
+        --sui-primary-accent-color: #34495e;
+        --sui-primary-accent-color-text: #aebfc9;
+        --sui-primary-accent-color-inverted: #ffffff;
+        --sui-primary-background-color: #363636;
+        --sui-secondary-background-color: #303030;
+        --sui-tertiary-background-color: #3c3c3c;
+        --sui-hover-background-color: #3d4850;
+        --sui-selected-background-color: #34495e;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]),
+        :root:not([data-theme]) body {
+          background: #303030;
+        }
+
+        :root:not([data-theme]) #nc-root,
+        :root:not([data-theme]) #nc-root > .sui.app-shell {
+          --sui-primary-accent-color: #34495e;
+          --sui-primary-accent-color-text: #aebfc9;
+          --sui-primary-accent-color-inverted: #ffffff;
+          --sui-primary-background-color: #363636;
+          --sui-secondary-background-color: #303030;
+          --sui-tertiary-background-color: #3c3c3c;
+          --sui-hover-background-color: #3d4850;
+          --sui-selected-background-color: #34495e;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .cms-access-notice {
+          right: 16px;
+          bottom: 16px;
+          max-width: calc(100vw - 32px);
+          box-sizing: border-box;
+        }
+
+        #nc-root :has(> h1) > img.logo {
+          width: 152px;
+          height: 152px;
+        }
+
+        #nc-root :has(> img.logo) > h1 {
+          font-size: 30px;
+        }
+
+        #nc-root :has(> h1) .buttons > .button {
+          min-height: 52px;
+          font-size: 16px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #nc-root .button:not([role="checkbox"]) {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <p class="cms-access-notice" role="note">
+      Sign in with a GitHub personal access token from an account that can write to this site's repository. The token is entered only in this browser; saving commits directly to main triggers the Pages deployment workflow.
+      <span class="cms-access-notice__chinese" lang="zh-Hans">请使用对本站仓库有写入权限的 GitHub 个人访问令牌登录。令牌只输入到当前浏览器；保存会直接提交到 main，并触发 Pages 部署流程。</span>
+    </p>
+    <div id="nc-root"></div>
+    <script>
+      (() => {
+        const bilingualEntryPrefix = "#/collections/posts/entries/";
+        const accessNotice = document.querySelector(".cms-access-notice");
+
+        const updateAccessNotice = () => {
+          accessNotice.hidden = window.location.hash.startsWith("#/");
+        };
+
+        const openSingleLanguageEditor = () => {
+          if (!window.location.hash.startsWith(bilingualEntryPrefix)) return;
+
+          const entryPath = decodeURIComponent(window.location.hash.slice(bilingualEntryPrefix.length));
+          const match = entryPath.match(/^([^/]+)\/index\.zh$/);
+          if (!match) return;
+
+          const entryName = `zh_${match[1].toLowerCase().replace(/[^a-z0-9_]/g, "_")}`;
+          window.location.replace(`#/collections/single_language_posts/entries/${entryName}`);
+        };
+
+        window.addEventListener("hashchange", () => {
+          updateAccessNotice();
+          openSingleLanguageEditor();
+        });
+        updateAccessNotice();
+        openSingleLanguageEditor();
+      })();
+    </script>
+    <script data-cfasync="false" src="https://unpkg.com/@sveltia/cms@0.174.0/dist/sveltia-cms.js"></script>
+  </body>
+</html>

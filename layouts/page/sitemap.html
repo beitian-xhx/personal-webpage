@@ -1,0 +1,73 @@
+{{ define "body-class" }}article-page sitemap-page{{ end }}
+
+{{ define "main" }}
+    {{- $isChinese := hasPrefix .Language.Lang "zh" -}}
+    {{- $excludedLayouts := slice "search" "archives" "sitemap" -}}
+    {{- $articles := where .Site.RegularPages "Section" "post" -}}
+    {{- $standalonePages := where .Site.RegularPages "Section" "page" -}}
+
+    <article class="main-article sitemap-article">
+        {{ partial "article/components/header" (dict "Page" . "IsList" false) }}
+
+        <section class="article-content sitemap-content" aria-label="{{ cond $isChinese "网站目录" "Site directory" }}">
+            <nav class="sitemap-introduction" aria-label="{{ cond $isChinese "主要页面" "Primary pages" }}">
+                <h2>{{ cond $isChinese "主要页面" "Primary pages" }}</h2>
+                <ul>
+                    <li><a href="{{ .Site.Home.RelPermalink }}">{{ cond $isChinese "首页" "Homepage" }}</a></li>
+                </ul>
+            </nav>
+
+            <section class="sitemap-section" aria-labelledby="sitemap-categories">
+                <h2 id="sitemap-categories">{{ cond $isChinese "分类" "Categories" }}</h2>
+                {{ range .Site.Taxonomies.categories.Alphabetical }}
+                    <section class="sitemap-category" aria-labelledby="sitemap-category-{{ .Page.Data.Term | urlize }}">
+                        <h3 id="sitemap-category-{{ .Page.Data.Term | urlize }}"><a href="{{ .Page.RelPermalink }}">{{ .Page.LinkTitle }}</a></h3>
+                        <ul class="sitemap-list">
+                            {{ range .Pages.ByDate.Reverse }}
+                                <li>
+                                    <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+                                    <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "2006-01-02" }}</time>
+                                </li>
+                            {{ end }}
+                        </ul>
+                    </section>
+                {{ end }}
+
+                {{ $uncategorized := slice }}
+                {{ range $articles }}
+                    {{ if not .Params.categories }}
+                        {{ $uncategorized = $uncategorized | append . }}
+                    {{ end }}
+                {{ end }}
+                {{ with $uncategorized }}
+                    <section class="sitemap-category" aria-labelledby="sitemap-category-uncategorized">
+                        <h3 id="sitemap-category-uncategorized">{{ cond $isChinese "未分类" "Uncategorized" }}</h3>
+                        <ul class="sitemap-list">
+                            {{ range .ByDate.Reverse }}
+                                <li>
+                                    <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+                                    <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "2006-01-02" }}</time>
+                                </li>
+                            {{ end }}
+                        </ul>
+                    </section>
+                {{ end }}
+            </section>
+
+            <section class="sitemap-section" aria-labelledby="sitemap-pages">
+                <h2 id="sitemap-pages">{{ cond $isChinese "重要页面" "Important pages" }}</h2>
+                <ul class="sitemap-list">
+                    {{ range $standalonePages.ByTitle }}
+                        {{ if and (ne .RelPermalink $.RelPermalink) (not (in $excludedLayouts .Layout)) }}
+                            <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
+                        {{ end }}
+                    {{ end }}
+                </ul>
+            </section>
+        </section>
+    </article>
+
+    {{ partial "footer/footer" . }}
+{{ end }}
+
+{{ define "right-sidebar" }}{{ end }}

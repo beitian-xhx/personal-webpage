@@ -1,0 +1,41 @@
+{{- $commentsEnabled := default false .Site.Params.comments.enabled -}}
+
+<footer class="site-footer">
+    <section class="copyright">
+        &copy;
+        {{ if and (.Site.Params.footer.since) (ne .Site.Params.footer.since (int (now.Format "2006"))) }}
+            {{ .Site.Params.footer.since }} -
+        {{ end }}
+        {{ now.Format "2006" }} {{ default .Site.Title .Site.Copyright }}
+    </section>
+
+    <section class="powerby">
+        <a href="{{ "privacy-policy/" | relLangURL }}">{{ cond (hasPrefix .Site.Language.Lang "zh") "隐私政策" "Privacy Policy" }}</a>
+        <span aria-hidden="true"> · </span>
+        {{ with .Site.GetPage "page" "sitemap" }}<a href="{{ .RelPermalink }}">{{ cond (hasPrefix $.Site.Language.Lang "zh") "网站地图" "Sitemap" }}</a>{{ end }}
+        <span aria-hidden="true"> · </span>
+        {{ with .Site.GetPage "page" "dashboard" }}<a href="{{ .RelPermalink }}">{{ cond (hasPrefix $.Site.Language.Lang "zh") "仪表盘" "Dashboard" }}</a>{{ end }}
+        {{- if ne .Kind "404" -}}
+            {{- if and .IsHome $commentsEnabled }}
+                <br>
+                <span class="waline-site-pageview-count" aria-live="polite">{{ cond (hasPrefix .Site.Language.Lang "zh") "全站浏览：—" "Site views: —" }}</span>
+            {{- end }}
+        {{- end }}
+        <br>
+        <span>
+            {{ if hasPrefix .Site.Language.Lang "zh" }}
+                使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 · 主题 <a href="https://github.com/Jingyuan-Zheng/Liquid-Stack" target="_blank" rel="noopener"><strong>Liquid Stack</strong></a> 由 <a href="https://github.com/Jingyuan-Zheng" target="_blank" rel="noopener">Jingyuan Zheng</a> 设计
+            {{ else }}
+                Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> · Theme <a href="https://github.com/Jingyuan-Zheng/Liquid-Stack" target="_blank" rel="noopener"><strong>Liquid Stack</strong></a> designed by <a href="https://github.com/Jingyuan-Zheng" target="_blank" rel="noopener">Jingyuan Zheng</a>
+            {{ end }}
+        </span>
+        {{ with .Site.Params.footer.launchDate }}
+            <br>
+            <small class="site-runtime">
+                {{ cond (hasPrefix $.Site.Language.Lang "zh") "本站已运行" "Online for" }}
+                <strong data-site-runtime data-launch-date="{{ . }}">0</strong>
+                {{ cond (hasPrefix $.Site.Language.Lang "zh") "天" "days" }}
+            </small>
+        {{ end }}
+    </section>
+</footer>

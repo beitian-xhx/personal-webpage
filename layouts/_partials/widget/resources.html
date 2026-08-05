@@ -1,0 +1,30 @@
+﻿{{- $resources := .Context.Site.Data.resources -}}
+{{- if $resources -}}
+    <section class="widget resources">
+        <div class="widget-icon">
+            {{ partial "helper/icon" "link" }}
+        </div>
+        <h2 class="widget-title section-title">资源导航</h2>
+        <ul class="resources-list">
+            {{ range $resources }}
+                {{- $domain := "" -}}
+                {{- with (urls.Parse .url) }}{{ $domain = .Host }}{{ end -}}
+                {{- $initial := upper (substr .name 0 1) -}}
+                {{- $icon := default "" .icon -}}
+                <li>
+                    <a href="{{ .url }}" target="_blank" rel="noopener" title="{{ .name }}">
+                        <span class="resources-list__icon" data-initial="{{ $initial }}">
+                            {{- if $icon -}}
+                                <img src="{{ $icon }}" alt="" loading="lazy">
+                            {{- else -}}
+                                <img src="https://icons.duckduckgo.com/ip3/{{ $domain }}.ico" alt="" loading="lazy"
+                                    onerror="this.closest('.resources-list__icon').classList.add('is-fallback');">
+                            {{- end -}}
+                        </span>
+                        <span class="resources-list__name">{{ .name }}</span>
+                    </a>
+                </li>
+            {{ end }}
+        </ul>
+    </section>
+{{- end -}}

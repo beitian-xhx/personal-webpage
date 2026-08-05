@@ -1,0 +1,75 @@
+{{- $name := . -}}
+{{- $hugomodsIcons := dict
+    "brand-bilibili" (dict "vendor" "simple-icons" "name" "bilibili")
+    "brand-douyin" (dict "vendor" "simple-icons" "name" "tiktok")
+    "brand-bing" (dict "vendor" "simple-icons" "name" "bing")
+    "brand-cloudflare" (dict "vendor" "simple-icons" "name" "cloudflare")
+    "brand-github" (dict "vendor" "simple-icons" "name" "github")
+    "brand-google-analytics" (dict "vendor" "simple-icons" "name" "googleanalytics")
+    "brand-google-search-console" (dict "vendor" "simple-icons" "name" "googlesearchconsole")
+    "brand-linkedin" (dict "vendor" "simple-icons" "name" "linkedin")
+    "brand-neon" (dict "vendor" "simple-icons" "name" "neon")
+    "brand-qq" (dict "vendor" "simple-icons" "name" "tencentqq")
+    "brand-reddit" (dict "vendor" "simple-icons" "name" "reddit")
+    "brand-weibo" (dict "vendor" "simple-icons" "name" "sinaweibo")
+    "brand-whatsapp" (dict "vendor" "simple-icons" "name" "whatsapp")
+    "brand-vercel" (dict "vendor" "simple-icons" "name" "vercel")
+    "brand-x" (dict "vendor" "simple-icons" "name" "x")
+    "brand-xiaohongshu" (dict "vendor" "simple-icons" "name" "xiaohongshu")
+    "brand-youtube" (dict "vendor" "simple-icons" "name" "youtube")
+    "travellings-rocket" (dict "vendor" "phosphor" "name" "rocket-launch-fill")
+    "articles" (dict "vendor" "lucide" "name" "files")
+    "calendar" (dict "vendor" "lucide-inline" "name" "calendar-days")
+    "chart" (dict "vendor" "lucide" "name" "chart-no-axes-combined")
+    "clock" (dict "vendor" "lucide-inline" "name" "clock-3")
+    "code" (dict "vendor" "lucide" "name" "code-2")
+    "dashboard" (dict "vendor" "lucide-inline" "name" "layout-dashboard")
+    "database" (dict "vendor" "lucide" "name" "database")
+    "date" (dict "vendor" "lucide-inline" "name" "calendar-days")
+    "eye" (dict "vendor" "lucide" "name" "eye")
+    "heatmap" (dict "vendor" "lucide" "name" "calendar-range")
+    "history" (dict "vendor" "lucide" "name" "history")
+    "home" (dict "vendor" "lucide-inline" "name" "house")
+    "info" (dict "vendor" "lucide" "name" "info")
+    "folder-bookmark" (dict "vendor" "lucide-inline" "name" "folder-bookmark")
+    "hash" (dict "vendor" "lucide-inline" "name" "hash")
+    "layers" (dict "vendor" "lucide" "name" "layers-3")
+    "language" (dict "vendor" "lucide-inline" "name" "languages")
+    "link" (dict "vendor" "lucide-inline" "name" "link-2")
+    "list-tree" (dict "vendor" "lucide-inline" "name" "list-tree")
+    "mail" (dict "vendor" "lucide" "name" "mail")
+    "archives" (dict "vendor" "lucide-inline" "name" "archive")
+    "photo" (dict "vendor" "lucide-inline" "name" "images")
+    "pictures" (dict "vendor" "lucide-inline" "name" "images")
+    "print" (dict "vendor" "lucide" "name" "printer")
+    "rss" (dict "vendor" "lucide" "name" "rss")
+    "search" (dict "vendor" "lucide-inline" "name" "search")
+    "settings" (dict "vendor" "lucide" "name" "settings")
+    "share" (dict "vendor" "lucide" "name" "share-2")
+    "sum" (dict "vendor" "lucide" "name" "sigma")
+    "tag" (dict "vendor" "lucide-inline" "name" "tag")
+    "toggle-left" (dict "vendor" "lucide-inline" "name" "toggle-left")
+    "toggle-right" (dict "vendor" "lucide-inline" "name" "toggle-right")
+    "user" (dict "vendor" "lucide-inline" "name" "circle-user-round")
+-}}
+
+{{- with index $hugomodsIcons $name -}}
+    {{- $vendor := .vendor -}}
+    {{- $iconName := .name -}}
+    {{- if eq $vendor "lucide-inline" -}}
+        {{- $iconFile := resources.GetMatch (printf "icons/lucide/%s.svg" $iconName) -}}
+        {{- $iconFile.Content | safeHTML -}}
+    {{- else -}}
+        {{- $package := cond (eq $vendor "phosphor") "@phosphor-icons/core" (cond (eq $vendor "lucide") "lucide-static" "simple-icons") -}}
+        {{- $iconPath := cond (eq $vendor "phosphor") (printf "assets/fill/%s.svg" $iconName) (printf "icons/%s.svg" $iconName) -}}
+        {{- $url := printf "https://cdn.jsdelivr.net/npm/%s@latest/%s" $package $iconPath -}}
+        <span class="hm-icon hm-icon--{{ $vendor }}" style="--hm-icon-url: url('{{ $url }}')" aria-hidden="true"></span>
+    {{- end -}}
+{{- else -}}
+    {{- $iconFile := resources.GetMatch (printf "icons/%s.svg" $name) -}}
+    {{- if $iconFile -}}
+        {{- $iconFile.Content | safeHTML -}}
+    {{- else -}}
+        {{- errorf "Error: icon '%s.svg' is not found under 'assets/icons' folder" $name -}}
+    {{- end -}}
+{{- end -}}

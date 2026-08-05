@@ -1,0 +1,44 @@
+{{ define "body-class" }}home-profile-layout{{ end }}
+{{ define "main" }}
+    {{ $isChinese := hasPrefix .Language.Lang "zh" }}
+    {{ $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
+    {{ $visible := where $pages "Params.hidden" "ne" true }}
+    
+    {{ $apps := slice }}{{ with hugo.Data.launchpad }}{{ range . }}{{ $apps = $apps | append . }}{{ end }}{{ end }}{{ $apps = sort $apps "order" }}
+    {{ $pictures := slice }}{{ with index hugo.Data "photo-wall" }}{{ range . }}{{ $pictures = $pictures | append . }}{{ end }}{{ end }}{{ $pictures = sort $pictures "order" }}
+    <section class="home-profile" aria-labelledby="home-profile-title">
+        {{ with .Site.Params.sidebar.avatar }}{{ $avatar := partial "helper/image" (dict "Image" . "Resources" resources "Context" $) }}{{ with $avatar }}
+        {{ $announcementTitle := cond $isChinese "网站公告" "Website announcement" }}
+        {{ $announcementOpenLabel := cond $isChinese "打开网站公告" "Open website announcement" }}
+        {{ $announcementUnreadLabel := cond $isChinese "打开网站公告，1 条未读" "Open website announcement, 1 unread" }}
+        {{ $announcementCloseLabel := cond $isChinese "关闭网站公告" "Close website announcement" }}
+        <figure class="home-profile__avatar" data-home-announcement data-announcement-id="site-welcome-2026-08">
+            <button class="home-profile__announcement-toggle" type="button" aria-expanded="false" aria-controls="home-profile-announcement" aria-label="{{ $announcementUnreadLabel }}" data-home-announcement-toggle data-announcement-open-label="{{ $announcementOpenLabel }}" data-announcement-close-label="{{ $announcementCloseLabel }}">
+                <img src="{{ .Permalink }}" width="{{ .Width }}" height="{{ .Height }}" loading="eager" alt="{{ $.Site.Title }}">
+                <span class="home-profile__announcement-badge" data-home-announcement-badge aria-hidden="true">1</span>
+            </button>
+            <button class="home-profile__emoji home-profile__management-toggle" type="button" aria-expanded="false" aria-controls="home-profile-management-menu" aria-label="{{ cond $isChinese "打开网站管理选单" "Open site management menu" }}" data-sidebar-management-toggle>{{ $.Site.Params.sidebar.emoji }}</button>
+            {{ partial "sidebar/management-menu.html" (dict "Context" $ "MenuID" "home-profile-management-menu") }}
+            <div class="home-profile__announcement-bubble" id="home-profile-announcement" data-home-announcement-bubble role="note" aria-live="polite" hidden>
+                <strong>{{ $announcementTitle }}</strong>
+                {{ if $isChinese }}
+                    <p>你好，欢迎来到我的个人网站。我热爱用代码、设计与内容创作来表达想法，也享受不断学习新事物的过程。这里记录我的项目、笔记与思考。</p>
+                {{ else }}
+                    <p>Building interesting things. Projects, notes, and ideas, updated over time.</p>
+                {{ end }}
+                <time class="home-profile__announcement-date" datetime="2026-08-02">{{ cond $isChinese "2026年8月2日" "2 Aug 2026" }}</time>
+            </div>
+        </figure>
+        {{ end }}{{ end }}
+        <div class="home-profile__copy"><p class="home-profile__greeting">{{ cond $isChinese "欢迎来到" "Welcome to" }}</p><h1 id="home-profile-title">{{ .Site.Title }}</h1><p class="home-profile__subtitle">{{ .Site.Params.sidebar.subtitle }}</p></div>
+        {{ with .Site.Menus.social }}<ol class="home-profile__social" aria-label="Social links">{{ range . }}<li><a href="{{ .URL }}" target="_blank" rel="noopener" title="{{ .Name }}">{{ partial "helper/icon" .Params.icon }}</a></li>{{ end }}</ol>{{ end }}
+    </section>
+    <section class="home-feature-grid" aria-label="{{ cond $isChinese "主页快捷入口" "Home shortcuts" }}">
+        {{ if gt (len $apps) 0 }}<a href="{{ "apps/" | relLangURL }}" class="home-feature-card home-feature-card--launchpad"><div class="home-feature-card__copy"><p>{{ cond $isChinese "资源导航" "Resource directory" }}</p><h2>{{ cond $isChinese "浏览在线资源" "Browse resources" }}</h2></div><div class="home-launchpad-teaser" aria-hidden="true">{{ range first 2 $apps }}<span class="home-launchpad-teaser__app"><img src="{{ relURL .icon }}" alt="" width="512" height="512" loading="lazy"></span>{{ end }}</div></a>{{ end }}
+        <a href="{{ "about/" | relLangURL }}" class="home-feature-card home-feature-card--resume"><div class="home-feature-card__copy"><p>{{ cond $isChinese "关于我" "About me" }}</p><h2>{{ cond $isChinese "认识我" "Meet me" }}</h2></div><div class="home-resume-teaser__mark" aria-hidden="true">{{ partial "helper/icon" "user" }}</div></a>
+        <a href="{{ "dashboard/" | relLangURL }}" class="home-feature-card home-feature-card--dashboard"><div class="home-feature-card__copy"><p>{{ cond $isChinese "站点数据" "Site data" }}</p><h2>{{ cond $isChinese "查看站点数据" "View site data" }}</h2></div><div class="home-dashboard-teaser__mark" aria-hidden="true">{{ partial "helper/icon" "dashboard" }}</div></a>
+        {{ if gt (len $pictures) 0 }}<a href="{{ "pictures/" | relLangURL }}" class="home-feature-card home-feature-card--gallery"><div class="home-feature-card__copy"><p>{{ cond $isChinese "照片墙" "Photo wall" }}</p><h2>{{ cond $isChinese "浏览视觉记录" "Browse visual notes" }}</h2></div><div class="home-gallery-teaser__stack" aria-hidden="true">{{ range $i, $picture := first 4 $pictures }}<img src="{{ relURL $picture.image }}" alt="" loading="lazy" style="--gallery-teaser-left: {{ mul $i 36 }}px; --gallery-teaser-mobile-left: {{ mul $i 50 }}px; --gallery-teaser-rotate: {{ sub (mul $i 7) 10 }}deg; --gallery-teaser-hover-rotate: {{ sub (mul $i 4) 6 }}deg;"><!-- generic teaser -->{{ end }}</div></a>{{ end }}
+    </section>
+    <section class="article-list">{{ range $visible }}{{ partial "article-list/default" . }}{{ end }}</section>{{ partial "footer/footer" . }}
+{{ end }}
+{{ define "right-sidebar" }}{{ partial "sidebar/right.html" (dict "Context" . "Scope" "homepage") }}{{ end }}

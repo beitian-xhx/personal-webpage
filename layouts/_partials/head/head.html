@@ -1,0 +1,62 @@
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+{{- partial "head/language-routing.html" . -}}
+
+<script>
+    (function () {
+        const colorSchemeKey = "StackColorScheme";
+        if (!localStorage.getItem(colorSchemeKey)) localStorage.setItem(colorSchemeKey, "{{ default "auto" .Site.Params.colorScheme.default }}");
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches === true;
+        document.documentElement.dataset.scheme = colorSchemeItem == "dark" || colorSchemeItem === "auto" && supportDarkMode ? "dark" : "light";
+    })();
+</script>
+<style>
+    html,
+    body {
+        min-height: 100%;
+        background: #f5f5fa;
+    }
+
+    html[data-scheme="light"],
+    html[data-scheme="light"] body {
+        background: #f5f5fa;
+        color-scheme: light;
+    }
+
+    html[data-scheme="dark"],
+    html[data-scheme="dark"] body {
+        background: #303030;
+        color-scheme: dark;
+    }
+</style>
+
+{{- $description := partialCached "data/description" . .RelPermalink -}}
+<meta name='description' {{ printf "content=%q" $description | safeHTMLAttr }}>
+{{ with .Params.Keywords }}<meta name="keywords" content="{{ delimit . ", " }}">{{ end }}
+
+{{- $title := partial "data/title" . -}}
+<title>{{ $title }}</title>
+
+{{ with .Params.canonicalUrl }}
+<link rel="canonical" href="{{ . }}">
+{{ else }}
+<link rel='canonical' href='{{ .Permalink }}'>
+{{ end }}
+
+{{- partial "head/custom-font.html" . -}}
+{{- partial "head/style.html" . -}}
+{{- partial "head/script.html" . -}}
+{{- partial "head/opengraph/include.html" . -}}
+
+{{- range .AlternativeOutputFormats -}}
+    <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink | safeURL }}">
+{{- end -}}
+
+{{ with .Site.Params.favicon }}
+    <link rel="icon" type="image/png" href="{{ . | relURL }}?v=2" />
+    <link rel="shortcut icon" href="{{ . | relURL }}?v=2" />
+{{ end }}
+
+{{- partial "cookies/analytics.html" . -}}
+{{- partial "head/custom.html" . -}}

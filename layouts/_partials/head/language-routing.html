@@ -1,0 +1,62 @@
+{{- $englishTarget := "/" -}}
+{{- $chineseTarget := "/zh/" -}}
+{{- range .Site.Home.AllTranslations -}}
+    {{- if eq .Language.Lang "en" -}}
+        {{- $englishTarget = .RelPermalink -}}
+    {{- else if eq .Language.Lang "zh" -}}
+        {{- $chineseTarget = .RelPermalink -}}
+    {{- end -}}
+{{- end -}}
+{{- range .AllTranslations -}}
+    {{- if eq .Language.Lang "en" -}}
+        {{- $englishTarget = .RelPermalink -}}
+    {{- else if eq .Language.Lang "zh" -}}
+        {{- $chineseTarget = .RelPermalink -}}
+    {{- end -}}
+{{- end -}}
+{{- $excludePrompt := eq $englishTarget "/about-me/" -}}
+{{- $languageConfig := dict
+    "currentLanguage" .Language.Lang
+    "englishTarget" $englishTarget
+    "chineseTarget" $chineseTarget
+    "excludePrompt" $excludePrompt
+-}}
+<script id="site-language-config" type="application/json">{{ $languageConfig | jsonify | safeJS }}</script>
+<script>
+    (function () {
+        var configElement = document.getElementById("site-language-config");
+        if (!configElement) return;
+
+        var config;
+        try {
+            config = JSON.parse(configElement.textContent || "{}");
+        } catch (_) {
+            return;
+        }
+
+        var preference = null;
+        try {
+            preference = localStorage.getItem("liquid-stack-language-preference");
+        } catch (_) {
+            // Language detection still works when storage is unavailable.
+        }
+
+        var primaryLocale = (navigator.languages && navigator.languages[0]) || navigator.language || "en";
+        var primaryLanguage = String(primaryLocale).trim().replace(/_/g, "-").split("-")[0].toLowerCase();
+        var target = null;
+
+        if ((preference === "en" || preference === "zh") && preference !== config.currentLanguage) {
+            target = preference === "zh" ? config.chineseTarget : config.englishTarget;
+        } else if (!preference && config.currentLanguage === "en" && primaryLanguage === "zh") {
+            target = config.chineseTarget;
+        }
+
+        if (!target) return;
+
+        var targetURL = new URL(target, window.location.origin);
+        targetURL.search = window.location.search;
+        targetURL.hash = window.location.hash;
+
+        if (targetURL.href !== window.location.href) window.location.replace(targetURL.href);
+    })();
+</script>

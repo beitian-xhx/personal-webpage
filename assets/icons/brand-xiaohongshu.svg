@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-xiaohongshu" width="24" height="24" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="37" height="37" x="5.5" y="5.5" rx="4" ry="4"/>
+  <path d="M32.254 19.374v9.252"/>
+  <path d="M26.473 20.85v7.776"/>
+  <path d="M24.95 20.85h3.047"/>
+  <path d="M23.959 28.626h4.803"/>
+  <path d="M30.361 20.85h4.13c.49 0 .885.396.885.885v2.696"/>
+  <path d="M29.815 24.43h7.194a.99.99 0 0 1 .99.991v2.214a.99.99 0 0 1-.99.99h-1.83"/>
+  <path d="M37.038 21.317l.962-.89"/>
+  <path d="M21.684 28.626h-2.118"/>
+  <path d="M17.188 21.971l.697 5.07"/>
+  <path d="M10.683 21.971L10 27.3"/>
+  <path d="M13.922 19.374v7.892c0 .75-.609 1.36-1.36 1.36H12.2"/>
+  <path d="M21.684 19.374l-1.367 3.253h1.866l-1.367 3.252h1.865"/>
+</svg>

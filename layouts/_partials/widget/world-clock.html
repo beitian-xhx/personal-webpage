@@ -1,0 +1,26 @@
+{{- $isChinese := hasPrefix .Context.Language.Lang "zh" -}}
+{{- $yourTime := cond $isChinese "你的时间" "Your time" -}}
+
+<section
+    class="widget world-clock-widget"
+    data-world-clock
+    aria-label="{{ $yourTime }}"
+>
+    <div class="world-clock-widget__list">
+        <div class="world-clock-widget__clock" data-clock="local">
+            <div class="world-clock-widget__dial" role="img" aria-label="{{ $yourTime }}">
+                <span class="world-clock-widget__numbers" aria-hidden="true">
+                    {{ range seq 1 12 }}
+                        {{ $angle := mul . 30 }}
+                        <i style="--clock-angle: {{ $angle }}deg; --clock-angle-inverse: -{{ $angle }}deg;"><span>{{ . }}</span></i>
+                    {{ end }}
+                </span>
+                <i class="world-clock-widget__hand world-clock-widget__hand--hour" aria-hidden="true"></i>
+                <i class="world-clock-widget__hand world-clock-widget__hand--minute" aria-hidden="true"></i>
+                <i class="world-clock-widget__hand world-clock-widget__hand--second" aria-hidden="true"></i>
+                <i class="world-clock-widget__centre" aria-hidden="true"></i>
+            </div>
+            <p class="world-clock-widget__label">{{ $yourTime }}</p>
+        </div>
+    </div>
+</section>

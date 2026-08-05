@@ -1,0 +1,20 @@
+﻿{{- $context := .Context -}}
+{{- $limit := default 3 .Params.limit -}}
+{{- $pages := partial "helper/pages.html" $context.Site.Home -}}
+{{- $recent := first $limit $pages -}}
+{{- if $recent -}}
+    <section class="widget recent-projects">
+        <div class="widget-icon">
+            {{ partial "helper/icon" "list-tree" }}
+        </div>
+        <h2 class="widget-title section-title">最近项目</h2>
+        <div class="widget-recent--list">
+            {{ range $recent }}
+                <a class="recent-project" href="{{ .RelPermalink }}">
+                    <span class="recent-project__date">{{ .Date.Format "2006-01-02" }}</span>
+                    <span class="recent-project__title">{{ .Title }}</span>
+                </a>
+            {{ end }}
+        </div>
+    </section>
+{{- end -}}

@@ -1,0 +1,131 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>头像区装饰方案对比（临时预览）</title>
+<style>
+  :root { --bg:#f5f5fa; --card:#fff; --text:#1f2937; --muted:#6b7280; --line:rgba(0,0,0,.08); }
+  html[data-scheme="dark"] { --bg:#303030; --card:#424242; --text:#e5e7eb; --muted:#9ca3af; --line:rgba(255,255,255,.1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif; background:var(--bg); color:var(--text); padding:32px 20px; transition:background .25s,color .25s; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:1280px; margin:0 auto 8px; flex-wrap:wrap; }
+  h1 { font-size:20px; }
+  .hint { color:var(--muted); font-size:13px; margin-top:4px; }
+  .toggle { border:0; border-radius:999px; padding:9px 18px; font-size:14px; cursor:pointer; background:var(--card); color:var(--text); box-shadow:0 2px 10px rgba(0,0,0,.08); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:18px; max-width:1280px; margin:0 auto; }
+  .opt { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .opt h2 { font-size:15px; display:flex; align-items:center; gap:8px; }
+  .opt .badge { font-size:11px; font-weight:700; color:#fff; background:linear-gradient(135deg,#2563eb,#38bdf8); border-radius:999px; padding:2px 9px; }
+  .opt p { font-size:12.5px; color:var(--muted); line-height:1.55; flex:1; }
+  .stage { position:relative; height:190px; border-radius:14px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--bg); border:1px solid var(--line); }
+  .avatar { position:relative; width:84px; height:84px; border-radius:50%; box-shadow:0 12px 24px rgba(0,0,0,.16); }
+  html[data-scheme="dark"] .avatar { box-shadow:0 12px 24px rgba(0,0,0,.42); }
+  .avatar img { width:100%; height:100%; object-fit:cover; display:block; border-radius:50%; }
+
+  /* F 状态徽章 */
+  .opt-f .avatar::after { content:""; position:absolute; right:-2px; bottom:-2px; width:16px; height:16px; border-radius:50%; background:#22c55e; border:3px solid var(--bg); animation:f-breathe 2.4s ease-in-out infinite; }
+  @keyframes f-breathe { 0%,100% { box-shadow:0 0 0 0 rgba(34,197,94,.4); } 50% { box-shadow:0 0 0 7px rgba(34,197,94,0); } }
+
+  /* G 漂浮装饰 */
+  .opt-g .stage::before, .opt-g .stage::after { content:"✦"; position:absolute; color:rgba(37,99,235,.5); font-size:15px; animation:g-float 3.4s ease-in-out infinite; }
+  .opt-g .stage::before { left:22%; top:24%; }
+  .opt-g .stage::after { right:22%; bottom:26%; animation-delay:1.2s; font-size:11px; }
+  html[data-scheme="dark"] .opt-g .stage::before, html[data-scheme="dark"] .opt-g .stage::after { color:rgba(96,165,250,.55); }
+  @keyframes g-float { 0%,100% { transform:translateY(0); opacity:.55; } 50% { transform:translateY(-7px); opacity:.85; } }
+
+  /* H 背景网格 */
+  .opt-h .stage { background-image:linear-gradient(rgba(37,99,235,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(37,99,235,.06) 1px,transparent 1px); background-size:22px 22px; }
+  html[data-scheme="dark"] .opt-h .stage { background-image:linear-gradient(rgba(96,165,250,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(96,165,250,.07) 1px,transparent 1px); }
+
+  /* I 虚线圆环 */
+  .opt-i .stage::before { content:""; position:absolute; width:132px; height:132px; border:1.5px dashed rgba(37,99,235,.35); border-radius:50%; animation:i-spin 26s linear infinite; }
+  html[data-scheme="dark"] .opt-i .stage::before { border-color:rgba(96,165,250,.35); }
+  @keyframes i-spin { to { transform:rotate(360deg); } }
+
+  /* J 身份标签 */
+  .opt-j .stage { flex-direction:column; gap:14px; }
+  .opt-j .chips { display:flex; gap:7px; flex-wrap:wrap; justify-content:center; }
+  .opt-j .chips span { font-size:11.5px; font-weight:600; color:#1d4ed8; background:rgba(37,99,235,.10); border:1px solid rgba(37,99,235,.25); border-radius:999px; padding:3px 10px; }
+  html[data-scheme="dark"] .opt-j .chips span { color:#c7d7fe; background:rgba(59,130,246,.16); border-color:rgba(59,130,246,.35); }
+
+  /* K 顶部微 tint + 底部渐变线 */
+  .opt-k .stage::before { content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(37,99,235,.05) 0%,transparent 45%); }
+  .opt-k .stage::after { content:""; position:absolute; bottom:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,#2563eb 25%,#38bdf8 75%,transparent); opacity:.55; }
+  html[data-scheme="dark"] .opt-k .stage::before { background:linear-gradient(180deg,rgba(59,130,246,.09) 0%,transparent 45%); }
+
+  /* L 头像下身份小字 */
+  .opt-l .stage { flex-direction:column; gap:10px; }
+  .opt-l .sign { font-size:12px; color:var(--muted); letter-spacing:.5px; }
+  .opt-l .sign b { color:#2563eb; font-weight:700; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>头像区装饰 · 方案对比（第二批：附近添加元素）</h1>
+    <div class="hint">每个卡片模拟主页 profile 区一角。切换暗色看表现。临时预览页，选完即删。</div>
+  </div>
+  <button class="toggle" id="themeBtn" type="button">切换到暗色</button>
+</header>
+
+<div class="grid">
+  <section class="opt opt-f">
+    <h2><span class="badge">F</span> 状态徽章</h2>
+    <div class="stage"><div class="avatar"><img src="/img/liquid-stack/avatar.png" alt="头像"></div></div>
+    <p>头像右下角一颗「在线」绿点，带轻微呼吸光晕。像社交平台头像，小而不抢。</p>
+  </section>
+
+  <section class="opt opt-g">
+    <h2><span class="badge">G</span> 漂浮小元素</h2>
+    <div class="stage"><div class="avatar"><img src="/img/liquid-stack/avatar.png" alt="头像"></div></div>
+    <p>头像两侧 1-2 个淡蓝「✦」，缓慢上下浮动，低透明度。给画面添一点生气。</p>
+  </section>
+
+  <section class="opt opt-h">
+    <h2><span class="badge">H</span> 背景网格</h2>
+    <div class="stage"><div class="avatar"><img src="/img/liquid-stack/avatar.png" alt="头像"></div></div>
+    <p>profile 区铺一层极淡蓝网格线，头像浮在网格上。单色、暗色友好、很「极客」。</p>
+  </section>
+
+  <section class="opt opt-i">
+    <h2><span class="badge">I</span> 虚线圆环</h2>
+    <div class="stage"><div class="avatar"><img src="/img/liquid-stack/avatar.png" alt="头像"></div></div>
+    <p>头像后一个大而极淡的虚线圆环，缓慢旋转。像「聚光灯/信号」，克制的动感。</p>
+  </section>
+
+  <section class="opt opt-j">
+    <h2><span class="badge">J</span> 身份标签</h2>
+    <div class="stage">
+      <div class="avatar"><img src="/img/liquid-stack/avatar.png" alt="头像"></div>
+      <div class="chips"><span>💻 Web 开发</span><span>📷 摄影</span><span>🎬 视频创作</span></div>
+    </div>
+    <p>头像下方一排淡蓝身份 chips，与全站标签药丸同风格。内容即装饰。</p>
+  </section>
+
+  <section class="opt opt-k">
+    <h2><span class="badge">K</span> 顶部微 tint + 底部渐变线</h2>
+    <div class="stage"><div class="avatar"><img src="/img/liquid-stack/avatar.png" alt="头像"></div></div>
+    <p>不给头像加东西：区域顶部一抹极淡蓝、底部一条细渐变线，让 profile 区有边界不空旷。</p>
+  </section>
+
+  <section class="opt opt-l">
+    <h2><span class="badge">L</span> 身份小字</h2>
+    <div class="stage">
+      <div class="avatar"><img src="/img/liquid-stack/avatar.png" alt="头像"></div>
+      <div class="sign">保持好奇 · <b>持续更新</b></div>
+    </div>
+    <p>头像下一行低调签名小字，重点词蓝色。零装饰成本，纯文字补白。</p>
+  </section>
+</div>
+
+<script>
+  const btn = document.getElementById("themeBtn");
+  btn.addEventListener("click", () => {
+    const dark = document.documentElement.dataset.scheme !== "dark";
+    document.documentElement.dataset.scheme = dark ? "dark" : "light";
+    btn.textContent = dark ? "切换到亮色" : "切换到暗色";
+  });
+</script>
+</body>
+</html>

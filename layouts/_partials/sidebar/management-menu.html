@@ -1,0 +1,33 @@
+{{- $context := .Context -}}
+{{- $menuID := .MenuID -}}
+<div
+    class="sidebar-management-menu"
+    id="{{ $menuID }}"
+    role="menu"
+    aria-label="{{ cond (hasPrefix $context.Language.Lang "zh") "网站管理" "Site management" }}"
+    data-sidebar-management-menu
+    hidden
+>
+    <div class="sidebar-management-menu__header">
+        <div class="sidebar-management-menu__heading">
+            <strong>{{ cond (hasPrefix $context.Language.Lang "zh") "网站管理" "Site management" }}</strong>
+            <small>{{ cond (hasPrefix $context.Language.Lang "zh") "仅供网站管理员使用，不对外开放" "For the site administrator only. Not open to the public." }}</small>
+        </div>
+        <a href="{{ $context.Site.Home.RelPermalink }}">{{ cond (hasPrefix $context.Language.Lang "zh") "返回主页" "Home" }}</a>
+    </div>
+    <div class="sidebar-management-menu__items">
+        {{- range hugo.Data.management_links }}
+            <a
+                href="{{ .url }}"
+                role="menuitem"
+                {{ if .groupStart }}class="sidebar-management-menu__item--group-start"{{ end }}
+                {{ if .external }}target="_blank" rel="noopener noreferrer"{{ end }}
+            >
+                <span class="sidebar-management-menu__icon" aria-hidden="true">
+                    {{ partial "helper/icon" .icon }}
+                </span>
+                <span>{{ cond (hasPrefix $context.Language.Lang "zh") .titleZh .title }}</span>
+            </a>
+        {{- end }}
+    </div>
+</div>

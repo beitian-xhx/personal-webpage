@@ -1,0 +1,246 @@
+﻿# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+
+# Use GitHub's token sign-in by default. For OAuth, configure a provider of
+# your choice and replace the placeholders below before publishing. This
+# repository is public, so never store credentials or private user data here.
+backend:
+  name: github
+  repo: northernday/personal-webpage
+  branch: main
+  auth_methods: [token]
+
+site_url: https://beitian.netlify.app/
+display_url: https://beitian.netlify.app/
+app_title: 我的名字 · 个人网站 CMS
+logo:
+  src: site-logo.png
+  show_in_header: true
+
+# Keep Hugo's existing English index.md / Chinese index.zh.md page-bundle
+# convention. Single-language articles remain independent and are exposed
+# through a compatibility collection without creating unpublished translations.
+i18n:
+  structure: multiple_files
+  locales: [en, zh]
+  default_locale: en
+  omit_default_locale_from_file_path: true
+  omit_default_locale_from_preview_path: true
+  initial_locales: [en, zh]
+
+# All existing public Hugo images live here. Article image folders stay intact.
+media_folder: /static/img
+public_folder: /img
+
+collections:
+__SINGLE_LANGUAGE_LOADERS__
+
+  - name: posts
+    label: Create or edit bilingual posts
+    label_singular: Blog post
+    folder: /content/post
+    path: '{{slug}}/index'
+    slug: '{{fields.slug}}'
+    media_folder: '{{media_folder}}/{{dirname}}'
+    public_folder: '{{public_folder}}/{{dirname}}'
+    i18n: true
+    extension: md
+    format: frontmatter
+    summary: '{{title}} — {{date}} ({{locales}})'
+    preview_path: '/p/{{slug}}/'
+    thumbnail: image
+    fields:
+      - label: Title
+        name: title
+        widget: string
+        i18n: true
+      - label: URL slug
+        name: slug
+        widget: string
+        i18n: duplicate
+        hint: Stable URL identifier; do not change it after publishing.
+      - label: Description
+        name: description
+        widget: text
+        required: false
+        i18n: true
+      - label: Published date
+        name: date
+        widget: datetime
+        format: 'YYYY-MM-DDTHH:mm:ssZ'
+        date_format: 'YYYY-MM-DD'
+        time_format: 'HH:mm'
+        i18n: duplicate
+      - label: Cover image
+        name: image
+        widget: image
+        required: false
+        i18n: duplicate
+        hint: Upload a new image or use an existing site path such as /img/post-name/featured.png.
+      - label: Categories
+        name: categories
+        widget: relation
+        required: false
+        collection: taxonomies
+        file: categories
+        multiple: true
+        value_field: '{{categories.*.name}}'
+        display_fields: ['{{categories.*.name}}']
+        search_fields: ['{{categories.*.name}}']
+        i18n: true
+      - label: Tags
+        name: tags
+        widget: relation
+        required: false
+        collection: taxonomies
+        file: tags
+        multiple: true
+        value_field: '{{tags.*.name}}'
+        display_fields: ['{{tags.*.name}}']
+        search_fields: ['{{tags.*.name}}']
+        i18n: true
+      - label: Article
+        name: body
+        widget: markdown
+        i18n: true
+
+__SINGLE_LANGUAGE_COLLECTION__
+
+  # Each photo is a separate entry so the CMS can provide thumbnails, a grid
+  # view and a New button while preserving the front-end order.
+  - name: photo_wall
+    label: Photo wall
+    label_singular: Photo
+    folder: /data/photo-wall
+    extension: yaml
+    format: yaml
+    identifier_field: id
+    slug: '{{fields.id}}'
+    summary: '{{title}} / {{titleZh}}'
+    thumbnail: image
+    media_folder: /static/img/gallery
+    public_folder: /img/gallery
+    reorder:
+      key: order
+    fields:
+      - { label: Order, name: order, widget: number, value_type: int }
+      - { label: Stable ID, name: id, widget: string, hint: Keep this unchanged after publishing so saved photo positions continue to work. }
+      - { label: Image, name: image, widget: image }
+      - { label: English title, name: title, widget: string }
+      - { label: Simplified Chinese title, name: titleZh, widget: string, required: false }
+      - { label: English description, name: description, widget: text, required: false }
+      - { label: Simplified Chinese description, name: descriptionZh, widget: text, required: false }
+      - { label: Date, name: date, widget: datetime, date_only: true, time_format: false, format: 'YYYY-MM-DD', required: false }
+      - { label: Optional link, name: link, widget: string, required: false }
+
+  - name: launchpad
+    label: Launchpad
+    label_singular: App
+    folder: /data/launchpad
+    extension: yaml
+    format: yaml
+    identifier_field: id
+    slug: '{{fields.id}}'
+    summary: '{{label}} / {{labelZh}}'
+    thumbnail: screenshot
+    media_folder: /static/img/launchpad
+    public_folder: /img/launchpad
+    reorder:
+      key: order
+    fields:
+      - { label: Order, name: order, widget: number, value_type: int }
+      - { label: Stable ID, name: id, widget: string, hint: Keep this unchanged after publishing. }
+      - { label: English name, name: name, widget: string }
+      - { label: Simplified Chinese name, name: nameZh, widget: string, required: false }
+      - { label: English grid label, name: label, widget: string }
+      - { label: Simplified Chinese grid label, name: labelZh, widget: string, required: false }
+      - { label: App icon, name: icon, widget: image }
+      - label: Icon style
+        name: iconMode
+        widget: select
+        options: [app]
+        default: app
+      - { label: Preview screenshot, name: screenshot, widget: image }
+      - { label: English screenshot description, name: screenshotAlt, widget: string }
+      - { label: Simplified Chinese screenshot description, name: screenshotAltZh, widget: string, required: false }
+      - { label: Close button horizontal position, name: closeX, widget: number, value_type: float, required: false, hint: Percentage from the left edge of the screenshot. }
+      - { label: Close button vertical position, name: closeY, widget: number, value_type: float, required: false, hint: Percentage from the top edge of the screenshot. }
+      - { label: English article URL, name: article, widget: string, required: false }
+      - { label: Simplified Chinese article URL, name: articleZh, widget: string, required: false }
+      - { label: Source repository URL, name: repository, widget: string, required: false }
+
+  # A shared vocabulary for post categories and tags. Relation fields above
+  # read from these lists, so additions become selectable in every post editor.
+  - name: taxonomies
+    label: Categories and tags
+    files:
+      - name: categories
+        label: Categories
+        file: /data/taxonomies/categories.yaml
+        format: yaml
+        fields:
+          - label: Categories
+            name: categories
+            widget: list
+            root: true
+            label_singular: Category
+            summary: '{{name}}'
+            fields:
+              - { label: Name, name: name, widget: string }
+      - name: tags
+        label: Tags
+        file: /data/taxonomies/tags.yaml
+        format: yaml
+        fields:
+          - label: Tags
+            name: tags
+            widget: list
+            root: true
+            label_singular: Tag
+            summary: '{{name}}'
+            fields:
+              - { label: Name, name: name, widget: string }
+
+
+  - name: resources
+    label: 资源导航
+    label_singular: 资源
+    files:
+      - name: resources_list
+        label: 资源列表
+        file: /data/resources.yaml
+        format: yaml
+        fields:
+          - label: 资源
+            name: resources
+            widget: list
+            root: true
+            label_singular: 资源
+            summary: "{{name}}"
+            fields:
+              - { label: 名称, name: name, widget: string }
+              - { label: 链接, name: url, widget: string }
+              - { label: 自定义图标（可选）, name: icon, widget: string, required: false, hint: 留空则自动获取网站 favicon }
+  - name: friend_links
+    label: Friend links
+    label_singular: Friend link
+    folder: /data/friend-links
+    extension: yaml
+    format: yaml
+    identifier_field: id
+    slug: '{{fields.id}}'
+    summary: '{{title}}'
+    thumbnail: image
+    media_folder: /content/page/links
+    public_folder: ''
+    reorder:
+      key: order
+    fields:
+      - { label: Order, name: order, widget: number, value_type: int }
+      - { label: Stable ID, name: id, widget: string, hint: Keep this unchanged after publishing. }
+      - { label: Website name, name: title, widget: string }
+      - { label: Special English name, name: titleEn, widget: string, required: false, hint: Leave blank when English uses the same name. }
+      - { label: One-line description, name: description, widget: text, required: false }
+      - { label: Special English description, name: descriptionEn, widget: text, required: false, hint: Leave blank when English uses the same description. }
+      - { label: Website URL, name: website, widget: string }
+      - { label: Avatar, name: image, widget: image, required: false }
+      - { label: RSS feed URL, name: rss, widget: string, required: false }
