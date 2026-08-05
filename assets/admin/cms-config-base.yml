@@ -1,4 +1,4 @@
-﻿# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
 
 # Use GitHub's token sign-in by default. For OAuth, configure a provider of
 # your choice and replace the placeholders below before publishing. This
@@ -9,8 +9,8 @@ backend:
   branch: main
   auth_methods: [token]
 
-site_url: https://beitian.netlify.app/
-display_url: https://beitian.netlify.app/
+site_url: https://beitian-xhx.github.io/personal-webpage/
+display_url: https://beitian-xhx.github.io/personal-webpage/
 app_title: 我的名字 · 个人网站 CMS
 logo:
   src: site-logo.png
