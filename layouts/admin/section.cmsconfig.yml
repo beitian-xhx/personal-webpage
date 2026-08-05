@@ -1,4 +1,11 @@
-{{- $loaderParts := split (os.ReadFile "assets/admin/cms-config-base.yml") "__SINGLE_LANGUAGE_LOADERS__" -}}
+{{- $catsData := transform.Unmarshal (os.ReadFile "data/taxonomies/categories.yaml") -}}
+{{- $tagsData := transform.Unmarshal (os.ReadFile "data/taxonomies/tags.yaml") -}}
+{{- $catsOpts := slice -}}
+{{- with $catsData.categories -}}{{ range . }}{{ $catsOpts = $catsOpts | append (index . "name") }}{{ end }}{{ end -}}
+{{- $tagsOpts := slice -}}
+{{- with $tagsData.tags -}}{{ range . }}{{ $tagsOpts = $tagsOpts | append (index . "name") }}{{ end }}{{ end -}}
+{{- $catsJSON := $catsOpts | jsonify -}}
+{{- $tagsJSON := $tagsOpts | jsonify -}}{{- $loaderParts := split (os.ReadFile "assets/admin/cms-config-base.yml") "__SINGLE_LANGUAGE_LOADERS__" -}}
 {{- $configParts := split (index $loaderParts 1) "__SINGLE_LANGUAGE_COLLECTION__" -}}
 {{ index $loaderParts 0 }}
 {{- /*
@@ -31,7 +38,7 @@ which also gives every entry a unique editor route.
   {{- end }}
 {{- end }}
 
-{{ index $configParts 0 }}
+{{ strings.Replace (strings.Replace (index $configParts 0) "__CATEGORY_OPTIONS__" $catsJSON) "__TAG_OPTIONS__" $tagsJSON }}
 {{- $singleLanguagePosts := slice -}}
 {{- range os.ReadDir "content/post" }}
   {{- if and .IsDir (os.FileExists (printf "content/post/%s/index.zh.md" .Name)) (not (os.FileExists (printf "content/post/%s/index.md" .Name))) }}
@@ -49,7 +56,7 @@ which also gives every entry a unique editor route.
         label: {{ . | humanize | title | jsonify }}
         file: content/post/{{ . }}/index.zh.md
         format: {{ cond (hasPrefix (os.ReadFile (printf "content/post/%s/index.zh.md" .)) "+++") "toml-frontmatter" "yaml-frontmatter" }}
-{{ os.ReadFile "assets/admin/single-language-fields.yml" }}
+{{ strings.Replace (strings.Replace (os.ReadFile "assets/admin/single-language-fields.yml") "__CATEGORY_OPTIONS__" $catsJSON) "__TAG_OPTIONS__" $tagsJSON }}
 {{- end }}
 {{- end }}
 
