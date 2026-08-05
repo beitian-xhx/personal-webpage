@@ -4720,34 +4720,53 @@ html[data-scheme="dark"] .home-profile-layout .home-profile__avatar {
         display: none;
     }
 }
-/* Home photo wall: show all photos */
-.home-gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    width: 320px;
+
+/* Home photo wall: all photos in stacked sticker style */
+.home-gallery-teaser__stack {
+    width: unquote("clamp(220px, 30vw, 340px)");
     max-width: 100%;
+    height: auto;
+    min-height: 118px;
     flex: 1 1 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
+    gap: 8px 10px;
+    padding: 6px 0;
 
     img {
-        width: 100%;
-        aspect-ratio: 1;
-        object-fit: cover;
-        border-radius: 6px;
-        background: #f4f1ec;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        position: static;
+        top: auto;
+        left: auto;
+        width: 64px;
+        height: 52px;
+        border-width: 4px;
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.13);
+        transform: rotate(var(--gallery-teaser-rotate, 0deg));
+
+        &:nth-child(3n + 1) { --gallery-teaser-rotate: -3deg; }
+        &:nth-child(3n + 2) { --gallery-teaser-rotate: 2.5deg; }
+        &:nth-child(3n)     { --gallery-teaser-rotate: -1deg; }
     }
 }
 
-.home-feature-card--gallery:hover .home-gallery-grid img,
-.home-feature-card--gallery:focus-visible .home-gallery-grid img {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+.home-feature-card--gallery:hover .home-gallery-teaser__stack img,
+.home-feature-card--gallery:focus-visible .home-gallery-teaser__stack img {
+    transform: translateY(-4px) rotate(0deg) scale(1.06);
+    box-shadow: 0 16px 26px rgba(0, 0, 0, 0.16);
 }
 
 @media (max-width: 767px) {
-    .home-gallery-grid {
-        grid-template-columns: repeat(4, 1fr);
+    .home-gallery-teaser__stack {
         width: 100%;
+        height: auto;
+        gap: 6px 8px;
+    }
+
+    .home-gallery-teaser__stack img {
+        left: auto;
+        width: 56px;
+        height: 44px;
     }
 }
