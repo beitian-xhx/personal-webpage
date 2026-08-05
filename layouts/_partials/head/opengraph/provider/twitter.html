@@ -16,7 +16,7 @@
 {{- else -}}
     {{- with .Site.Params.defaultImage.opengraph -}}
         {{- if .enabled -}}
-            {{- $imageURL = absURL .src -}}
+            {{- $imageURL = absURL (strings.TrimPrefix "/" .src) -}}
         {{- end -}}
     {{- end -}}
 {{- end -}}

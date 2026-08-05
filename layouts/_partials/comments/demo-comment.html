@@ -1,6 +1,6 @@
 <div class="wl-card-item">
     <div class="wl-user" aria-hidden="true">
-        <img class="wl-user-avatar" src="{{ cond .isAuthor "/img/liquid-stack/logo-transparent.png" "/img/comment-guest-avatar.svg" | relURL }}" alt="">
+        <img class="wl-user-avatar" src="{{ (cond .isAuthor "/img/liquid-stack/logo-transparent.png" "/img/comment-guest-avatar.svg") | strings.TrimPrefix "/" | relURL }}" alt="">
         {{ if .isAuthor }}<span class="administrator-icon"></span>{{ end }}
     </div>
     <div class="wl-card">

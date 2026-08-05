@@ -33,14 +33,14 @@
                             aria-label="{{ printf (cond $isChinese "预览 %s" "Preview %s") $name }}"
                             data-launchpad-app
                             data-app-title="{{ $name }}"
-                            data-app-screenshot="{{ relURL .screenshot }}"
+                            data-app-screenshot="{{ relURL (strings.TrimPrefix "/" .screenshot) }}"
                             data-app-screenshot-alt="{{ $screenshotAlt }}"
                             data-app-close-x="{{ default 7.4 .closeX }}"
                             data-app-close-y="{{ default 7.0 .closeY }}"
                             data-app-article="{{ $articleURL }}"
                         >
                             <span class="launchpad-app__icon launchpad-app__icon--{{ default "app" .iconMode }}" aria-hidden="true">
-                                <img src="{{ relURL .icon }}" alt="" width="512" height="512" loading="eager">
+                                <img src="{{ relURL (strings.TrimPrefix "/" .icon) }}" alt="" width="512" height="512" loading="eager">
                             </span>
                             <span class="launchpad-app__label">{{ $label }}</span>
                         </button>

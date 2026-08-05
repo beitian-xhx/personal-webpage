@@ -18,7 +18,7 @@
             {{ with $picture.image }}
                 {{ $imageURL := . }}
                 {{ $parsedURL := urls.Parse $imageURL }}
-                {{ $permalink := cond (or (eq $parsedURL.Scheme "http") (eq $parsedURL.Scheme "https")) $imageURL (relURL $imageURL) }}
+                {{ $permalink := cond (or (eq $parsedURL.Scheme "http") (eq $parsedURL.Scheme "https")) $imageURL (relURL (strings.TrimPrefix "/" $imageURL)) }}
                 {{ $title := default (printf "Photo %d" (add $index 1)) $picture.title }}
                 {{ with $picture.titleZh }}
                     {{ if $isChinese }}{{ $title = . }}{{ end }}

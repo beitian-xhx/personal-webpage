@@ -13,7 +13,7 @@
 
 {{ if .Image }}
     {{ $url := urls.Parse .Image }}
-    {{ $permalink := .Image }}
+    {{ $permalink := .Image }}{{ if and (not (in (slice "https" "http") $url.Scheme)) (strings.HasPrefix $permalink "/") }}{{ $permalink = strings.TrimPrefix "/" $permalink | relURL }}{{ end }}
 
     {{ $result = dict
         "Resource" nil
