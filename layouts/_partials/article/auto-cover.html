@@ -6,9 +6,9 @@
 {{- $cat := "" -}}
 {{- with $page.Params.categories }}{{ $cat = delimit . " / " | htmlEscape }}{{ end -}}
 {{- $kicker := printf "Beitian · %s" (cond (gt (len $cat) 0) $cat $page.Section) -}}
-{{- $title := truncate 22 $page.Title | htmlEscape -}}
+{{- $title := truncate 14 $page.Title | htmlEscape -}}
 {{- $desc := "" -}}
-{{- with $page.Description }}{{ $desc = truncate 40 . | htmlEscape }}{{ end -}}
+{{- with $page.Description }}{{ $desc = truncate 32 . | htmlEscape }}{{ end -}}
 {{- $tags := "" -}}
 {{- with $page.Params.tags }}{{ $tags = delimit . " · " | htmlEscape }}{{ end -}}
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="{{ $id }}t {{ $id }}d" preserveAspectRatio="xMidYMid slice">
@@ -19,8 +19,8 @@
 <circle cx="1030" cy="100" r="190" fill="#fff" fill-opacity=".13"/>
 <circle cx="1120" cy="560" r="230" fill="#fff" fill-opacity=".09"/>
 <path d="M0 560C220 470 340 640 560 520s350-105 640 0v110H0z" fill="#fff" fill-opacity=".08"/>
-<text x="78" y="135" fill="#fff" fill-opacity=".82" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="30" letter-spacing="5">{{ $kicker }}</text>
-<text x="80" y="300" fill="#fff" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="54" font-weight="800">{{ $title }}</text>
-{{ if $desc }}<text x="82" y="372" fill="#fff" fill-opacity=".92" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="26">{{ $desc }}</text>{{ end }}
-{{ if $tags }}<text x="82" y="485" fill="#fff" fill-opacity=".84" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="28">{{ $tags }}</text>{{ end }}
+<text x="78" y="135" fill="#fff" fill-opacity=".82" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="24" letter-spacing="3">{{ $kicker }}</text>
+<text x="80" y="300" fill="#fff" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="42" font-weight="800">{{ $title }}</text>
+{{ if $desc }}<text x="82" y="372" fill="#fff" fill-opacity=".92" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="22">{{ $desc }}</text>{{ end }}
+{{ if $tags }}<text x="82" y="485" fill="#fff" fill-opacity=".84" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="24">{{ $tags }}</text>{{ end }}
 </svg>

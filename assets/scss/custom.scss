@@ -4773,6 +4773,7 @@ html[data-scheme="dark"] .home-profile-layout .home-profile__avatar {
 .article-image--auto svg {
     width: 100%;
     height: auto;
+    max-height: 50vh;
     display: block;
 }
 
