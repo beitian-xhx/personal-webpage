@@ -1,4 +1,15 @@
 {{ define "main" }}
+    <script>
+        (function () {
+            var base = "/personal-webpage";
+            var path = window.location.pathname;
+            var rest = path.indexOf(base) === 0 ? path.slice(base.length) : path;
+            if (rest === "/zh" || rest.indexOf("/zh/") === 0) {
+                var target = rest.replace(/^\/zh(\/|$)/, "/") || "/";
+                window.location.replace(base + target);
+            }
+        })();
+    </script>
     <div class="not-found-card">
         <h1 class="article-title">{{ T "notFound.title" }}</h1>
         <h2 class="article-subtitle">{{ T "notFound.subtitle" }}</h2>
