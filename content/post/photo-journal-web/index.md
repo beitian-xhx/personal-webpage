@@ -4,7 +4,7 @@ description: "一个用 Astro 搭建的静态摄影作品站点，支持深色�
 date: "2026-06-15"
 slug: "photo-journal-web"
 categories: []
-tags: ["Web 开发", "个人项目"]
+tags: ["Web 开发", "个人项目", "Astro", "Tailwind CSS", "Markdown", "摄影"]
 image: "/img/article-covers/photo-journal-web.svg"
 gradient:
   a: "#0f4c5c"

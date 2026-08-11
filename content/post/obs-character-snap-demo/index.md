@@ -8,6 +8,11 @@ categories:
   - 效率工具
 tags:
   - 个人项目
+  - Python
+  - YOLO
+  - OpenCV
+  - Tkinter
+  - 计算机视觉
 ---
 
 ## 项目简介
