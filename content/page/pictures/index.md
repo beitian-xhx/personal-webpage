@@ -1,5 +1,5 @@
 ---
-title: "Pictures"
+title: "照片"
 slug: pictures
 layout: pictures
 menu:

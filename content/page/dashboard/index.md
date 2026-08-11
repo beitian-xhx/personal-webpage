@@ -1,5 +1,5 @@
 ﻿---
-title: "Dashboard"
+title: "仪表盘"
 slug: dashboard
 layout: dashboard
 menu:

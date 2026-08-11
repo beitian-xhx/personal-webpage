@@ -1,7 +1,7 @@
 ---
-title: Sitemap
+title: 网站地图
 slug: sitemap
-description: A browsable directory of articles, categories, and key pages.
+description: 可浏览的文章、分类和主要页面目录。
 comments: false
 license: false
 layout: sitemap

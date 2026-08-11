@@ -1,9 +1,0 @@
-        fields:
-          - { label: 标题, name: title, widget: string }
-          - { label: URL 标识, name: slug, widget: string, required: false }
-          - { label: 描述, name: description, widget: text, required: false }
-          - { label: 发布日期, name: date, widget: datetime, required: false }
-          - { label: 封面图, name: image, widget: image, required: false }
-          - { label: 分类, name: categories, widget: select, multiple: true, options: __CATEGORY_OPTIONS__, required: false }
-          - { label: 标签, name: tags, widget: select, multiple: true, options: __TAG_OPTIONS__, required: false }
-          - { label: 正文, name: body, widget: markdown }

@@ -17,48 +17,37 @@ logo:
   src: site-logo.png
   show_in_header: true
 
-# Keep Hugo's existing English index.md / Chinese index.zh.md page-bundle
-# convention. Single-language articles remain independent and are exposed
-# through a compatibility collection without creating unpublished translations.
-i18n:
-  structure: multiple_files
-  locales: [en, zh]
-  default_locale: en
-  omit_default_locale_from_file_path: true
-  omit_default_locale_from_preview_path: true
-  initial_locales: [en, zh]
-
 # All existing public Hugo images live here. Article image folders stay intact.
 media_folder: /static/img
 public_folder: /img
 
 collections:
-__SINGLE_LANGUAGE_LOADERS__
+
 
   - name: posts
-    label: 文章（双语）
+    label: 文章
     label_singular: 文章
     folder: /content/post
     path: '{{slug}}/index'
     slug: '{{fields.slug}}'
     media_folder: '{{media_folder}}/{{dirname}}'
     public_folder: '{{public_folder}}/{{dirname}}'
-    i18n: true
+
     extension: md
     format: frontmatter
-    summary: '{{title}} — {{date}} ({{locales}})'
+    summary: '{{title}} — {{date}}'
     preview_path: '/p/{{slug}}/'
     thumbnail: image
     fields:
-      - { label: 标题, name: title, widget: string, i18n: true }
-      - { label: URL 标识, name: slug, widget: string, i18n: duplicate, hint: 稳定的 URL 标识，发布后请勿更改。 }
-      - { label: 描述, name: description, widget: text, required: false, i18n: true }
-      - { label: 发布日期, name: date, widget: datetime, format: 'YYYY-MM-DDTHH:mm:ssZ', date_format: 'YYYY-MM-DD', time_format: 'HH:mm', i18n: duplicate }
-      - { label: 封面图, name: image, widget: image, required: false, i18n: duplicate, hint: 上传新图片或使用已有站点路径，如 /img/post-name/featured.png。 }
-      - { label: 分类, name: categories, widget: select, multiple: true, options: __CATEGORY_OPTIONS__, required: false, i18n: true }
-      - { label: 标签, name: tags, widget: select, multiple: true, options: __TAG_OPTIONS__, required: false, i18n: true }
-      - { label: 正文, name: body, widget: markdown, i18n: true }
-__SINGLE_LANGUAGE_COLLECTION__
+      - { label: 标题, name: title, widget: string }
+      - { label: URL 标识, name: slug, widget: string, hint: 稳定的 URL 标识，发布后请勿更改。 }
+      - { label: 描述, name: description, widget: text, required: false }
+      - { label: 发布日期, name: date, widget: datetime, format: 'YYYY-MM-DDTHH:mm:ssZ', date_format: 'YYYY-MM-DD', time_format: 'HH:mm' }
+      - { label: 封面图, name: image, widget: image, required: false, hint: 上传新图片或使用已有站点路径，如 /img/post-name/featured.png。 }
+      - { label: 分类, name: categories, widget: select, multiple: true, options: __CATEGORY_OPTIONS__, required: false }
+      - { label: 标签, name: tags, widget: select, multiple: true, options: __TAG_OPTIONS__, required: false }
+      - { label: 正文, name: body, widget: markdown }
+
 
   # Each photo is a separate entry so the CMS can provide thumbnails, a grid
   # view and a New button while preserving the front-end order.

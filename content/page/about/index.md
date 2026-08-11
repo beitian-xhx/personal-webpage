@@ -1,7 +1,7 @@
 ---
-title: "About"
+title: "关于我"
 slug: about
-description: "Meet me — skills, experience, and how to reach me."
+description: "认识我——技能、经历与联系方式。"
 comments: false
 license: false
 toc: false
@@ -28,9 +28,9 @@ menu:
 </style>
 
 <main class="about-page">
-<header class="about-hero"><p class="about-kicker">About · 我的名字</p><h1>我的名字</h1><p class="about-profile">一个对技术与创作充满好奇的年轻人。这个网站是我的「数字花园」：用项目记录我做过什么，用文章记录我在想什么。我崇尚把事情做好，也享受把复杂的东西讲清楚。</p></header>
-<nav class="about-nav" aria-label="Page sections"><a href="#skills">Skills</a><a href="#experience">Experience</a><a href="#contact">Find me</a></nav>
-<section id="skills" class="about-section"><h2 class="about-heading">Skills</h2><div class="about-grid"><article class="about-card"><h3>Programming</h3><p>Python, HTML/CSS, JavaScript, Git</p></article><article class="about-card"><h3>Design &amp; Visuals</h3><p>Figma, Photography, Graphic Layout</p></article><article class="about-card"><h3>Video Creation</h3><p>Video Editing, VFX</p></article><article class="about-card"><h3>Productivity Tools</h3><p>Office Suite, Information Research, Note Systems</p></article></div></section>
-<section id="experience" class="about-section"><h2 class="about-heading">Experience</h2><ul class="about-links"><li><span>2023.09 – 2026.06</span><span>High school · Changzhou No.1 High School — started learning IT and programming, self-taught web development, joined school clubs and activities.</span></li><li><span>2026.06</span><span>Gaokao — finished the national college entrance exam and gained a clearer idea of future study direction.</span></li><li><span>2026.09 (upcoming)</span><span>Starting university — plan to study programming and design systematically and keep updating this site to record growth.</span></li></ul></section>
-<section id="contact" class="about-section"><h2 class="about-heading">Find me</h2><ul class="about-links"><li><a href="https://github.com/yourname" target="_blank" rel="me noopener">GitHub <span>github.com/yourname</span></a></li><li><a href="https://space.bilibili.com/0000000" target="_blank" rel="me noopener">Bilibili <span>space.bilibili.com/0000000</span></a></li><li><a href="mailto:you@example.com">Email <span>you@example.com</span></a></li></ul></section>
+<header class="about-hero"><p class="about-kicker">关于页面 · 北天</p><h1>北天</h1><p class="about-profile">你好，我是 XX，一个对技术与创作充满好奇的年轻人。这个网站是我的「数字花园」：用项目记录我做过什么，用文章记录我在想什么。我崇尚把事情做好，也享受把复杂的东西讲清楚。</p></header>
+<nav class="about-nav" aria-label="页面章节"><a href="#skills">技能</a><a href="#experience">经历</a><a href="#contact">找到我</a></nav>
+<section id="skills" class="about-section"><h2 class="about-heading">技能</h2><div class="about-grid"><article class="about-card"><h3>编程</h3><p>Python、HTML/CSS、JavaScript、Git</p></article><article class="about-card"><h3>设计与视觉</h3><p>Figma、摄影、平面排版</p></article><article class="about-card"><h3>视频创作</h3><p>视频剪辑、特效制作</p></article><article class="about-card"><h3>效率工具</h3><p>Office 三件套、信息检索、笔记系统</p></article></div></section>
+<section id="experience" class="about-section"><h2 class="about-heading">经历</h2><ul class="about-links"><li><span>2023.09 – 2026.06</span><span>高中学习阶段 · 常州市第一中学 —— 接触信息技术与编程，开始自学网页开发，参与校园社团与活动。</span></li><li><span>2026.06</span><span>高考 —— 完成高考，对未来的学习方向有了更清晰的想法。</span></li><li><span>2026.09（即将）</span><span>即将进入大学 —— 计划系统学习编程与设计，持续更新这个网站，记录成长。</span></li></ul></section>
+<section id="contact" class="about-section"><h2 class="about-heading">找到我</h2><ul class="about-links"><li><a href="https://github.com/northernday" target="_blank" rel="me noopener">GitHub <span>github.com/northernday</span></a></li><li><a href="https://space.bilibili.com/1824409989" target="_blank" rel="me noopener">Bilibili <span>space.bilibili.com/1824409989</span></a></li><li><a href="https://www.zhihu.com/people/yourname" target="_blank" rel="me noopener">知乎 <span>www.zhihu.com/people/yourname</span></a></li><li><a href="mailto:xhx1234569@163.com">邮箱 <span>xhx1234569@163.com</span></a></li><li><span>微信</span><span>xhaoxuan11</span></li></ul><p style="margin-top:1.2rem;color:var(--card-text-color-secondary);font-size:1.45rem">如需合作或交流，欢迎通过邮箱联系我。</p></section>
 </main>

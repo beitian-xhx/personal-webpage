@@ -3,7 +3,7 @@ canonifyURLs: false
 title: "北天"
 theme: stack
 copyright: "北天"
-defaultContentLanguage: en
+defaultContentLanguage: zh
 hasCJKLanguage: true
 timeZone: Asia/Shanghai
 mediaTypes:
@@ -20,16 +20,6 @@ outputFormats:
     baseName: sitemap-flat
     isPlainText: true
     notAlternative: true
-languages:
-  en: { label: English, locale: en-US, weight: 1 }
-  zh:
-    label: 简体中文
-    locale: zh-Hans
-    weight: 2
-    copyright: "北天"
-    params:
-      sidebar:
-        subtitle: 做点有意思的东西
 pagination: { pagerSize: 10 }
 permalinks:
   post: /p/:slug/
@@ -43,7 +33,7 @@ params:
     lastUpdated: 02/Jan/2006 15:04 MST
   sidebar:
     emoji: "😄"
-    subtitle: Building interesting things — projects, notes, and ideas.
+    subtitle: 做点有意思的东西
     avatar: /img/uploads/b_22cb441f64208eaff55e9670d85922ab.jpg
   footer:
     since: 2026

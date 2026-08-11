@@ -1,6 +1,6 @@
 ---
 title: OBS 人物吸附 Demo
-slug: https://github.com/beitian-xhx/obs-character-snap-demo
+slug: obs-character-snap-demo
 description: 基于 YOLO 的实时游戏画面人物检测与吸附 Demo：屏幕捕获 → 人物头部检测 → 目标锁定与平滑吸附跟随，Tkinter 实时调参面板。
 date: 2026-08-11T13:05:00+08:00
 image: ''

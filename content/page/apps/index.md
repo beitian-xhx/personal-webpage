@@ -1,5 +1,5 @@
 ---
-title: "Apps"
+title: "应用"
 slug: apps
 layout: apps
 menu:

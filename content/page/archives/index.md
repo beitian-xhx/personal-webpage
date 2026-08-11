@@ -1,5 +1,5 @@
 ---
-title: Archives
+title: 归档
 slug: archives
 layout: archives
 menu:
