@@ -1,40 +1,8 @@
-tags:
-  - name: 随笔
-  - name: 个人网站
-  - name: 学习笔记
-  - name: 效率工具
-  - name: 内容创作
-  - name: 视频创作
-  - name: 视频剪辑
-  - name: 特效制作
-  - name: 摄影
-  - name: 平面排版
-  - name: 信息检索
-  - name: 笔记系统
-  - name: Web 开发
-  - name: 前端
-  - name: HTML/CSS
-  - name: JavaScript
-  - name: TypeScript
-  - name: Python
-  - name: Git
-  - name: Electron
-  - name: React
-  - name: Astro
-  - name: Tailwind CSS
-  - name: Markdown
-  - name: Vite
-  - name: Ant Design
-  - name: Recharts
-  - name: Zustand
-  - name: xlsx
-  - name: dayjs
-  - name: GitHub API
-  - name: YOLO
-  - name: OpenCV
-  - name: Tkinter
-  - name: 计算机视觉
-  - name: 剪映
-  - name: Pr
-  - name: Figma
-  - name: 个人项目
+- name: 游戏开发
+- name: 计算机视觉
+- name: 数据可视化
+- name: 视频创作
+- name: Electron
+- name: React
+- name: Remotion
+- name: Node.js
