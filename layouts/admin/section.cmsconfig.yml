@@ -1,9 +1,13 @@
 {{- $catsData := transform.Unmarshal (os.ReadFile "data/taxonomies/categories.yaml") -}}
 {{- $tagsData := transform.Unmarshal (os.ReadFile "data/taxonomies/tags.yaml") -}}
+{{- $catsList := slice -}}
+{{- if reflect.IsMap $catsData -}}{{- $catsList = $catsData.categories -}}{{- else -}}{{- $catsList = $catsData -}}{{- end -}}
 {{- $catsOpts := slice -}}
-{{- with $catsData.categories -}}{{ range . }}{{ $catsOpts = $catsOpts | append (index . "name") }}{{ end }}{{ end -}}
+{{- range $catsList -}}{{- $catsOpts = $catsOpts | append (index . "name") -}}{{- end -}}
+{{- $tagsList := slice -}}
+{{- if reflect.IsMap $tagsData -}}{{- $tagsList = $tagsData.tags -}}{{- else -}}{{- $tagsList = $tagsData -}}{{- end -}}
 {{- $tagsOpts := slice -}}
-{{- with $tagsData.tags -}}{{ range . }}{{ $tagsOpts = $tagsOpts | append (index . "name") }}{{ end }}{{ end -}}
+{{- range $tagsList -}}{{- $tagsOpts = $tagsOpts | append (index . "name") -}}{{- end -}}
 {{- $catsJSON := $catsOpts | jsonify -}}
 {{- $tagsJSON := $tagsOpts | jsonify -}}
 {{- $base := os.ReadFile "assets/admin/cms-config-base.yml" -}}

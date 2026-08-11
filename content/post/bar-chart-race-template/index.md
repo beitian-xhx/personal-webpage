@@ -1,6 +1,6 @@
 ---
 title: 二游流水动态可视化：从需求到可复用的 Bar Chart Race 模板
-slug: https://github.com/beitian-xhx/bar-chart-race-template
+slug: bar-chart-race-template
 description: 用 Remotion 制作国产二游全球月度流水动态条形图竞赛视频的完整记录：数据整理、逐月过渡与排名动画的实现，以及沉淀为可复用模板与 skill 的过程。
 date: 2026-08-11T19:02:00+08:00
 image: ''
@@ -8,6 +8,9 @@ categories: []
 tags:
   - 视频创作
   - 信息检索
+links:
+  - title: 代码仓库
+    website: https://github.com/beitian-xhx/bar-chart-race-template
 ---
 
 最近做了一个数据可视化视频：把 2025 年 7 月到 2026 年 6 月国产二次元手游的全球月度流水做成「动态条形图竞赛」（Bar Chart Race）的形式，竖屏 1080×1920，赛博朋克风格。整个过程从一段需求描述开始，最后沉淀成一个可复用的模板。记录如下。

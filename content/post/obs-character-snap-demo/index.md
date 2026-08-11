@@ -12,6 +12,9 @@ tags:
   - OpenCV
   - Tkinter
   - 计算机视觉
+links:
+  - title: 代码仓库
+    website: https://github.com/beitian-xhx/obs-character-snap-demo
 ---
 
 最近做了一个计算机视觉方向的练习项目：实时识别游戏画面中的人物，并实现"跟拍锁定"功能。把完整过程记录如下，包括思路、踩过的坑和用到的工具。
