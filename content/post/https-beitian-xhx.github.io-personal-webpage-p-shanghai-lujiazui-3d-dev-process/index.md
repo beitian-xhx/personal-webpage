@@ -15,7 +15,7 @@ links:
 
 ![](/img//https-beitian-xhx.github.io-personal-webpage-p-shanghai-lujiazui-3d-dev-process/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-08-21%20214059.png)
 
-一、数据准备：从 OSM 到 3,201 栋建筑
+## **一、数据准备：从 OSM 到 3,201 栋建筑**
 
 数据源选了 OpenStreetMap：免费、公开、覆盖全上海。拉了陆家嘴—外滩区域的原始 XML（16 MB），写了个 Python 脚本清洗成建筑 GeoJSON（2.1 MB，3,201 栋），每栋楼都保留自己的真实 footprint 轮廓。
 
