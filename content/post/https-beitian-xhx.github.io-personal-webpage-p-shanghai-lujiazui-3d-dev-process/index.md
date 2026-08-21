@@ -1,9 +1,9 @@
 ---
 title: 沪江天际线demo
-slug: https://beitian-xhx.github.io/personal-webpage/p/shanghai-lujiazui-3d-dev-process/
+slug: shanghai-lujiazui-3d-dev-process
 description: 最近做了一个能在浏览器里漫游的上海陆家嘴 3D 场景：以黄浦江为轴，陆家嘴的天际线和外滩的万国建筑群一江两岸同时铺开。整个项目从数据准备、程序化建模到相机漫游分几步完成，记录一下开发过程，工具清单放最后。
 date: 2026-08-21T22:47:00+08:00
-image: /img//https-beitian-xhx.github.io-personal-webpage-p-shanghai-lujiazui-3d-dev-process/屏幕截图 2026-08-21 214059.png
+image: ''
 categories:
   - Web 开发
 tags:
@@ -13,7 +13,9 @@ links:
     website: https://github.com/beitian-xhx/shanghai-lujiazui-3d
 ---
 
-## 一、数据准备：从 OSM 到 3,201 栋建筑
+![](/img//https-beitian-xhx.github.io-personal-webpage-p-shanghai-lujiazui-3d-dev-process/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202026-08-21%20214059.png)
+
+一、数据准备：从 OSM 到 3,201 栋建筑
 
 数据源选了 OpenStreetMap：免费、公开、覆盖全上海。拉了陆家嘴—外滩区域的原始 XML（16 MB），写了个 Python 脚本清洗成建筑 GeoJSON（2.1 MB，3,201 栋），每栋楼都保留自己的真实 footprint 轮廓。
 
