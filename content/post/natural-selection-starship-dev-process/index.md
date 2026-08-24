@@ -1,0 +1,88 @@
+---
+title: 恒星级战舰——自然选择#3D建模
+slug: natural-selection-starship-dev-process
+description: 从刘慈欣《黑暗森林》的设定出发，按六视图灰模蓝图用 Three.js 程序化重建恒星级战舰「自然选择号」——站点放样、模块化装甲叠加、无工质辐射推进与前进四交互，记录开发过程与工具清单
+date: 2026-08-24T17:46:00+08:00
+image: ''
+categories: []
+tags: []
+links:
+  - title: 代码仓库
+    website: https://github.com/beitian-xhx/natural-selection-starship
+  - title: 项目demo展示
+    website: https://deepdemos.top/demo/demo-7d8bffaf
+---
+
+![](/img//natural-selection-starship-dev-process/ChatGPT%20Image%202026%E5%B9%B48%E6%9C%8823%E6%97%A5%2023_19_04.png "初稿灰模图")
+
+做了一个能在浏览器里直接展开的恒星级战舰 3D 场景：三体《黑暗森林》里亚洲舰队的「自然选择号」。整个舰体完全程序化生成，几何按用户提供的六视图灰模蓝图（左/顶/底/前/后 + 四分之三视角）重建，成品是一个可双击打开的单文件 HTML——没有服务器、没有网络请求、没有任何外部模型或贴图。记录一下开发过程，工具清单放最后。
+
+## 一、几何来源：从六视图灰模到站点放样
+
+这个项目的第一优先级是"形要对"。舰体不是从零创意，而是严格按一组灰模多视图做几何重建：超长、低矮、宽体、尖锐舰艏、厚重阶梯舰尾。
+
+实现上用了**站点放样**：沿舰轴取 29 个截面站，每个站定义 7 折点半剖面（顶部较平 → 两侧斜切 → 中部厚重 → 下部收缩），站与站之间连四边形面片，用逐面法线做硬表面平直着色。这样一个连续的多边形截面在整条舰上扫过，天然形成参考图那种锐利折面感，而不是平滑的旋转体。
+
+后面又按模块化灰模提示做了 A1–A7 组件叠加：中央主脊（A1）、两侧大型功能舱（A2）、底部中央腹部（A3）、顶部多层装甲（A4）、舰尾过渡结构（A5）、舰尾推进舱（A6）、内部推进器单元（A7）。叠加方式是用 `stationAt / profileAt` 读舰体表面再加装，保持轮廓统一、避免穿插破坏。
+
+## 二、工具链与技术选型
+
+技术路线是"全程序化 + 单文件打包"：
+
+- **Three.js r158** 负责几何、材质、光照与渲染；
+- **Canvas 2D** 现场绘制所有纹理——装甲板、金色 MLI 箔、辐射器管路板、舷窗、警示斜纹、舰名涂装，并做 Sobel 差分生成法线图，让平板有真实的凹槽和铆钉立体感；
+- **PMREMGenerator** 从场景烘出环境反射贴图，金属表面因此有真实的环境映射；
+- **tools/bundle.mjs** 自研打包器：把整张 ES Module 图（含 three.js）编译成一个普通 `<script>` 内联进单个 HTML，解决 `file://` 下 CORS 拦 ESM 的问题——这是"双击即开"的关键。
+
+环境上依赖为零：三体设定相关的数据（尺寸、推进方式、武器布局）来自原著文本，几何全部程序化，不依赖任何外部网格或贴图资产。
+
+![](/img//natural-selection-starship-dev-process/602d38f4-6a3f-4106-96f2-7cb942e6a4a8.png "二次增补")
+
+## 三、核心实现：把设定翻译成几何与材质
+
+舰体沿 X 轴布置，舰艏朝 +X。全长 1,600 m（不含尾焰），最大宽约 410 m。分区从艏部到尾部依次为：舰艏楔形 → 指挥段 → 主居住舰体 → 恒星型氢弹发射井段 → 中央桁架（深海加速液贮箱）→ 聚变反应堆与主散热翼 → 无工质辐射推进阵。
+
+几个代表性的实现点：
+
+**1. 无工质核聚变辐射推进**。《黑暗森林》里发动机"不喷出任何工质，只有辐射光"。所以舰尾不是一排火箭喷口，而是一组白炽辐射盘：A6 推进舱外部装甲框架围出开口，A7 内部 5 个推进器单元各配一个深腔 + 圆形白炽核心，外面套八边形截角喷环。"前进四"时 5 束尾焰齐喷，尾焰用自定义 ShaderMaterial（边缘辉光 + 流纹噪声 + 脉动），`uPower` 由推进功率驱动。
+
+**2. 散热翼与深海加速液贮箱**。聚变堆的废热只能靠辐射排散，做了 ±Z 双主翼（展宽 430 m）+ 背腹辅鳍，用高发射率的暗色辐射器面板。深海加速液贮箱则做成金色 MLI 多层隔热箔胶囊，挂在中央桁架四侧。
+
+**3. 材质分层**。军规深色涂装配三级灰阶：主装甲、次级装甲、暗结构件。纹理是 Canvas 程序化的装甲板三通道（颜色/法线/粗糙度），三平面投影 UV 按世界尺度平铺，避免拉伸。红蓝点亮只用极克制的状态灯与三盏点光源（舰桥蓝、舰尾红、舰艏蓝），避免大面积发光冲白。
+
+**4. 环境**。FBM 噪声星云天穹、9000 颗闪烁星、木星型巨行星与大气散射壳、冰卫星。场景经 PMREM 烘出环境反射。
+
+## 四、交互与验证
+
+场景提供几种观察方式：拖拽环绕、滚轮缩放、右键平移；`⟳ 自动环绕`、`▷ 自动导览`（9 个航路点）、`▲ 前进四`、`✦ 泛光`、`▦ 线框`、`✕ 隐藏界面`（快捷键 H）。点击画面上悬浮的分区标签可直接飞抵该舱段。
+
+前进四是比较有记忆点的交互：一键进入全功率点火，5 束尾焰齐亮、引擎段加一个镜头微震，指数逼近推进功率目标。
+
+验证走两套自检：
+
+- \*\*`node tools/smoke.mjs`\*\*——在 Node 里桩化 Canvas，真实执行整条建造管线（无需 WebGL），统计三角面与 draw call、扫描 NaN 顶点、核验材质键齐全、核验推进功率收敛到目标；
+- \*\*`node tools/browser-check.mjs`\*\*——起无头 Chrome（CDP）打开页面，采集控制台报错与异常，并从多角度截图人工核对。
+
+## 五、整体流程
+
+复制
+
+```plain
+设定(原著+灰模) → 站点放样主壳 → A1-A7 模块叠加 → 材质/纹理 → 环境与照明
+→ HUD/交互 → bundle.mjs 单文件打包 → smoke/browser-check 自检 → 双击即开
+```
+
+工程上有一条约定：`tools/bundle.mjs` 是唯一的单文件来源，改源码后重新打包即可；`smoke.mjs` 与 `browser-check.mjs` 只做验证，不参与构建，保证渲染结果可复现。
+
+## 六、工具清单
+
+| 工具 | 用途 | 官网 |
+| --- | --- | --- |
+| Three.js | 3D 几何、材质、光照与渲染 | [https://threejs.org](https://threejs.org/) |
+| Canvas 2D | 程序化纹理（装甲板/MLI 箔/舷窗/舰名） | [https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) |
+| PMREMGenerator | 从场景烘焙环境反射贴图 | [https://threejs.org/docs/#api/en/extras/PMREMGenerator](https://threejs.org/docs/#api/en/extras/PMREMGenerator) |
+| Node.js | 打包器、冒烟测试、无头浏览器验证 | [https://nodejs.org](https://nodejs.org/) |
+| Chrome DevTools Protocol | 无头浏览器截图与报错采集 | [https://chromedevtools.github.io/devtools-protocol/](https://chromedevtools.github.io/devtools-protocol/) |
+| Sobel 差分 | 由高度图生成法线图 | [https://en.wikipedia.org/wiki/Sobel_operator](https://en.wikipedia.org/wiki/Sobel_operator) |
+
+回头看，这个项目最值得记的一点是**分层**：几何层（站点放样 + 模块叠加）、材质层（程序化纹理 + 物理光照）、交互层（环绕/导览/前进四）各管各的，靠按材质合并的几何桶把上万细节件压成 19 个 draw call。后续计划是把舰尾推进区再往参考图的后视图方向收敛一版，顺便把"前进四"时的深海加速液栖装氛围做进 HUD。
