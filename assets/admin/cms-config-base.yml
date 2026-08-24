@@ -30,8 +30,8 @@ collections:
     folder: /content/post
     path: '{{slug}}/index'
     slug: '{{fields.slug}}'
-    media_folder: '{{media_folder}}/{{dirname}}'
-    public_folder: '{{public_folder}}/{{dirname}}'
+    media_folder: /static/img/uploads
+    public_folder: /img/uploads
 
     extension: md
     format: frontmatter
