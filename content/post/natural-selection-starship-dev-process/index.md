@@ -13,7 +13,7 @@ links:
     website: https://deepdemos.top/demo/demo-7d8bffaf
 ---
 
-![](/img//natural-selection-starship-dev-process/ChatGPT%20Image%202026%E5%B9%B48%E6%9C%8823%E6%97%A5%2023_19_04.png "初稿灰模图")
+![](/img/uploads/ChatGPT%20Image%202026%E5%B9%B48%E6%9C%8823%E6%97%A5%2023_19_04.png "初稿灰模图")
 
 做了一个能在浏览器里直接展开的恒星级战舰 3D 场景：三体《黑暗森林》里亚洲舰队的「自然选择号」。整个舰体完全程序化生成，几何按用户提供的六视图灰模蓝图（左/顶/底/前/后 + 四分之三视角）重建，成品是一个可双击打开的单文件 HTML——没有服务器、没有网络请求、没有任何外部模型或贴图。记录一下开发过程，工具清单放最后。
 
@@ -36,7 +36,7 @@ links:
 
 环境上依赖为零：三体设定相关的数据（尺寸、推进方式、武器布局）来自原著文本，几何全部程序化，不依赖任何外部网格或贴图资产。
 
-![](/img//natural-selection-starship-dev-process/602d38f4-6a3f-4106-96f2-7cb942e6a4a8.png "二次增补")
+![](/img/uploads/602d38f4-6a3f-4106-96f2-7cb942e6a4a8.png "二次增补")
 
 ## 三、核心实现：把设定翻译成几何与材质
 
