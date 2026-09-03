@@ -36,10 +36,10 @@ footer {
 
 /* ---- 卡片：半透明让磨砂玻璃透出（无白纱） ---- */
 :root {
-    --card-glass: color-mix(in srgb, var(--card-background) 55%, transparent);
+    --card-glass: color-mix(in srgb, var(--card-background) 30%, transparent);
 }
 
-/* 精准卡片容器 */
+/* 精准卡片容器（覆盖全部页面类型） */
 .main-article,
 .section-card,
 .article-list article,
@@ -50,7 +50,20 @@ footer {
 .widget.archives .widget-archive--list,
 .right-sidebar .widget.recent-projects .widget-recent--list,
 .right-sidebar .widget.resources .resources-list,
-.not-found-card {
+.not-found-card,
+.tagCloud .tagCloud-tags a,
+.search-form input,
+.search-form.widget,
+.widget .archives .widget-archive--list,
+.article-toc details,
+.dashboard-summary-card,
+.dashboard-panel,
+.cookie-banner__content,
+.consent-placeholder,
+#main-menu,
+.friend-links__application iframe,
+.sidebar header .site-avatar .emoji,
+.site-avatar .site-avatar__management-toggle {
     background-color: var(--card-glass) !important;
 }
 
@@ -65,6 +78,37 @@ footer {
 .home-feature-card {
     background-color: var(--card-glass) !important;
     border-radius: var(--card-border-radius) !important;
+}
+
+/* 图标颜色改 accent */
+.widget-icon svg,
+.widget-icon .hm-icon,
+.menu-social a,
+.menu-social a svg,
+.sidebar-color-icon--light .hm-icon,
+.sidebar-color-icon--dark .hm-icon {
+    color: var(--accent-color) !important;
+    stroke: var(--accent-color) !important;
+}
+
+/* 搜索框图标 */
+.search-form button svg {
+    color: var(--accent-color) !important;
+    stroke: var(--accent-color) !important;
+}
+
+/* tagCloud 与分类/标签 chip 文字对比度 */
+.tagCloud .tagCloud-tags a {
+    color: var(--accent-color) !important;
+    border-color: color-mix(in srgb, var(--accent-color) 50%, transparent) !important;
+}
+
+/* 文章页分类/标签 chips */
+.article-category a,
+.article-tags a {
+    color: var(--accent-color-text) !important;
+    background: color-mix(in srgb, var(--accent-color) 82%, transparent) !important;
+    border-color: color-mix(in srgb, var(--accent-color) 60%, transparent) !important;
 }
 
 /* ---- 打印禁用背景 ---- */
