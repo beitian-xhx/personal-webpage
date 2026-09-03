@@ -64,7 +64,7 @@ params:
     page: [{ type: toc }]
   defaultImage:
     opengraph: { enabled: true, local: true, src: /img/liquid-stack/featured.png }
-  colorScheme: { toggle: true, default: auto }
+  colorScheme: { toggle: true, default: dark }
   imageProcessing:
     thumbnail: { enabled: true }
     content: { enabled: true }
