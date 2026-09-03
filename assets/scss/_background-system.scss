@@ -5,6 +5,18 @@
  */
 
 /* ---- 全局背景层 ---- */
+.global-glass-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: rgba(245, 245, 250, 0.25);
+}
+
+html[data-scheme="dark"] .global-glass-veil {
+    background: rgba(20, 20, 25, 0.28);
+}
+
 .global-glass-backdrop {
     position: fixed;
     inset: 0;
@@ -144,6 +156,13 @@ body {
 .article-content .gist,
 .article-content .footnotes,
 .article-content .alert {
+    background-color: var(--card-glass) !important;
+}
+.resources-list__icon,
+.photo-gallery-empty,
+.pagination .page-link.current,
+.pagination .page-link:hover:not(.current):not(.disabled),
+.cookie-btn--secondary:hover {
     background-color: var(--card-glass) !important;
 }
 .site-footer, footer { color: var(--card-text-color-main) !important; opacity: 0.85; }
