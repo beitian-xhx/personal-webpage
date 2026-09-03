@@ -52,7 +52,7 @@ footer {
     content: "";
     display: block;
     width: 100%;
-    height: clamp(180px, 26vh, 300px);
+    height: clamp(240px, 55vh, 600px);
     margin-bottom: var(--section-separation, 24px);
     border-radius: var(--card-border-radius, 10px);
     background-image: var(--hero-image);
