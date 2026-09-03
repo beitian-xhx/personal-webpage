@@ -43,7 +43,11 @@
 .right-sidebar .widget.recent-projects .widget-recent--list,
 .right-sidebar .widget.resources .resources-list,
 .not-found-card, .tagCloud .tagCloud-tags a,
-.search-form input, .search-form.widget,
+.search-form.widget,
+.search-form input,
+.search-form button {
+    border-radius: var(--card-border-radius) !important;
+}
 .widget .archives .widget-archive--list, .article-toc details,
 .dashboard-summary-card, .dashboard-panel,
 .cookie-banner__content, .consent-placeholder, #main-menu,
@@ -63,6 +67,11 @@
 .home-feature-card {
     background-color: var(--card-glass) !important;
     border-radius: var(--card-border-radius) !important;
+}
+
+/* 全体文字在磨砂玻璃上可读性微阴影 */
+body {
+    text-shadow: 0 1px 3px color-mix(in srgb, var(--card-background) 50%, transparent);
 }
 
 /* ---- 图标 accent ---- */
@@ -85,11 +94,13 @@
 }
 .article-subtitle, .section-description,
 .home-profile__subtitle, .home-profile__copy .home-profile__subtitle {
-    color: var(--card-text-color-secondary) !important;
+    color: var(--card-text-color-main) !important;
+    opacity: 0.85;
 }
 .article-meta, .article-meta time, .recent-project__date,
 .widget .widget-recent--list .recent-project__date {
-    color: var(--card-text-color-tertiary) !important;
+    color: var(--card-text-color-main) !important;
+    opacity: 0.7;
 }
 .recent-project__title, .resources-list__name,
 .archives-year a, .tagCloud-tags a,
@@ -101,7 +112,41 @@
     background: color-mix(in srgb, var(--accent-color) 82%, transparent) !important;
     border-color: color-mix(in srgb, var(--accent-color) 60%, transparent) !important;
 }
-.site-footer, footer { color: var(--card-text-color-secondary) !important; }
+
+/* 遗漏白色方块补丁 */
+.article-content .copyCodeButton,
+.article-share__button::after,
+.photo-gallery__item,
+.dashboard-admin-link,
+.home-gallery-teaser__stack img,
+.home-profile-layout .home-profile__emoji,
+.site-language-notice,
+#pagination-jump-dialog,
+#i18n-switch select option,
+.article-page .main-article,
+.mermaid:not([data-processed]),
+.waline-container,
+.waline-comment-content,
+.search-form button {
+    background-color: var(--card-glass) !important;
+}
+
+/* 文章内容内嵌元素（代码块/表格/引用等） */
+.article-content pre,
+.article-content code,
+.article-content table,
+.article-content blockquote,
+.article-content .highlight,
+.article-content .highlight pre,
+.article-content .highlight div,
+.article-content .highlight table,
+.article-content .copyCodeButton,
+.article-content .gist,
+.article-content .footnotes,
+.article-content .alert {
+    background-color: var(--card-glass) !important;
+}
+.site-footer, footer { color: var(--card-text-color-main) !important; opacity: 0.85; }
 .site-footer a, footer a { color: var(--accent-color) !important; }
 .pagination a, .pagination .page-link { color: var(--accent-color) !important; }
 .not-found-card .article-title,
