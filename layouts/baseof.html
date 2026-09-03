@@ -26,5 +26,28 @@
             </main>
         </div>
         {{ partial "footer/include.html" . }}
+        <button class="bg-switch" id="bg-switch" type="button" title="切换背景系统">
+            <span class="bg-switch-label">背景</span>
+            <span class="bg-switch-state" id="bg-switch-state">开</span>
+        </button>
+        <script>
+        (function(){
+            var key = "site-bg-switch";
+            var root = document.documentElement;
+            var btn = document.getElementById("bg-switch");
+            var stateEl = document.getElementById("bg-switch-state");
+            function apply(v){
+                root.dataset.bg = v ? "on" : "off";
+                if (stateEl) stateEl.textContent = v ? "开" : "关";
+            }
+            var v = localStorage.getItem(key) !== "off";
+            apply(v);
+            if (btn) btn.addEventListener("click", function(){
+                v = !v;
+                localStorage.setItem(key, v ? "on" : "off");
+                apply(v);
+            });
+        })();
+        </script>
     </body>
 </html>

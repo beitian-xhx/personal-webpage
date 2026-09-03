@@ -1,27 +1,45 @@
 /* ===== 背景系统 =====
- * - 页面背景：global-glass-backdrop（IMG_9343 模糊版）
- * - 卡片：半透明透出背景（无独立卡片图）
- * - 字体/图标 accent 驱动
+ * 全部规则在 html[data-bg="on"] 下生效，开关控制该属性。
+ * 关闭开关 → 回到原始主题（无任何覆盖）。
  */
 
-/* ---- 全局背景层 ---- */
+/* ---- 开关按钮样式（始终可见，不受开关影响） ---- */
+.bg-switch {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 999;
+    padding: 8px 16px;
+    border: 1px solid var(--card-separator-color);
+    border-radius: 999px;
+    background: var(--card-glass, var(--card-background));
+    color: var(--card-text-color-main);
+    font-size: 1.3rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-l1);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: opacity .2s ease;
+}
+.bg-switch:hover { opacity: .85; }
+.bg-switch .bg-switch-state {
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+/* ---- 以下全部规则只在开关开启时生效 ---- */
+html[data-bg="on"] {
+
+/* 全局背景层 */
+.global-glass-backdrop,
 .global-glass-veil {
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: rgba(245, 245, 250, 0.25);
-}
-
-html[data-scheme="dark"] .global-glass-veil {
-    background: rgba(20, 20, 25, 0.28);
 }
 
 .global-glass-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
     background-color: var(--body-background);
     background-image: var(--bg-image);
     background-position: center;
@@ -29,6 +47,14 @@ html[data-scheme="dark"] .global-glass-veil {
     background-repeat: no-repeat;
     filter: blur(14px) saturate(0.9);
     transform: scale(1.05);
+}
+
+.global-glass-veil {
+    background: rgba(245, 245, 250, 0.25);
+}
+
+&[data-scheme="dark"] .global-glass-veil {
+    background: rgba(20, 20, 25, 0.28);
 }
 
 /* 内容层抬升 */
@@ -43,10 +69,8 @@ html[data-scheme="dark"] .global-glass-veil {
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* ---- 卡片半透明（30%）透出磨砂背景 ---- */
-:root {
+/* 卡片半透明（30%）透出磨砂背景 */
     --card-glass: color-mix(in srgb, var(--card-background) 30%, transparent);
-}
 
 .main-article, .section-card, .article-list article,
 .article-list--compact, .article-list--tile article,
@@ -55,17 +79,44 @@ html[data-scheme="dark"] .global-glass-veil {
 .right-sidebar .widget.recent-projects .widget-recent--list,
 .right-sidebar .widget.resources .resources-list,
 .not-found-card, .tagCloud .tagCloud-tags a,
-.search-form.widget,
-.search-form input,
-.search-form button {
-    border-radius: var(--card-border-radius) !important;
-}
+.search-form input, .search-form.widget,
 .widget .archives .widget-archive--list, .article-toc details,
 .dashboard-summary-card, .dashboard-panel,
 .cookie-banner__content, .consent-placeholder, #main-menu,
 .friend-links__application iframe,
 .sidebar header .site-avatar .emoji,
-.site-avatar .site-avatar__management-toggle {
+.site-avatar .site-avatar__management-toggle,
+.article-content .copyCodeButton,
+.article-share__button::after,
+.photo-gallery__item,
+.dashboard-admin-link,
+.home-gallery-teaser__stack img,
+.home-profile-layout .home-profile__emoji,
+.site-language-notice,
+#pagination-jump-dialog,
+#i18n-switch select option,
+.article-page .main-article,
+.mermaid:not([data-processed]),
+.waline-container,
+.waline-comment-content,
+.search-form button,
+.article-content pre,
+.article-content code,
+.article-content table,
+.article-content blockquote,
+.article-content .highlight,
+.article-content .highlight pre,
+.article-content .highlight div,
+.article-content .highlight table,
+.article-content .copyCodeButton,
+.article-content .gist,
+.article-content .footnotes,
+.article-content .alert,
+.resources-list__icon,
+.photo-gallery-empty,
+.pagination .page-link.current,
+.pagination .page-link:hover:not(.current):not(.disabled),
+.cookie-btn--secondary:hover {
     background-color: var(--card-glass) !important;
 }
 
@@ -81,12 +132,19 @@ html[data-scheme="dark"] .global-glass-veil {
     border-radius: var(--card-border-radius) !important;
 }
 
-/* 全体文字在磨砂玻璃上可读性微阴影 */
+/* 搜索框圆角统一 */
+.search-form.widget,
+.search-form input,
+.search-form button {
+    border-radius: var(--card-border-radius) !important;
+}
+
+/* 全体文字微阴影 */
 body {
     text-shadow: 0 1px 3px color-mix(in srgb, var(--card-background) 50%, transparent);
 }
 
-/* ---- 图标 accent ---- */
+/* 图标 accent */
 .widget-icon svg, .widget-icon .hm-icon,
 .menu-social a, .menu-social a svg,
 .sidebar-color-icon--light .hm-icon,
@@ -96,7 +154,7 @@ body {
     stroke: var(--accent-color) !important;
 }
 
-/* ---- 字体颜色 ---- */
+/* 字体颜色 adaptation */
 .article-title a, .article-title, .section-title,
 .widget-title, .section-term, .site-name, .site-name a,
 .home-profile__greeting, .home-profile__copy h1,
@@ -124,68 +182,26 @@ body {
     background: color-mix(in srgb, var(--accent-color) 82%, transparent) !important;
     border-color: color-mix(in srgb, var(--accent-color) 60%, transparent) !important;
 }
-
-/* 遗漏白色方块补丁 */
-.article-content .copyCodeButton,
-.article-share__button::after,
-.photo-gallery__item,
-.dashboard-admin-link,
-.home-gallery-teaser__stack img,
-.home-profile-layout .home-profile__emoji,
-.site-language-notice,
-#pagination-jump-dialog,
-#i18n-switch select option,
-.article-page .main-article,
-.mermaid:not([data-processed]),
-.waline-container,
-.waline-comment-content,
-.search-form button {
-    background-color: var(--card-glass) !important;
-}
-
-/* 文章内容内嵌元素（代码块/表格/引用等） */
-.article-content pre,
-.article-content code,
-.article-content table,
-.article-content blockquote,
-.article-content .highlight,
-.article-content .highlight pre,
-.article-content .highlight div,
-.article-content .highlight table,
-.article-content .copyCodeButton,
-.article-content .gist,
-.article-content .footnotes,
-.article-content .alert {
-    background-color: var(--card-glass) !important;
-}
-.resources-list__icon,
-.photo-gallery-empty,
-.pagination .page-link.current,
-.pagination .page-link:hover:not(.current):not(.disabled),
-.cookie-btn--secondary:hover {
-    background-color: var(--card-glass) !important;
-}
 .site-footer, footer { color: var(--card-text-color-main) !important; opacity: 0.85; }
 .site-footer a, footer a { color: var(--accent-color) !important; }
 .pagination a, .pagination .page-link { color: var(--accent-color) !important; }
 .not-found-card .article-title,
 .not-found-card .article-subtitle { color: var(--accent-color) !important; }
 
-@media print { .global-glass-backdrop { display: none !important; } }
-
-/* ===== 字体颜色重新适配 =====
- * 提升灰色字体变量对比度（浅色更暗、深色更亮），
- * 所有使用 secondary/tertiary/body-text 的文字一次生效。
- */
-
-:root {
+/* 灰色字体变量提升 */
     --card-text-color-secondary: #3d3d3d;
     --card-text-color-tertiary: #525252;
     --body-text-color: #3d3d3d;
-}
 
-html[data-scheme="dark"] {
+&[data-scheme="dark"] {
     --card-text-color-secondary: rgba(255, 255, 255, 0.88);
     --card-text-color-tertiary: rgba(255, 255, 255, 0.78);
     --body-text-color: rgba(255, 255, 255, 0.86);
 }
+
+@media print {
+    .global-glass-backdrop { display: none !important; }
+    .global-glass-veil { display: none !important; }
+}
+
+} /* end html[data-bg="on"] */
