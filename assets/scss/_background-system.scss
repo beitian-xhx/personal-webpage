@@ -172,3 +172,20 @@ body {
 .not-found-card .article-subtitle { color: var(--accent-color) !important; }
 
 @media print { .global-glass-backdrop { display: none !important; } }
+
+/* ===== 字体颜色重新适配 =====
+ * 提升灰色字体变量对比度（浅色更暗、深色更亮），
+ * 所有使用 secondary/tertiary/body-text 的文字一次生效。
+ */
+
+:root {
+    --card-text-color-secondary: #3d3d3d;
+    --card-text-color-tertiary: #525252;
+    --body-text-color: #3d3d3d;
+}
+
+html[data-scheme="dark"] {
+    --card-text-color-secondary: rgba(255, 255, 255, 0.88);
+    --card-text-color-tertiary: rgba(255, 255, 255, 0.78);
+    --body-text-color: rgba(255, 255, 255, 0.86);
+}
