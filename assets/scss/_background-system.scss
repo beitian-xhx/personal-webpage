@@ -1,7 +1,7 @@
 /* ===== 背景系统 =====
- * 设计原则：不加页面模板结构，只装饰现有骨架。
- * - 页面背景：global-glass-backdrop（IMG_9343 模糊版，无白纱）
- * - 卡片背景：IMG_9456 磨砂玻璃版（渐变遮罩 + 图），文字可读
+ * - 页面背景：global-glass-backdrop（IMG_9343 模糊版）
+ * - 卡片：半透明透出背景（无独立卡片图）
+ * - 字体/图标 accent 驱动
  */
 
 /* ---- 全局背景层 ---- */
@@ -19,194 +19,92 @@
     transform: scale(1.05);
 }
 
-/* 内容层抬升到背景之上 */
-.container.main-container,
-.site-footer,
-footer {
+/* 内容层抬升 */
+.container.main-container, .site-footer, footer {
     position: relative;
     z-index: 1;
 }
 
-/* 左侧栏悬浮玻璃感 */
+/* 左侧栏 */
 .left-sidebar {
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* ---- 卡片背景 = IMG_9456 磨砂玻璃版 ---- */
+/* ---- 卡片半透明（30%）透出磨砂背景 ---- */
 :root {
-    --card-glass: color-mix(in srgb, var(--card-background) 95%, transparent); /* fallback */
+    --card-glass: color-mix(in srgb, var(--card-background) 30%, transparent);
 }
 
-/* 全部卡片容器：position relative 让子元素正确叠放 */
-.main-article,
-.section-card,
-.article-list article,
-.article-list--compact,
-.article-list--tile article,
-.pagination,
-.widget--toc,
+.main-article, .section-card, .article-list article,
+.article-list--compact, .article-list--tile article,
+.pagination, .widget--toc,
 .widget.archives .widget-archive--list,
 .right-sidebar .widget.recent-projects .widget-recent--list,
 .right-sidebar .widget.resources .resources-list,
-.not-found-card,
-.tagCloud .tagCloud-tags a,
-.search-form input,
-.search-form.widget,
-.widget .archives .widget-archive--list,
-.article-toc details,
-.dashboard-summary-card,
-.dashboard-panel,
-.cookie-banner__content,
-.consent-placeholder,
-#main-menu,
+.not-found-card, .tagCloud .tagCloud-tags a,
+.search-form input, .search-form.widget,
+.widget .archives .widget-archive--list, .article-toc details,
+.dashboard-summary-card, .dashboard-panel,
+.cookie-banner__content, .consent-placeholder, #main-menu,
 .friend-links__application iframe,
 .sidebar header .site-avatar .emoji,
 .site-avatar .site-avatar__management-toggle {
-    position: relative;
-    isolation: isolate;
-    background-image: linear-gradient(
-        color-mix(in srgb, var(--card-background) 55%, transparent),
-        color-mix(in srgb, var(--card-background) 55%, transparent)
-    ), var(--card-image) !important;
-    background-size: cover, cover !important;
-    background-position: center, center !important;
-    background-repeat: no-repeat, no-repeat !important;
-    background-color: var(--card-background) !important;
+    background-color: var(--card-glass) !important;
 }
 
-/* 首页 profile 卡片化 */
+/* 首页 profile / 功能卡 */
 .home-profile {
-    background-image: linear-gradient(
-        color-mix(in srgb, var(--card-background) 55%, transparent),
-        color-mix(in srgb, var(--card-background) 55%, transparent)
-    ), var(--card-image) !important;
-    background-size: cover, cover !important;
-    background-position: center, center !important;
+    background: var(--card-glass) !important;
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
 }
 
-/* 首页功能卡 */
 .home-feature-card {
-    background-image: linear-gradient(
-        color-mix(in srgb, var(--card-background) 55%, transparent),
-        color-mix(in srgb, var(--card-background) 55%, transparent)
-    ), var(--card-image) !important;
-    background-size: cover, cover !important;
-    background-position: center, center !important;
+    background-color: var(--card-glass) !important;
     border-radius: var(--card-border-radius) !important;
 }
 
-/* 深色模式卡片遮罩更暗 */
-html[data-scheme="dark"] .main-article,
-html[data-scheme="dark"] .section-card,
-html[data-scheme="dark"] .article-list article,
-html[data-scheme="dark"] .article-list--compact,
-html[data-scheme="dark"] .article-list--tile article,
-html[data-scheme="dark"] .pagination,
-html[data-scheme="dark"] .widget--toc,
-html[data-scheme="dark"] .widget.archives .widget-archive--list,
-html[data-scheme="dark"] .right-sidebar .widget.recent-projects .widget-recent--list,
-html[data-scheme="dark"] .right-sidebar .widget.resources .resources-list,
-html[data-scheme="dark"] .not-found-card,
-html[data-scheme="dark"] .tagCloud .tagCloud-tags a,
-html[data-scheme="dark"] .search-form input,
-html[data-scheme="dark"] .search-form.widget,
-html[data-scheme="dark"] .widget .archives .widget-archive--list,
-html[data-scheme="dark"] .article-toc details,
-html[data-scheme="dark"] .dashboard-summary-card,
-html[data-scheme="dark"] .dashboard-panel,
-html[data-scheme="dark"] .cookie-banner__content,
-html[data-scheme="dark"] .consent-placeholder,
-html[data-scheme="dark"] #main-menu,
-html[data-scheme="dark"] .friend-links__application iframe,
-html[data-scheme="dark"] .sidebar header .site-avatar .emoji,
-html[data-scheme="dark"] .site-avatar .site-avatar__management-toggle,
-html[data-scheme="dark"] .home-profile,
-html[data-scheme="dark"] .home-feature-card {
-    background-image: linear-gradient(
-        color-mix(in srgb, var(--card-background) 65%, transparent),
-        color-mix(in srgb, var(--card-background) 65%, transparent)
-    ), var(--card-image) !important;
-}
-
-/* ---- 图标颜色改 accent ---- */
-.widget-icon svg,
-.widget-icon .hm-icon,
-.menu-social a,
-.menu-social a svg,
+/* ---- 图标 accent ---- */
+.widget-icon svg, .widget-icon .hm-icon,
+.menu-social a, .menu-social a svg,
 .sidebar-color-icon--light .hm-icon,
-.sidebar-color-icon--dark .hm-icon {
-    color: var(--accent-color) !important;
-    stroke: var(--accent-color) !important;
-}
+.sidebar-color-icon--dark .hm-icon,
 .search-form button svg {
     color: var(--accent-color) !important;
     stroke: var(--accent-color) !important;
 }
 
-/* ---- 字体颜色（accent 驱动）---- */
-.article-title a,
-.article-title,
-.section-title,
-.widget-title,
-.section-term,
-.site-name,
-.site-name a,
-.home-profile__greeting,
-.home-profile__copy h1,
-.page-title,
-.section-card .section-term,
-.left-sidebar .site-name a,
-.left-sidebar .site-name {
+/* ---- 字体颜色 ---- */
+.article-title a, .article-title, .section-title,
+.widget-title, .section-term, .site-name, .site-name a,
+.home-profile__greeting, .home-profile__copy h1,
+.page-title, .section-card .section-term,
+.left-sidebar .site-name a, .left-sidebar .site-name {
     color: var(--accent-color) !important;
 }
-.article-subtitle,
-.section-description,
-.home-profile__subtitle,
-.home-profile__copy .home-profile__subtitle {
+.article-subtitle, .section-description,
+.home-profile__subtitle, .home-profile__copy .home-profile__subtitle {
     color: var(--card-text-color-secondary) !important;
 }
-.article-meta,
-.article-meta time,
-.recent-project__date,
+.article-meta, .article-meta time, .recent-project__date,
 .widget .widget-recent--list .recent-project__date {
     color: var(--card-text-color-tertiary) !important;
 }
-.recent-project__title,
-.resources-list__name,
-.archives-year a,
-.tagCloud-tags a,
+.recent-project__title, .resources-list__name,
+.archives-year a, .tagCloud-tags a,
 .article-list--compact .article-title a {
     color: var(--accent-color) !important;
 }
-.article-category a,
-.article-tags a {
+.article-category a, .article-tags a {
     color: var(--accent-color-text) !important;
     background: color-mix(in srgb, var(--accent-color) 82%, transparent) !important;
     border-color: color-mix(in srgb, var(--accent-color) 60%, transparent) !important;
 }
-.site-footer,
-footer {
-    color: var(--card-text-color-secondary) !important;
-}
-.site-footer a,
-footer a {
-    color: var(--accent-color) !important;
-}
-.pagination a,
-.pagination .page-link {
-    color: var(--accent-color) !important;
-}
+.site-footer, footer { color: var(--card-text-color-secondary) !important; }
+.site-footer a, footer a { color: var(--accent-color) !important; }
+.pagination a, .pagination .page-link { color: var(--accent-color) !important; }
 .not-found-card .article-title,
-.not-found-card .article-subtitle {
-    color: var(--accent-color) !important;
-}
+.not-found-card .article-subtitle { color: var(--accent-color) !important; }
 
-/* ---- 打印禁用背景 ---- */
-@media print {
-    .global-glass-backdrop {
-        display: none !important;
-    }
-}
+@media print { .global-glass-backdrop { display: none !important; } }
