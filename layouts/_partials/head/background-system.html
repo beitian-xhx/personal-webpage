@@ -1,0 +1,18 @@
+{{- $bg := index hugo.Data "site_background" | default dict -}}
+{{- $defaultBgImage := $bg.image | default "/img/backgrounds/default.svg" -}}
+{{- $defaultAccent := $bg.accent | default "#34495e" -}}
+{{- $pageHeroImage := $defaultBgImage -}}
+{{- with .Params.heroImage }}{{ $pageHeroImage = . }}{{ end -}}
+{{- $pageAccent := $defaultAccent -}}
+{{- with .Params.accentColor }}{{ $pageAccent = . }}{{ end -}}
+{{- $bgImageURL := $pageHeroImage -}}
+{{- if not (hasPrefix $pageHeroImage "http") }}{{ $bgImageURL = strings.TrimPrefix "/" $pageHeroImage | relURL }}{{ end -}}
+<style>
+:root {
+  --bg-image: url("{{ $bgImageURL }}");
+  --hero-image: url("{{ $bgImageURL }}");
+  --accent: {{ $pageAccent }};
+  --accent-color: {{ $pageAccent }};
+  --accent-color-darker: color-mix(in srgb, {{ $pageAccent }}, #000 20%);
+}
+</style>

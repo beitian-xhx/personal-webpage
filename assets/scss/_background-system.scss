@@ -1,0 +1,96 @@
+/* ===== 背景系统 =====
+ * 设计原则：不加页面模板结构，只装饰现有骨架。
+ * - body 固定两层背景：global-glass-backdrop(清晰图模糊版) + global-glass-veil(可读性纱)
+ * - .main 顶部伪元素横幅：同一张图清晰显示 = "上端清晰图片"
+ * - 卡片微透明 + accent 随页面配置变化
+ */
+
+/* ---- 全局背景层 ---- */
+.global-glass-backdrop,
+.global-glass-veil {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.global-glass-backdrop {
+    background-color: var(--body-background);
+    background-image: var(--bg-image);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    filter: blur(16px) saturate(0.85);
+    transform: scale(1.05);
+}
+
+.global-glass-veil {
+    background: var(--glass-veil, rgba(245, 245, 250, 0.62));
+}
+
+html[data-scheme="dark"] .global-glass-veil {
+    background: var(--glass-veil-dark, rgba(24, 24, 28, 0.66));
+}
+
+/* 内容层抬升到背景之上 */
+.container.main-container,
+.site-footer,
+footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* ---- 左侧栏悬浮玻璃感 ---- */
+.left-sidebar {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* ---- 顶部清晰横幅（.main 伪元素，零模板侵入）---- */
+.main::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: clamp(180px, 26vh, 300px);
+    margin-bottom: var(--section-separation, 24px);
+    border-radius: var(--card-border-radius, 10px);
+    background-image: var(--hero-image);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    box-shadow: var(--shadow-l1, 0 1px 2px rgba(0,0,0,.1));
+}
+
+/* 文章页已有封面图，不加横幅避免双图 */
+body.article-page .main::before {
+    display: none;
+}
+
+/* ---- 卡片微透明（保留可读性） ---- */
+:root {
+    --card-glass: color-mix(in srgb, var(--card-background) 88%, transparent);
+}
+
+.main-article,
+.widget,
+.section-card,
+.article-list article,
+.article-list--compact article,
+.article-list--tile article,
+.pagination {
+    background-color: var(--card-glass) !important;
+}
+
+/* 首页 profile / 功能卡保留为主视觉，轻微透明即可 */
+.home-profile {
+    background: transparent !important;
+}
+
+/* ---- 打印禁用背景 ---- */
+@media print {
+    .global-glass-backdrop,
+    .global-glass-veil,
+    .main::before {
+        display: none !important;
+    }
+}
