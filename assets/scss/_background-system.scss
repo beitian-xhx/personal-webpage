@@ -73,3 +73,93 @@ footer {
         display: none !important;
     }
 }
+
+/* ===== 字体颜色全局适配 =====
+ * 所有页面共用：标题/链接/标签用 --accent（随背景图协调色），
+ * 正文保留对比度，磨砂玻璃上补微阴影提升可读性。
+ */
+
+/* 标题统一走 accent */
+.article-title a,
+.article-title,
+.section-title,
+.widget-title,
+.section-term,
+.site-name,
+.site-name a,
+.home-profile__greeting,
+.home-profile__copy h1,
+.page-title,
+.section-card .section-term {
+    color: var(--accent-color) !important;
+}
+
+/* 左侧栏站点名 */
+.left-sidebar .site-name a,
+.left-sidebar .site-name {
+    color: var(--accent-color) !important;
+}
+
+/* 次级描述文字 */
+.article-subtitle,
+.section-description,
+.home-profile__subtitle,
+.home-profile__copy .home-profile__subtitle {
+    color: var(--card-text-color-secondary) !important;
+}
+
+/* 元信息 / 日期 */
+.article-meta,
+.article-meta time,
+.recent-project__date,
+.widget .widget-recent--list .recent-project__date {
+    color: var(--card-text-color-tertiary) !important;
+}
+
+/* 列表项标题 */
+.recent-project__title,
+.resources-list__name,
+.archives-year a,
+.tagCloud-tags a,
+.article-list--compact .article-title a {
+    color: var(--accent-color) !important;
+}
+
+/* 标签 / 分类 chip */
+.article-category a,
+.article-tags a {
+    color: var(--accent-color-text) !important;
+    background: color-mix(in srgb, var(--accent-color) 82%, transparent) !important;
+    border-color: color-mix(in srgb, var(--accent-color) 60%, transparent) !important;
+}
+
+/* 页脚 */
+.site-footer,
+footer {
+    color: var(--card-text-color-secondary) !important;
+}
+.site-footer a,
+footer a {
+    color: var(--accent-color) !important;
+}
+
+/* 分页 */
+.pagination a,
+.pagination .page-link {
+    color: var(--accent-color) !important;
+}
+
+/* 正文基础：磨砂玻璃上的可读性微阴影 */
+body {
+    text-shadow: 0 1px 2px color-mix(in srgb, var(--card-background) 55%, transparent);
+}
+
+html[data-scheme="dark"] body {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* 404 */
+.not-found-card .article-title,
+.not-found-card .article-subtitle {
+    color: var(--accent-color) !important;
+}
