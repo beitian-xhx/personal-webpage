@@ -1,36 +1,23 @@
 /* ===== 背景系统 =====
  * 设计原则：不加页面模板结构，只装饰现有骨架。
- * - body 固定两层背景：global-glass-backdrop(清晰图模糊版) + global-glass-veil(可读性纱)
- * - .main 顶部伪元素横幅：同一张图清晰显示 = "上端清晰图片"
- * - 卡片微透明 + accent 随页面配置变化
- * - 精准定位已知卡片容器，不误伤内部行/组件
+ * - body 固定背景层：global-glass-backdrop(整图模糊版 = 磨砂玻璃)
+ * - 无白纱、无顶部横幅
+ * - 卡片半透明，让磨砂玻璃图直接透出（不用白色底）
  */
 
 /* ---- 全局背景层 ---- */
-.global-glass-backdrop,
-.global-glass-veil {
+.global-glass-backdrop {
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-}
-
-.global-glass-backdrop {
     background-color: var(--body-background);
     background-image: var(--bg-image);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
-    filter: blur(16px) saturate(0.85);
+    filter: blur(14px) saturate(0.9);
     transform: scale(1.05);
-}
-
-.global-glass-veil {
-    background: var(--glass-veil, rgba(245, 245, 250, 0.62));
-}
-
-html[data-scheme="dark"] .global-glass-veil {
-    background: var(--glass-veil-dark, rgba(24, 24, 28, 0.66));
 }
 
 /* 内容层抬升到背景之上 */
@@ -41,38 +28,18 @@ footer {
     z-index: 1;
 }
 
-/* ---- 左侧栏悬浮玻璃感 ---- */
+/* 左侧栏悬浮玻璃感 */
 .left-sidebar {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
-/* ---- 顶部清晰横幅（.main 伪元素，零模板侵入）---- */
-.main::before {
-    content: "";
-    display: block;
-    width: 100%;
-    height: clamp(240px, 55vh, 600px);
-    margin-bottom: var(--section-separation, 24px);
-    border-radius: var(--card-border-radius, 10px);
-    background-image: var(--hero-image);
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    box-shadow: var(--shadow-l1, 0 1px 2px rgba(0,0,0,.1));
-}
-
-/* 文章页已有封面图，不加横幅避免双图 */
-body.article-page .main::before {
-    display: none;
-}
-
-/* ---- 卡片微透明（保留可读性） ---- */
+/* ---- 卡片：半透明让磨砂玻璃透出（无白纱） ---- */
 :root {
-    --card-glass: color-mix(in srgb, var(--card-background) 88%, transparent);
+    --card-glass: color-mix(in srgb, var(--card-background) 55%, transparent);
 }
 
-/* 精准卡片容器（只改已知有 card-style 的元素） */
+/* 精准卡片容器 */
 .main-article,
 .section-card,
 .article-list article,
@@ -94,16 +61,15 @@ body.article-page .main::before {
     padding: var(--card-padding);
 }
 
-/* 首页功能卡保持原有圆角 */
+/* 首页功能卡 */
 .home-feature-card {
+    background-color: var(--card-glass) !important;
     border-radius: var(--card-border-radius) !important;
 }
 
 /* ---- 打印禁用背景 ---- */
 @media print {
-    .global-glass-backdrop,
-    .global-glass-veil,
-    .main::before {
+    .global-glass-backdrop {
         display: none !important;
     }
 }
