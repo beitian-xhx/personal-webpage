@@ -1,3 +1,4 @@
 # 全站背景系统配置
-image: /img/backgrounds/test.jpg
+image: /img/backgrounds/page.jpg
+cardImage: /img/backgrounds/card.jpg
 accent: "#34495e"

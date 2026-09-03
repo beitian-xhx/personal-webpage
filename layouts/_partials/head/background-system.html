@@ -5,12 +5,15 @@
 {{- with .Params.heroImage }}{{ $pageHeroImage = . }}{{ end -}}
 {{- $pageAccent := $defaultAccent -}}
 {{- with .Params.accentColor }}{{ $pageAccent = . }}{{ end -}}
+{{- $cardImage := $bg.cardImage | default $defaultBgImage -}}
+{{- $cardImageURL := $cardImage -}}
+{{- if not (hasPrefix $cardImage "http") }}{{ $cardImageURL = strings.TrimPrefix "/" $cardImage | relURL }}{{ end -}}
 {{- $bgImageURL := $pageHeroImage -}}
 {{- if not (hasPrefix $pageHeroImage "http") }}{{ $bgImageURL = strings.TrimPrefix "/" $pageHeroImage | relURL }}{{ end -}}
 <style>
 :root {
   --bg-image: url("{{ $bgImageURL }}");
-  --hero-image: url("{{ $bgImageURL }}");
+  --card-image: url("{{ $cardImageURL }}");
   --accent: {{ $pageAccent }};
   --accent-color: {{ $pageAccent }};
   --accent-color-darker: color-mix(in srgb, {{ $pageAccent }}, #000 20%);

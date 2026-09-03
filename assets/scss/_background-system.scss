@@ -1,8 +1,7 @@
 /* ===== 背景系统 =====
  * 设计原则：不加页面模板结构，只装饰现有骨架。
- * - body 固定背景层：global-glass-backdrop(整图模糊版 = 磨砂玻璃)
- * - 无白纱、无顶部横幅
- * - 卡片半透明，让磨砂玻璃图直接透出（不用白色底）
+ * - 页面背景：global-glass-backdrop（IMG_9343 模糊版，无白纱）
+ * - 卡片背景：IMG_9456 磨砂玻璃版（渐变遮罩 + 图），文字可读
  */
 
 /* ---- 全局背景层 ---- */
@@ -34,12 +33,12 @@ footer {
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* ---- 卡片：半透明让磨砂玻璃透出（无白纱） ---- */
+/* ---- 卡片背景 = IMG_9456 磨砂玻璃版 ---- */
 :root {
-    --card-glass: color-mix(in srgb, var(--card-background) 30%, transparent);
+    --card-glass: color-mix(in srgb, var(--card-background) 95%, transparent); /* fallback */
 }
 
-/* 精准卡片容器（覆盖全部页面类型） */
+/* 全部卡片容器：position relative 让子元素正确叠放 */
 .main-article,
 .section-card,
 .article-list article,
@@ -64,23 +63,75 @@ footer {
 .friend-links__application iframe,
 .sidebar header .site-avatar .emoji,
 .site-avatar .site-avatar__management-toggle {
-    background-color: var(--card-glass) !important;
+    position: relative;
+    isolation: isolate;
+    background-image: linear-gradient(
+        color-mix(in srgb, var(--card-background) 55%, transparent),
+        color-mix(in srgb, var(--card-background) 55%, transparent)
+    ), var(--card-image) !important;
+    background-size: cover, cover !important;
+    background-position: center, center !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-color: var(--card-background) !important;
 }
 
 /* 首页 profile 卡片化 */
 .home-profile {
-    background: var(--card-glass) !important;
+    background-image: linear-gradient(
+        color-mix(in srgb, var(--card-background) 55%, transparent),
+        color-mix(in srgb, var(--card-background) 55%, transparent)
+    ), var(--card-image) !important;
+    background-size: cover, cover !important;
+    background-position: center, center !important;
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
 }
 
 /* 首页功能卡 */
 .home-feature-card {
-    background-color: var(--card-glass) !important;
+    background-image: linear-gradient(
+        color-mix(in srgb, var(--card-background) 55%, transparent),
+        color-mix(in srgb, var(--card-background) 55%, transparent)
+    ), var(--card-image) !important;
+    background-size: cover, cover !important;
+    background-position: center, center !important;
     border-radius: var(--card-border-radius) !important;
 }
 
-/* 图标颜色改 accent */
+/* 深色模式卡片遮罩更暗 */
+html[data-scheme="dark"] .main-article,
+html[data-scheme="dark"] .section-card,
+html[data-scheme="dark"] .article-list article,
+html[data-scheme="dark"] .article-list--compact,
+html[data-scheme="dark"] .article-list--tile article,
+html[data-scheme="dark"] .pagination,
+html[data-scheme="dark"] .widget--toc,
+html[data-scheme="dark"] .widget.archives .widget-archive--list,
+html[data-scheme="dark"] .right-sidebar .widget.recent-projects .widget-recent--list,
+html[data-scheme="dark"] .right-sidebar .widget.resources .resources-list,
+html[data-scheme="dark"] .not-found-card,
+html[data-scheme="dark"] .tagCloud .tagCloud-tags a,
+html[data-scheme="dark"] .search-form input,
+html[data-scheme="dark"] .search-form.widget,
+html[data-scheme="dark"] .widget .archives .widget-archive--list,
+html[data-scheme="dark"] .article-toc details,
+html[data-scheme="dark"] .dashboard-summary-card,
+html[data-scheme="dark"] .dashboard-panel,
+html[data-scheme="dark"] .cookie-banner__content,
+html[data-scheme="dark"] .consent-placeholder,
+html[data-scheme="dark"] #main-menu,
+html[data-scheme="dark"] .friend-links__application iframe,
+html[data-scheme="dark"] .sidebar header .site-avatar .emoji,
+html[data-scheme="dark"] .site-avatar .site-avatar__management-toggle,
+html[data-scheme="dark"] .home-profile,
+html[data-scheme="dark"] .home-feature-card {
+    background-image: linear-gradient(
+        color-mix(in srgb, var(--card-background) 65%, transparent),
+        color-mix(in srgb, var(--card-background) 65%, transparent)
+    ), var(--card-image) !important;
+}
+
+/* ---- 图标颜色改 accent ---- */
 .widget-icon svg,
 .widget-icon .hm-icon,
 .menu-social a,
@@ -90,40 +141,12 @@ footer {
     color: var(--accent-color) !important;
     stroke: var(--accent-color) !important;
 }
-
-/* 搜索框图标 */
 .search-form button svg {
     color: var(--accent-color) !important;
     stroke: var(--accent-color) !important;
 }
 
-/* tagCloud 与分类/标签 chip 文字对比度 */
-.tagCloud .tagCloud-tags a {
-    color: var(--accent-color) !important;
-    border-color: color-mix(in srgb, var(--accent-color) 50%, transparent) !important;
-}
-
-/* 文章页分类/标签 chips */
-.article-category a,
-.article-tags a {
-    color: var(--accent-color-text) !important;
-    background: color-mix(in srgb, var(--accent-color) 82%, transparent) !important;
-    border-color: color-mix(in srgb, var(--accent-color) 60%, transparent) !important;
-}
-
-/* ---- 打印禁用背景 ---- */
-@media print {
-    .global-glass-backdrop {
-        display: none !important;
-    }
-}
-
-/* ===== 字体颜色全局适配 =====
- * 所有页面共用：标题/链接/标签用 --accent（随背景图协调色），
- * 正文保留对比度，磨砂玻璃上补微阴影提升可读性。
- */
-
-/* 标题统一走 accent */
+/* ---- 字体颜色（accent 驱动）---- */
 .article-title a,
 .article-title,
 .section-title,
@@ -134,33 +157,23 @@ footer {
 .home-profile__greeting,
 .home-profile__copy h1,
 .page-title,
-.section-card .section-term {
-    color: var(--accent-color) !important;
-}
-
-/* 左侧栏站点名 */
+.section-card .section-term,
 .left-sidebar .site-name a,
 .left-sidebar .site-name {
     color: var(--accent-color) !important;
 }
-
-/* 次级描述文字 */
 .article-subtitle,
 .section-description,
 .home-profile__subtitle,
 .home-profile__copy .home-profile__subtitle {
     color: var(--card-text-color-secondary) !important;
 }
-
-/* 元信息 / 日期 */
 .article-meta,
 .article-meta time,
 .recent-project__date,
 .widget .widget-recent--list .recent-project__date {
     color: var(--card-text-color-tertiary) !important;
 }
-
-/* 列表项标题 */
 .recent-project__title,
 .resources-list__name,
 .archives-year a,
@@ -168,16 +181,12 @@ footer {
 .article-list--compact .article-title a {
     color: var(--accent-color) !important;
 }
-
-/* 标签 / 分类 chip */
 .article-category a,
 .article-tags a {
     color: var(--accent-color-text) !important;
     background: color-mix(in srgb, var(--accent-color) 82%, transparent) !important;
     border-color: color-mix(in srgb, var(--accent-color) 60%, transparent) !important;
 }
-
-/* 页脚 */
 .site-footer,
 footer {
     color: var(--card-text-color-secondary) !important;
@@ -186,24 +195,18 @@ footer {
 footer a {
     color: var(--accent-color) !important;
 }
-
-/* 分页 */
 .pagination a,
 .pagination .page-link {
     color: var(--accent-color) !important;
 }
-
-/* 正文基础：磨砂玻璃上的可读性微阴影 */
-body {
-    text-shadow: 0 1px 2px color-mix(in srgb, var(--card-background) 55%, transparent);
-}
-
-html[data-scheme="dark"] body {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-}
-
-/* 404 */
 .not-found-card .article-title,
 .not-found-card .article-subtitle {
     color: var(--accent-color) !important;
+}
+
+/* ---- 打印禁用背景 ---- */
+@media print {
+    .global-glass-backdrop {
+        display: none !important;
+    }
 }
