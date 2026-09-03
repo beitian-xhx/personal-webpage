@@ -3,6 +3,7 @@
  * - body 固定两层背景：global-glass-backdrop(清晰图模糊版) + global-glass-veil(可读性纱)
  * - .main 顶部伪元素横幅：同一张图清晰显示 = "上端清晰图片"
  * - 卡片微透明 + accent 随页面配置变化
+ * - 精准定位已知卡片容器，不误伤内部行/组件
  */
 
 /* ---- 全局背景层 ---- */
@@ -71,19 +72,31 @@ body.article-page .main::before {
     --card-glass: color-mix(in srgb, var(--card-background) 88%, transparent);
 }
 
+/* 精准卡片容器（只改已知有 card-style 的元素） */
 .main-article,
-.widget,
 .section-card,
 .article-list article,
-.article-list--compact article,
+.article-list--compact,
 .article-list--tile article,
-.pagination {
+.pagination,
+.widget--toc,
+.widget.archives .widget-archive--list,
+.right-sidebar .widget.recent-projects .widget-recent--list,
+.right-sidebar .widget.resources .resources-list,
+.not-found-card {
     background-color: var(--card-glass) !important;
 }
 
-/* 首页 profile / 功能卡保留为主视觉，轻微透明即可 */
+/* 首页 profile 卡片化 */
 .home-profile {
-    background: transparent !important;
+    background: var(--card-glass) !important;
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+}
+
+/* 首页功能卡保持原有圆角 */
+.home-feature-card {
+    border-radius: var(--card-border-radius) !important;
 }
 
 /* ---- 打印禁用背景 ---- */
