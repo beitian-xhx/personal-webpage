@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="890" viewBox="0 0 1200 890" role="img" aria-labelledby="title desc">
+  <title id="title">Mimir 的任务、专业模块与写入边界</title>
+  <desc id="desc">使用者确认目标与候选，成长层组织任务与回望。论文、文稿和科研工具处理专业工作。模型建议经过业务与来源检查，由使用者确认后写入本地记录。</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#f4f7f8"/><stop offset="1" stop-color="#eeebf5"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L8 5L1 9" fill="none" stroke="#7a879e" stroke-width="1.6"/></marker>
+    <style>
+      text {font-family:'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#263747}
+      .label {font-size:15px;letter-spacing:2px;fill:#64748b}
+      .heading {font-size:24px;font-weight:600}
+      .body {font-size:18px;fill:#506274}
+      .small {font-size:16px;fill:#64748b}
+      .card {fill:#fff;fill-opacity:.82;stroke:#d2dbe5;stroke-width:1.5}
+      .line {fill:none;stroke:#7a879e;stroke-width:2;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="890" rx="28" fill="url(#bg)"/>
+  <text x="54" y="62" class="label">MIMIR · DEVELOPMENT NOTES</text>
+  <text x="54" y="112" font-size="36" font-weight="600">从目标到成果，各层负责一段工作</text>
+  <text x="54" y="149" class="body">成长层组织过程，专业模块处理内容；跨模块操作由使用者推进。</text>
+  <text x="54" y="199" class="label">01  成长层 · 当前方案与历史</text>
+  <rect class="card" x="54" y="220" width="246" height="110" rx="14"/>
+  <text x="77" y="259" class="heading">目标与约束</text>
+  <text x="77" y="295" class="body">目的 / 基础 / 时间</text>
+  <path class="line" d="M304 274H332"/>
+  <rect class="card" x="342" y="220" width="246" height="110" rx="14"/>
+  <text x="365" y="259" class="heading">候选与确认</text>
+  <text x="365" y="295" class="body">先预览，再切换方案</text>
+  <path class="line" d="M592 274H620"/>
+  <rect class="card" x="630" y="220" width="246" height="110" rx="14"/>
+  <text x="653" y="259" class="heading">世界树任务</text>
+  <text x="653" y="295" class="body">清单 / 知识 / 路径</text>
+  <path class="line" d="M880 274H908"/>
+  <rect class="card" x="918" y="220" width="228" height="110" rx="14"/>
+  <text x="941" y="259" class="heading">阶段回望</text>
+  <text x="941" y="295" class="body">困难 / 成果 / 修订</text>
+  <path d="M1032 334V355H465V334" fill="none" stroke="#9b9ab3" stroke-width="2" stroke-dasharray="5 6" marker-end="url(#arrow)"/>
+  <text x="54" y="405" class="label">02  专业工作 · 使用者进入与操作</text>
+  <rect class="card" x="54" y="426" width="348" height="151" rx="14"/>
+  <text x="78" y="466" class="heading">论文与研究</text>
+  <text x="78" y="503" class="body">选区问答 / 分析与综合</text>
+  <text x="78" y="539" class="body">来源快照 / 引用定位 / 复核</text>
+  <rect class="card" x="426" y="426" width="348" height="151" rx="14"/>
+  <text x="450" y="466" class="heading">文稿与审阅</text>
+  <text x="450" y="503" class="body">结构化正文 / 修改建议</text>
+  <text x="450" y="539" class="body">接受或拒绝 / 保存 / 导出</text>
+  <rect class="card" x="798" y="426" width="348" height="151" rx="14"/>
+  <text x="822" y="466" class="heading">专题与工具</text>
+  <text x="822" y="503" class="body">预测与数值核对 / 图表</text>
+  <text x="822" y="539" class="body">文档处理 / 本地 TeX 编译</text>
+  <path class="line" d="M228 582V612"/>
+  <path class="line" d="M600 582V612"/>
+  <path class="line" d="M972 582V612"/>
+  <rect x="54" y="626" width="1092" height="84" rx="14" fill="#dfe7ee" stroke="#bdcbd8"/>
+  <text x="78" y="661" font-size="21" font-weight="600">对应模块的检查与确认</text>
+  <text x="78" y="691" class="body">资源与时间约束 · 来源与版本核对 · 人工审核 · 版本冲突与重复提交处理</text>
+  <path class="line" d="M600 715V744"/>
+  <rect class="card" x="54" y="758" width="1092" height="78" rx="14"/>
+  <text x="78" y="791" font-size="21" font-weight="600">本地记录与文件</text>
+  <text x="78" y="819" class="body">方案 / 任务 / 成果 / 文稿 / 来源证据 / 历史记录</text>
+  <text x="54" y="868" class="small">按现有模块关系整理。示意图不表示所有数据已统一，也不表示已实现跨模块自动执行。</text>
+</svg>
