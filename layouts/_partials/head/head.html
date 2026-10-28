@@ -46,7 +46,7 @@
             var glassRaw = sessionStorage.getItem("site-glass-arrival");
             if (glassRaw) {
                 var glass = JSON.parse(glassRaw);
-                if (glass && glass.to === location.pathname && Date.now() - Number(glass.time) < 15000) {
+                if (glass && glass.to === location.pathname && Date.now() - Number(glass.time) < 120000) {
                     arriving = true;
                     root.dataset.glassArrival = "true";
                     if (root.dataset.experience === "true" && typeof glass.snapshot === "string" && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(glass.snapshot) && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
