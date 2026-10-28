@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="{{ .Site.Language.Locale }}" dir="{{ default `ltr` .Language.Direction }}">
+<html lang="{{ .Site.Language.Locale }}" dir="{{ default `ltr` .Language.Direction }}" {{ if .Site.Params.experience.enabled }}data-experience="true"{{ end }} data-site-base="{{ "/" | relURL }}" data-scheme="{{ cond (eq .Site.Params.colorScheme.default "dark") "dark" "light" }}">
     <head>
         {{- partial "head/head.html" . -}}
         {{- block "head" . -}}{{ end }}
     </head>
-    <body class="{{ block `body-class` . }}{{ end }}">
+    <body class="{{ if .Site.Params.experience.enabled }}experience-enabled {{ end }}{{ block `body-class` . }}{{ end }}">
+        {{ if .Site.Params.experience.enabled }}
+        <div class="experience-fluid" aria-hidden="true"><canvas></canvas></div>
+        {{ partial "experience/nav.html" . }}
+        {{ partial "experience/portal.html" . }}
+        <div class="experience-cursor" aria-hidden="true"><span></span></div>
+        <div class="experience-transition" aria-hidden="true"></div>
+        {{ end }}
+        <div class="reading-progress" aria-hidden="true"></div>
         <div class="global-glass-backdrop" aria-hidden="true"></div>
         <div class="global-glass-veil" aria-hidden="true"></div>
 
@@ -39,12 +47,13 @@
             function apply(v){
                 root.dataset.bg = v ? "on" : "off";
                 if (stateEl) stateEl.textContent = v ? "开" : "关";
+                if (btn) btn.setAttribute("aria-pressed", v ? "true" : "false");
             }
-            var v = localStorage.getItem(key) !== "off";
+            var v = root.dataset.bg !== "off";
             apply(v);
             if (btn) btn.addEventListener("click", function(){
                 v = !v;
-                localStorage.setItem(key, v ? "on" : "off");
+                try { localStorage.setItem(key, v ? "on" : "off"); } catch (_) {}
                 apply(v);
             });
         })();

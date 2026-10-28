@@ -1,3 +1,6 @@
+import { initMotion } from "./motion";
+import { initExperience } from "./experience";
+
 const copyText = async (text: string): Promise<void> => {
     if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(text);
@@ -461,58 +464,6 @@ const initHomeSocialHover = () => {
     });
 };
 
-const getCurrentSchemeBackground = () => (document.documentElement.dataset.scheme === "dark" ? "#303030" : "#f5f5fa");
-
-const showNavigationVeil = () => {
-    if (document.querySelector(".page-navigation-veil")) return;
-
-    const veil = document.createElement("div");
-    veil.className = "page-navigation-veil";
-    veil.style.background = getCurrentSchemeBackground();
-    document.body.appendChild(veil);
-
-    window.requestAnimationFrame(() => {
-        veil.classList.add("is-visible");
-    });
-};
-
-const hideNavigationVeil = () => {
-    document.querySelector(".page-navigation-veil")?.remove();
-};
-
-const initNavigationSmoothing = () => {
-    const internalLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>("#main-menu > li:not(.menu-bottom-section) > a"));
-    const seen = new Set<string>();
-
-    internalLinks.forEach((link) => {
-        const url = new URL(link.href, window.location.href);
-        if (url.origin !== window.location.origin || seen.has(url.href)) return;
-
-        seen.add(url.href);
-
-        const prefetch = document.createElement("link");
-        prefetch.rel = "prefetch";
-        prefetch.href = url.href;
-        prefetch.as = "document";
-        document.head.appendChild(prefetch);
-    });
-
-    internalLinks.forEach((link) => {
-        link.addEventListener("click", (event) => {
-            if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-            if (link.target && link.target !== "_self") return;
-
-            const target = new URL(link.href, window.location.href);
-            if (target.origin !== window.location.origin || target.href === window.location.href) return;
-
-            showNavigationVeil();
-        });
-    });
-
-    window.addEventListener("pagehide", showNavigationVeil);
-    window.addEventListener("pageshow", hideNavigationVeil);
-};
-
 const initSidebarMenuHover = () => {
     document.querySelectorAll<HTMLElement>("#main-menu").forEach((menu) => {
         if (menu.dataset.hoverReady === "true") return;
@@ -601,17 +552,6 @@ const initSidebarMenuHover = () => {
 const initHomeProfile = () => {
     const profile = document.querySelector<HTMLElement>(".home-profile");
     const greeting = document.querySelector<HTMLElement>("[data-home-greeting]");
-    const arriveFromHomeKey = "homeProfileArrive";
-
-    if (window.sessionStorage.getItem(arriveFromHomeKey) === "true") {
-        window.sessionStorage.removeItem(arriveFromHomeKey);
-        document.body.classList.add("is-arriving-from-home");
-
-        window.setTimeout(() => {
-            document.body.classList.remove("is-arriving-from-home");
-        }, 700);
-    }
-
     if (greeting) {
         const hour = new Date().getHours();
         const key = hour >= 6 && hour < 12 ? "greetingMorning" : hour >= 12 && hour < 18 ? "greetingAfternoon" : hour >= 18 && hour < 22 ? "greetingEvening" : "greetingNight";
@@ -695,25 +635,6 @@ const initHomeProfile = () => {
         });
     }
 
-    document.querySelectorAll<HTMLAnchorElement>("#main-menu > li:not(.menu-bottom-section) > a").forEach((link) => {
-        link.addEventListener("click", (event) => {
-            if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-            if (link.target && link.target !== "_self") return;
-
-            const target = new URL(link.href, window.location.href);
-            if (target.origin !== window.location.origin) return;
-            if (target.href === window.location.href) return;
-
-            event.preventDefault();
-            window.sessionStorage.setItem(arriveFromHomeKey, "true");
-            document.body.classList.add("is-home-profile-leaving");
-            window.setTimeout(showNavigationVeil, 120);
-
-            window.setTimeout(() => {
-                window.location.href = target.href;
-            }, 180);
-        });
-    });
 };
 
 const initAppLaunchpad = () => {
@@ -895,6 +816,10 @@ const initPhotoGallery = () => {
 
         let zoomedItem: HTMLElement | null = null;
         let zoomClone: HTMLElement | null = null;
+        let previousFocus: HTMLElement | null = null;
+        let finishZoom: (() => void) | null = null;
+        const revealAnimations = new Set<Animation>();
+        let hasRevealed = false;
         let frame = 0;
         let dragState: {
             item: HTMLElement;
@@ -907,7 +832,7 @@ const initPhotoGallery = () => {
         } | null = null;
 
         const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const canDrag = () => window.matchMedia("(pointer: fine) and (min-width: 721px)").matches;
+        const canDrag = () => !prefersReducedMotion() && window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 721px)").matches;
         const storageKey = (item: HTMLElement) => `photo-gallery-offset:${item.dataset.galleryId || ""}`;
 
         const hashString = (value: string) => {
@@ -969,6 +894,7 @@ const initPhotoGallery = () => {
 
             if (window.matchMedia("(max-width: 720px)").matches || prefersReducedMotion()) {
                 gallery.style.removeProperty("height");
+                gallery.classList.remove("is-enhanced");
                 gallery.classList.add("is-ready");
                 return;
             }
@@ -1027,14 +953,35 @@ const initPhotoGallery = () => {
                 }
             });
 
-            gallery.classList.add("is-ready");
+            gallery.classList.add("is-ready", "is-enhanced");
+            if (!hasRevealed && !prefersReducedMotion() && "animate" in Element.prototype) {
+                hasRevealed = true;
+                items.slice(0, 6).forEach((item, index) => {
+                    try {
+                        const animation = item.animate([{ opacity: 0 }, { opacity: 1 }], {
+                            duration: 300, delay: Math.min(index * 30, 150), fill: "backwards", easing: "cubic-bezier(.22,1,.36,1)",
+                        });
+                        revealAnimations.add(animation);
+                        animation.finished.catch(() => undefined).then(() => revealAnimations.delete(animation));
+                    } catch (_) {}
+                });
+            }
         };
 
-        const setFloatingRect = (item: HTMLElement, rect: { left: number; top: number; width: number }, rotate = "0deg") => {
-            item.style.setProperty("--gallery-float-left", `${rect.left}px`);
-            item.style.setProperty("--gallery-float-top", `${rect.top}px`);
-            item.style.setProperty("--gallery-float-width", `${rect.width}px`);
-            item.style.setProperty("--gallery-float-rotate", rotate);
+        const setFloatingTransform = (clone: HTMLElement, item: HTMLElement) => {
+            const origin = item.getBoundingClientRect();
+            const itemTransform = getComputedStyle(item).transform;
+            const matrix = new DOMMatrixReadOnly(itemTransform === "none" ? undefined : itemTransform);
+            const cloneStyle = getComputedStyle(clone);
+            const centerX = parseFloat(cloneStyle.left);
+            const centerY = parseFloat(cloneStyle.top);
+            const scaleX = item.offsetWidth * Math.hypot(matrix.a, matrix.b) / Math.max(clone.offsetWidth, 1);
+            const scaleY = item.offsetHeight * Math.hypot(matrix.c, matrix.d) / Math.max(clone.offsetHeight, 1);
+            clone.style.setProperty("--gallery-flip-x", `${origin.left + origin.width / 2 - centerX}px`);
+            clone.style.setProperty("--gallery-flip-y", `${origin.top + origin.height / 2 - centerY}px`);
+            clone.style.setProperty("--gallery-flip-scale-x", `${Math.max(scaleX, 0.001)}`);
+            clone.style.setProperty("--gallery-flip-scale-y", `${Math.max(scaleY, 0.001)}`);
+            clone.style.setProperty("--gallery-flip-rotate", `${Math.atan2(matrix.b, matrix.a) * 180 / Math.PI}deg`);
         };
 
         const showBackdrop = () => {
@@ -1055,17 +1002,17 @@ const initPhotoGallery = () => {
             }, prefersReducedMotion() ? 0 : 260);
         };
 
-        const closeZoom = () => {
+        const closeZoom = (immediate = false) => {
             if (!zoomedItem || !zoomClone) return;
+            if (finishZoom) {
+                if (immediate) finishZoom();
+                return;
+            }
 
             const item = zoomedItem;
             const clone = zoomClone;
-            const origin = item.getBoundingClientRect();
-
-            if (origin) {
-                setFloatingRect(clone, origin, item.dataset.originRotate || "0deg");
-            }
-
+            setFloatingTransform(clone, item);
+            clone.style.willChange = "transform, opacity";
             clone.classList.remove("is-zoomed");
             hideBackdrop();
 
@@ -1077,26 +1024,28 @@ const initPhotoGallery = () => {
                 finished = true;
                 if (handleCloseTransitionEnd) clone.removeEventListener("transitionend", handleCloseTransitionEnd);
                 clone.remove();
-                delete item.dataset.originRect;
                 document.body.classList.remove("photo-gallery-open");
-                window.requestAnimationFrame(() => {
-                    item.classList.remove("is-zoom-origin");
-                });
+                item.classList.remove("is-zoom-origin");
+                item.setAttribute("aria-expanded", "false");
+                if (!document.hidden) (previousFocus?.isConnected ? previousFocus : item).focus({ preventScroll: true });
+                previousFocus = null;
+                finishZoom = null;
                 if (zoomedItem === item) zoomedItem = null;
                 if (zoomClone === clone) zoomClone = null;
             };
+            finishZoom = finish;
 
             handleCloseTransitionEnd = (event: TransitionEvent) => {
                 if (event.target !== clone) return;
-                if (!["transform", "left", "top", "width"].includes(event.propertyName)) return;
+                if (event.propertyName !== "transform" && event.propertyName !== "opacity") return;
                 finish();
             };
 
-            if (prefersReducedMotion()) {
+            if (immediate || prefersReducedMotion()) {
                 finish();
             } else {
                 clone.addEventListener("transitionend", handleCloseTransitionEnd);
-                window.setTimeout(finish, 560);
+                window.setTimeout(finish, 280);
             }
         };
 
@@ -1106,42 +1055,65 @@ const initPhotoGallery = () => {
                 return;
             }
 
-            if (zoomedItem) closeZoom();
-
-            const originRect = item.getBoundingClientRect();
-            const rotate = getComputedStyle(item).getPropertyValue("--gallery-rotate").trim() || "0deg";
-
-            item.dataset.originRect = JSON.stringify({
-                left: originRect.left,
-                top: originRect.top,
-                width: originRect.width,
-            });
-            item.dataset.originRotate = rotate;
+            if (zoomedItem) closeZoom(true);
+            previousFocus = item;
+            revealAnimations.forEach(animation => animation.cancel());
+            revealAnimations.clear();
 
             const clone = item.cloneNode(true) as HTMLElement;
             clone.removeAttribute("data-gallery-item");
+            clone.removeAttribute("data-gallery-id");
+            clone.removeAttribute("aria-expanded");
+            clone.removeAttribute("aria-haspopup");
             clone.classList.remove("is-menu-hovered", "is-dragging", "is-zoom-origin");
             clone.classList.add("is-gallery-clone");
             clone.tabIndex = -1;
-            clone.setAttribute("aria-hidden", "true");
-            setFloatingRect(clone, originRect, rotate);
+            clone.setAttribute("role", "dialog");
+            clone.setAttribute("aria-modal", "true");
+            clone.setAttribute("aria-label", item.dataset.galleryTitle || "照片预览");
+            const closeButton = document.createElement("button");
+            closeButton.type = "button";
+            closeButton.className = "photo-gallery__close";
+            closeButton.dataset.galleryCloseButton = "";
+            closeButton.setAttribute("aria-label", "关闭照片");
+            closeButton.textContent = "×";
+            closeButton.addEventListener("click", event => {
+                event.stopPropagation();
+                closeZoom();
+            });
+            clone.appendChild(closeButton);
+            clone.style.transition = "none";
+            clone.style.willChange = "transform, opacity";
 
             document.body.appendChild(clone);
-            clone.getBoundingClientRect();
-            item.classList.add("is-zoom-origin");
             showBackdrop();
+            const finalRect = clone.getBoundingClientRect();
+            clone.style.width = `${finalRect.width}px`;
+            clone.style.height = `${finalRect.height}px`;
+            setFloatingTransform(clone, item);
+            item.classList.add("is-zoom-origin");
+            item.setAttribute("aria-expanded", "true");
 
             zoomedItem = item;
             zoomClone = clone;
 
             clone.addEventListener("click", (event) => {
-                if ((event.target as HTMLElement).closest("a")) return;
+                if ((event.target as HTMLElement).closest("a, button")) return;
                 closeZoom();
+            });
+            clone.addEventListener("transitionend", event => {
+                if (event.target === clone && event.propertyName === "transform" && clone.classList.contains("is-zoomed")) {
+                    clone.style.removeProperty("will-change");
+                }
             });
 
             window.requestAnimationFrame(() => {
                 window.requestAnimationFrame(() => {
+                    if (zoomClone !== clone || finishZoom) return;
+                    clone.style.removeProperty("transition");
                     clone.classList.add("is-zoomed");
+                    if (prefersReducedMotion()) clone.style.removeProperty("will-change");
+                    closeButton.focus({ preventScroll: true });
                 });
             });
         };
@@ -1153,6 +1125,10 @@ const initPhotoGallery = () => {
 
         items.forEach((item) => {
             item.tabIndex = 0;
+            item.setAttribute("role", "button");
+            item.setAttribute("aria-haspopup", "dialog");
+            item.setAttribute("aria-expanded", "false");
+            item.setAttribute("aria-label", `放大照片：${item.dataset.galleryTitle || item.querySelector("img")?.alt || "照片"}`);
             applyOffset(item, readOffset(item));
             applyImageShape(item);
 
@@ -1231,6 +1207,7 @@ const initPhotoGallery = () => {
             });
 
             item.addEventListener("keydown", (event) => {
+                if ((event.target as HTMLElement).closest("a, button")) return;
                 if (event.key !== "Enter" && event.key !== " ") return;
 
                 event.preventDefault();
@@ -1238,13 +1215,46 @@ const initPhotoGallery = () => {
             });
         });
 
-        backdrop?.addEventListener("click", closeZoom);
+        backdrop?.addEventListener("click", () => closeZoom());
 
         document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") closeZoom();
+            if (!zoomClone) return;
+            if (event.key === "Escape") {
+                event.preventDefault();
+                closeZoom();
+            }
+            if (event.key === "Tab") {
+                const controls = [...zoomClone.querySelectorAll<HTMLElement>("button, a[href]")];
+                const first = controls[0];
+                const last = controls[controls.length - 1];
+                if (event.shiftKey && (document.activeElement === first || !zoomClone.contains(document.activeElement))) {
+                    event.preventDefault();
+                    last?.focus();
+                } else if (!event.shiftKey && (document.activeElement === last || !zoomClone.contains(document.activeElement))) {
+                    event.preventDefault();
+                    first?.focus();
+                }
+            }
         });
 
-        window.addEventListener("resize", scheduleLayout);
+        window.addEventListener("resize", () => {
+            closeZoom(true);
+            scheduleLayout();
+        });
+        const resetGallery = () => {
+            revealAnimations.forEach(animation => animation.cancel());
+            revealAnimations.clear();
+            closeZoom(true);
+            dragState = null;
+            items.forEach(item => item.classList.remove("is-dragging"));
+        };
+        window.addEventListener("pagehide", resetGallery);
+        window.addEventListener("site:motion-reset", resetGallery);
+        document.addEventListener("visibilitychange", () => { if (document.hidden) resetGallery(); });
+        window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => {
+            resetGallery();
+            scheduleLayout();
+        });
 
         if ("fonts" in document) {
             document.fonts.ready.then(scheduleLayout).catch(() => undefined);
@@ -1687,22 +1697,45 @@ const initRocketGestures = () => {
     });
 };
 
+const initStorageSafeColorScheme = () => {
+    try {
+        window.localStorage.getItem("StackColorScheme");
+        return;
+    } catch (_) {}
+    const stack = window.Stack;
+    if (!stack?.init) return;
+    const initialize = stack.init;
+    stack.init = () => {
+        try {
+            initialize();
+        } catch (error) {
+            if (!/storage|SecurityError/i.test(String(error))) throw error;
+            const toggle = document.getElementById("dark-mode-toggle");
+            if (!toggle || toggle.dataset.schemeReady === "true") return;
+            toggle.dataset.schemeReady = "true";
+            toggle.addEventListener("click", () => {
+                const root = document.documentElement;
+                root.dataset.scheme = root.dataset.scheme === "dark" ? "light" : "dark";
+                window.dispatchEvent(new CustomEvent("onColorSchemeChange", { detail: root.dataset.scheme }));
+            });
+        }
+    };
+};
+
 const initCustomScripts = () => {
-    initSiteLanguageExperience();
-    initLocalizedArticleDates();
-    initArticleShare();
-    initHomeSocialHover();
-    initNavigationSmoothing();
-    initSidebarMenuHover();
-    initHomeProfile();
-    initAppLaunchpad();
-    initPhotoGallery();
-    initWorldClocks();
-    initSiteRuntime();
-    initDashboard();
-    initDashboardAdminGesture();
-    initSidebarManagementMenu();
-    initRocketGestures();
+    if (document.documentElement.dataset.customReady === "true") return;
+    document.documentElement.dataset.customReady = "true";
+    [initStorageSafeColorScheme, initSiteLanguageExperience, initLocalizedArticleDates,
+        initArticleShare, initHomeSocialHover, initSidebarMenuHover, initHomeProfile,
+        initAppLaunchpad, initPhotoGallery, initWorldClocks, initSiteRuntime, initDashboard,
+        initDashboardAdminGesture, initSidebarManagementMenu, initRocketGestures, initMotion, initExperience,
+    ].forEach(initialize => {
+        try {
+            initialize();
+        } catch (error) {
+            console.error("网站交互初始化失败", error);
+        }
+    });
 };
 
 if (document.readyState === "loading") {

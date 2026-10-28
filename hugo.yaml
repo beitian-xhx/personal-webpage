@@ -25,6 +25,8 @@ permalinks:
   post: /p/:slug/
   page: /:slug/
 params:
+  experience:
+    enabled: true
   mainSections: [post]
   description: "你好，欢迎来到我的个人网站。我热爱用代码、设计与内容创作来表达想法，也享受不断学习新事物的过程。这里记录我的项目、笔记与思考。"
   favicon: /favicon.svg

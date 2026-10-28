@@ -1,0 +1,64 @@
+{{ $pages := where (where .Site.RegularPages "Type" "in" .Site.Params.mainSections) "Params.hidden" "ne" true }}
+{{ $pictures := slice }}
+{{ with index hugo.Data "photo-wall" }}{{ range . }}{{ if fileExists (printf "static/%s" (strings.TrimPrefix "/" .image)) }}{{ $pictures = $pictures | append . }}{{ end }}{{ end }}{{ end }}
+{{ $pictures = sort $pictures "order" }}
+<div class="exp-home">
+    <section class="exp-hero home-profile" aria-labelledby="exp-title">
+        <div class="exp-hero__orb" aria-hidden="true"></div>
+        {{ with .Site.Params.sidebar.avatar }}
+        {{ if or (resources.Get .) (fileExists (printf "static/%s" (strings.TrimPrefix "/" .))) }}
+        {{ $avatar := partial "helper/image" (dict "Image" . "Resources" resources "Context" $) }}
+        <figure class="home-profile__avatar" data-home-announcement data-announcement-id="site-welcome-2026-08" data-exp-reveal>
+            <button class="home-profile__announcement-toggle" type="button" aria-expanded="false" aria-controls="experience-home-announcement" aria-label="打开网站公告，1 条未读" data-home-announcement-toggle data-announcement-open-label="打开网站公告" data-announcement-close-label="关闭网站公告">
+                <img src="{{ $avatar.Permalink }}"{{ with $avatar.Width }} width="{{ . }}"{{ end }}{{ with $avatar.Height }} height="{{ . }}"{{ end }} loading="eager" alt="{{ $.Site.Title }}的头像">
+                <span class="home-profile__announcement-badge" data-home-announcement-badge aria-hidden="true">1</span>
+            </button>
+            {{ with $.Site.Params.sidebar.emoji }}<button class="home-profile__emoji home-profile__management-toggle" type="button" aria-expanded="false" aria-controls="experience-home-management-menu" aria-label="打开网站管理选单" data-sidebar-management-toggle>{{ . }}</button>{{ end }}
+            {{ partial "sidebar/management-menu.html" (dict "Context" $ "MenuID" "experience-home-management-menu") }}
+            <div class="home-profile__announcement-bubble" id="experience-home-announcement" data-home-announcement-bubble role="note" aria-live="polite" hidden>
+                <strong>网站公告</strong>
+                <p>{{ $.Site.Params.description }}</p>
+                <time class="home-profile__announcement-date" datetime="2026-08-02">2026年8月2日</time>
+            </div>
+        </figure>
+        {{ end }}{{ end }}
+        <div class="home-profile__copy" data-exp-reveal>
+            <p class="home-profile__greeting">欢迎来到</p>
+            <h1 class="exp-hero__title" id="exp-title" tabindex="-1">{{ .Site.Title }}</h1>
+            <p class="home-profile__subtitle">{{ .Site.Params.sidebar.subtitle }}</p>
+        </div>
+        {{ with .Site.Menus.social }}<ol class="home-profile__social" aria-label="社交链接" data-exp-reveal>{{ range . }}<li><a href="{{ .URL }}" aria-label="{{ .Name }}" title="{{ .Name }}"{{ if .Params.newTab }} target="_blank" rel="noopener noreferrer"{{ end }} data-exp-magnet>{{ partial "helper/icon" .Params.icon }}</a></li>{{ end }}</ol>{{ end }}
+    </section>
+    <section class="home-feature-grid exp-home-features" aria-label="主页快捷入口" data-exp-reveal>
+        {{ with .Site.GetPage "/page/apps" }}<a class="home-feature-card home-feature-card--launchpad" href="{{ .RelPermalink }}"><h2>资源导航</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "list-tree" }}</span></a>{{ end }}
+        {{ with .Site.GetPage "/page/about" }}<a class="home-feature-card home-feature-card--resume" href="{{ .RelPermalink }}"><h2>关于我</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "user" }}</span></a>{{ end }}
+        {{ with .Site.GetPage "/page/dashboard" }}<a class="home-feature-card home-feature-card--dashboard" href="{{ .RelPermalink }}"><h2>站点数据</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "dashboard" }}</span></a>{{ end }}
+        {{ with .Site.GetPage "/page/pictures" }}<a class="home-feature-card home-feature-card--gallery" href="{{ .RelPermalink }}"><h2>照片墙</h2><div class="home-gallery-teaser__stack" aria-hidden="true">{{ range first 3 $pictures }}<img src="{{ strings.TrimPrefix "/" .image | relURL }}" alt="" loading="lazy" decoding="async">{{ else }}{{ partial "helper/icon" "pictures" }}{{ end }}</div></a>{{ end }}
+    </section>
+    <section class="exp-index" id="exp-content" tabindex="-1" aria-labelledby="exp-index-title">
+        <header class="exp-index__heading" data-exp-reveal><h2 id="exp-index-title">最近文章</h2><span class="exp-index__count" aria-live="polite" aria-atomic="true"><span data-exp-count>{{ len $pages }}</span> 篇</span></header>
+        <div class="exp-filters" role="group" aria-label="按分类筛选" data-exp-reveal>
+            <button type="button" data-exp-filter="" aria-pressed="true">全部</button>
+            <details class="exp-filter-menu"><summary>分类</summary><div>{{ range $name, $taxonomy := .Site.Taxonomies.categories }}<button type="button" data-exp-filter="{{ $name | urlize }}" aria-pressed="false">{{ $taxonomy.Page.Title }}</button>{{ end }}</div></details>
+        </div>
+        <div class="exp-list">
+            {{ range $pages.ByDate.Reverse }}
+            {{ $page := . }}
+            {{ $image := dict }}
+            {{ with .Params.image }}
+                {{ $imageResources := $page.Resources }}
+                {{ if resources.Get . }}{{ $imageResources = resources }}{{ end }}
+                {{ if or ($page.Resources.Get .) (resources.Get .) (fileExists (printf "static/%s" (strings.TrimPrefix "/" .))) }}{{ $image = partial "helper/image" (dict "Image" . "Resources" $imageResources "Context" $page) }}{{ end }}
+            {{ end }}
+            <a class="exp-row" href="{{ .RelPermalink }}" data-exp-row data-exp-reveal data-categories="{{ range .Params.categories }}{{ . | urlize }}|{{ end }}" data-transition-key="{{ .RelPermalink }}">
+                <div class="exp-row__meta"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01" }}</time><span>{{ with .Params.categories }}{{ index . 0 }}{{ else }}记录{{ end }}</span></div>
+                <div class="exp-row__copy"><h3 class="exp-row__title">{{ .Title }}</h3></div>
+                <span class="exp-row__arrow" aria-hidden="true">↗</span>
+                <div class="exp-row__band" aria-hidden="true"><div class="exp-row__marquee">{{ range seq 3 }}<span>{{ $.Site.Title }}</span><span> / </span>{{ end }}</div></div>
+                <figure class="exp-row__preview" aria-hidden="true" data-transition-cover>{{ if $image }}<img src="{{ $image.Permalink }}" alt="" loading="lazy" decoding="async">{{ else }}{{ partial "article/auto-cover" . }}{{ end }}</figure>
+            </a>
+            {{ end }}
+        </div>
+    </section>
+    {{ partial "footer/footer" . }}
+</div>

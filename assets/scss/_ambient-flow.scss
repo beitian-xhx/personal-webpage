@@ -1,0 +1,101 @@
+/* Blue-white ambient light; all paint stays behind the existing content layer.
+ * Static gradients remain before JS starts, with JS disabled, or without WebGL.
+ * Only transforms animate: no moving background-position or full-screen blur.
+ */
+html[data-experience="true"] body.experience-enabled .experience-fluid {
+    opacity: .38;
+    overflow: hidden;
+    pointer-events: none;
+    // Keep the existing fixed position, z-index and screen blend in dark mode.
+    --ambient-blue: 100, 155, 238;
+    --ambient-ice: 202, 225, 255;
+    --ambient-white: 238, 246, 255;
+
+    &::before, &::after {
+        content: "";
+        position: absolute;
+        inset: -12%;
+        pointer-events: none;
+        background-repeat: no-repeat;
+        animation-play-state: paused;
+    }
+
+    &::before {
+        background-image:
+            radial-gradient(ellipse at 12% 30%, rgba(var(--ambient-blue), .48), rgba(var(--ambient-blue), .09) 26%, transparent 48%),
+            radial-gradient(ellipse at 90% 65%, rgba(var(--ambient-ice), .36), rgba(var(--ambient-blue), .08) 24%, transparent 46%);
+        animation: ambient-flow-drift 18s ease-in-out -6s infinite alternate;
+        animation-play-state: paused;
+    }
+
+    &::after {
+        background-image:
+            radial-gradient(ellipse 48% 9% at 76% 32%, rgba(var(--ambient-white), .28), rgba(var(--ambient-ice), .12) 38%, transparent 76%),
+            radial-gradient(ellipse 34% 12% at 22% 78%, rgba(var(--ambient-blue), .32), transparent 74%);
+        animation: ambient-flow-ribbon 23s ease-in-out -11s infinite alternate;
+        animation-play-state: paused;
+    }
+
+    &[data-ambient-state="running"]::before,
+    &[data-ambient-state="running"]::after {
+        animation-play-state: running;
+    }
+
+    canvas {
+        position: relative;
+        opacity: .68;
+    }
+
+    canvas:not([data-renderer="webgl-fluid"]) { opacity: 0; }
+
+    &[data-ambient-state="static"] {
+        &::before, &::after { animation: none !important; }
+        canvas { opacity: 0; }
+    }
+}
+
+// Multiply needs less white and a little more blue against the light paper.
+html[data-experience="true"][data-scheme="light"] body.experience-enabled .experience-fluid {
+    opacity: .21;
+    --ambient-blue: 72, 124, 203;
+    --ambient-ice: 127, 170, 231;
+    --ambient-white: 175, 204, 241;
+}
+
+// Portal visibility is owned by its existing stylesheet. Pause here immediately.
+html[data-experience="true"][data-portal="open"]:not([data-portal-motion="true"]) body.experience-enabled .experience-fluid {
+    &::before, &::after { animation-play-state: paused; }
+}
+
+@keyframes ambient-flow-drift {
+    from { transform: translate3d(-4%, -3%, 0) rotate(-7deg); }
+    to { transform: translate3d(5%, 4%, 0) rotate(8deg); }
+}
+
+@keyframes ambient-flow-ribbon {
+    from { transform: translate3d(5%, -5%, 0) rotate(-12deg); }
+    to { transform: translate3d(-6%, 6%, 0) rotate(13deg); }
+}
+
+@media (max-width: 700px), (pointer: coarse) {
+    html[data-experience="true"] body.experience-enabled .experience-fluid {
+        // One composited gradient layer; Canvas has its own 24fps/pixel budget.
+        &::before { inset: -6%; animation-duration: 24s; }
+        &::after { display: none; }
+        canvas { opacity: .56; }
+        canvas:not([data-renderer="webgl-fluid"]) { opacity: 0; }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-experience="true"] body.experience-enabled .experience-fluid {
+        // Override the experience layer's display:none with a quiet static wash.
+        display: block;
+        &::before, &::after { animation: none !important; transform: none; }
+        canvas { display: none; }
+    }
+}
+
+@media print {
+    html[data-experience="true"] body.experience-enabled .experience-fluid { display: none !important; }
+}

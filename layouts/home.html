@@ -1,12 +1,15 @@
-{{ define "body-class" }}home-profile-layout{{ end }}
+{{ define "body-class" }}home-profile-layout{{ if .Site.Params.experience.enabled }} experience-home-restored{{ end }}{{ end }}
 {{ define "main" }}
+{{ if .Site.Params.experience.enabled }}
+    {{ partial "experience/home.html" . }}
+{{ else }}
     {{ $isChinese := hasPrefix .Language.Lang "zh" }}
     {{ $pages := where .Site.RegularPages "Type" "in" .Site.Params.mainSections }}
     {{ $visible := where $pages "Params.hidden" "ne" true }}
     
     {{ $apps := slice }}{{ with hugo.Data.launchpad }}{{ range . }}{{ $apps = $apps | append . }}{{ end }}{{ end }}{{ $apps = sort $apps "order" }}
     {{ $pictures := slice }}{{ with index hugo.Data "photo-wall" }}{{ range . }}{{ $pictures = $pictures | append . }}{{ end }}{{ end }}{{ $pictures = sort $pictures "order" }}
-    <section class="home-profile" aria-labelledby="home-profile-title">
+    <section class="home-profile" aria-labelledby="home-profile-title" data-motion="reveal">
         {{ with .Site.Params.sidebar.avatar }}{{ $avatar := partial "helper/image" (dict "Image" . "Resources" resources "Context" $) }}{{ with $avatar }}
         {{ $announcementTitle := cond $isChinese "网站公告" "Website announcement" }}
         {{ $announcementOpenLabel := cond $isChinese "打开网站公告" "Open website announcement" }}
@@ -34,11 +37,12 @@
         {{ with .Site.Menus.social }}<ol class="home-profile__social" aria-label="Social links">{{ range . }}<li><a href="{{ .URL }}" target="_blank" rel="noopener" title="{{ .Name }}">{{ partial "helper/icon" .Params.icon }}</a></li>{{ end }}</ol>{{ end }}
     </section>
     <section class="home-feature-grid" aria-label="{{ cond $isChinese "主页快捷入口" "Home shortcuts" }}">
-        {{ if gt (len $apps) 0 }}<a href="{{ "apps/" | relLangURL }}" class="home-feature-card home-feature-card--launchpad"><div class="home-feature-card__copy"><p>{{ cond $isChinese "资源导航" "Resource directory" }}</p><h2>{{ cond $isChinese "浏览在线资源" "Browse resources" }}</h2></div><div class="home-launchpad-teaser" aria-hidden="true">{{ range first 2 $apps }}<span class="home-launchpad-teaser__app"><img src="{{ relURL (strings.TrimPrefix "/" .icon) }}" alt="" width="512" height="512" loading="lazy"></span>{{ end }}</div></a>{{ end }}
-        <a href="{{ "about/" | relLangURL }}" class="home-feature-card home-feature-card--resume"><div class="home-feature-card__copy"><p>{{ cond $isChinese "关于我" "About me" }}</p><h2>{{ cond $isChinese "认识我" "Meet me" }}</h2></div><div class="home-resume-teaser__mark" aria-hidden="true">{{ partial "helper/icon" "user" }}</div></a>
-        <a href="{{ "dashboard/" | relLangURL }}" class="home-feature-card home-feature-card--dashboard"><div class="home-feature-card__copy"><p>{{ cond $isChinese "站点数据" "Site data" }}</p><h2>{{ cond $isChinese "查看站点数据" "View site data" }}</h2></div><div class="home-dashboard-teaser__mark" aria-hidden="true">{{ partial "helper/icon" "dashboard" }}</div></a>
-        {{ if gt (len $pictures) 0 }}<a href="{{ "pictures/" | relLangURL }}" class="home-feature-card home-feature-card--gallery"><div class="home-feature-card__copy"><p>{{ cond $isChinese "照片墙" "Photo wall" }}</p><h2>{{ cond $isChinese "浏览视觉记录" "Browse visual notes" }}</h2></div><div class="home-gallery-teaser__stack" aria-hidden="true">{{ range first 3 $pictures }}<img src="{{ relURL (strings.TrimPrefix "/" .image) }}" alt="" loading="lazy" decoding="async">{{ end }}</div></a>{{ end }}
+        {{ if gt (len $apps) 0 }}<a href="{{ "apps/" | relLangURL }}" class="home-feature-card home-feature-card--launchpad" data-motion="reveal" data-motion-card><div class="home-feature-card__copy"><p>{{ cond $isChinese "资源导航" "Resource directory" }}</p><h2>{{ cond $isChinese "浏览在线资源" "Browse resources" }}</h2></div><div class="home-launchpad-teaser" aria-hidden="true">{{ range first 2 $apps }}<span class="home-launchpad-teaser__app"><img src="{{ relURL (strings.TrimPrefix "/" .icon) }}" alt="" width="512" height="512" loading="lazy"></span>{{ end }}</div></a>{{ end }}
+        <a href="{{ "about/" | relLangURL }}" class="home-feature-card home-feature-card--resume" data-motion="reveal" data-motion-card><div class="home-feature-card__copy"><p>{{ cond $isChinese "关于我" "About me" }}</p><h2>{{ cond $isChinese "认识我" "Meet me" }}</h2></div><div class="home-resume-teaser__mark" aria-hidden="true">{{ partial "helper/icon" "user" }}</div></a>
+        <a href="{{ "dashboard/" | relLangURL }}" class="home-feature-card home-feature-card--dashboard" data-motion="reveal" data-motion-card><div class="home-feature-card__copy"><p>{{ cond $isChinese "站点数据" "Site data" }}</p><h2>{{ cond $isChinese "查看站点数据" "View site data" }}</h2></div><div class="home-dashboard-teaser__mark" aria-hidden="true">{{ partial "helper/icon" "dashboard" }}</div></a>
+        {{ if gt (len $pictures) 0 }}<a href="{{ "pictures/" | relLangURL }}" class="home-feature-card home-feature-card--gallery" data-motion="reveal" data-motion-card><div class="home-feature-card__copy"><p>{{ cond $isChinese "照片墙" "Photo wall" }}</p><h2>{{ cond $isChinese "浏览视觉记录" "Browse visual notes" }}</h2></div><div class="home-gallery-teaser__stack" aria-hidden="true">{{ range first 3 $pictures }}<img src="{{ relURL (strings.TrimPrefix "/" .image) }}" alt="" loading="lazy" decoding="async">{{ end }}</div></a>{{ end }}
     </section>
-    <section class="article-list">{{ range $visible }}{{ partial "article-list/default" . }}{{ end }}</section>{{ partial "footer/footer" . }}
+    <section class="article-list" data-motion="reveal">{{ range $visible }}{{ partial "article-list/default" . }}{{ end }}</section>{{ partial "footer/footer" . }}
+{{ end }}
 {{ end }}
 {{ define "right-sidebar" }}{{ partial "sidebar/right.html" (dict "Context" . "Scope" "homepage") }}{{ end }}

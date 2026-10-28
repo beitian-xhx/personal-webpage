@@ -1,0 +1,7 @@
+<script>
+    (function () {
+        var scheme = "{{ default "auto" .Site.Params.colorScheme.default }}";
+        try { scheme = localStorage.getItem("StackColorScheme") || scheme; } catch (_) {}
+        document.documentElement.dataset.scheme = scheme === "dark" || scheme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    })();
+</script>

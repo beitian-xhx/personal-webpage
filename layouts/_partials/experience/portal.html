@@ -1,0 +1,12 @@
+<section class="hologram-portal" id="hologram-portal" aria-label="北天的个人网站，全息入场" hidden>
+    <div class="hologram-portal__noise" aria-hidden="true"></div>
+    <div class="hologram-portal__field" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="hologram-portal__orbits" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="hologram-portal__scan" aria-hidden="true"></div>
+    <div class="hologram-portal__identity"><span class="hologram-portal__star" aria-hidden="true"></span><span>{{ .Site.Title }}</span></div>
+    <p class="hologram-portal__label">个人网站</p>
+    <canvas class="hologram-portal__canvas" data-portrait="{{ "img/experience/portrait.png" | relURL }}" aria-hidden="true"></canvas>
+    <div class="hologram-portal__baseline" aria-hidden="true"></div>
+    <div class="hologram-portal__beam" aria-hidden="true"></div>
+    <button class="hologram-portal__enter" type="button" data-portal-enter><span class="hologram-portal__enter-dot" aria-hidden="true"></span><span>点击任意位置进入</span><span aria-hidden="true">↗</span></button>
+</section>

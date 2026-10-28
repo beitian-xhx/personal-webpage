@@ -1,16 +1,100 @@
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
+{{ if .Site.Params.experience.enabled }}
+<script type="importmap">{"imports":{"three":"{{ "vendor/three/three.module.js" | relURL }}"}}</script>
+<script>
+(function(){
+    var root=document.documentElement;
+    var show={{ if .IsHome }}true{{ else }}false{{ end }};
+    try { show=show && sessionStorage.getItem('beitian-entry-v1')!=='entered'; } catch(_) {}
+    if(new URLSearchParams(location.search).has('intro'))show=true;
+    if(new URLSearchParams(location.search).has('skipintro'))show=false;
+    if(show)root.dataset.portal='open';
+    window.setTimeout(function(){
+        var portal=document.getElementById('hologram-portal');
+        if(root.dataset.portal==='open' && (!portal || portal.dataset.ready!=='true')){
+            delete root.dataset.portal;
+            if(portal)portal.hidden=true;
+        }
+    },6500);
+})();
+</script>
+<noscript><style>html[data-portal="open"]{overflow:auto}html[data-portal="open"] body>:not(.hologram-portal):not(script){visibility:visible}.hologram-portal{display:none!important}</style></noscript>
+{{ end }}
 
 <script>
     (function () {
         const colorSchemeKey = "StackColorScheme";
-        if (!localStorage.getItem(colorSchemeKey)) localStorage.setItem(colorSchemeKey, "{{ default "auto" .Site.Params.colorScheme.default }}");
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        let colorSchemeItem = "{{ default "auto" .Site.Params.colorScheme.default }}";
+        let backgroundEnabled = true;
+        try {
+            const savedScheme = localStorage.getItem(colorSchemeKey);
+            if (savedScheme) colorSchemeItem = savedScheme;
+            else localStorage.setItem(colorSchemeKey, colorSchemeItem);
+            backgroundEnabled = localStorage.getItem("site-bg-switch") !== "off";
+        } catch (_) {}
         const supportDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches === true;
         document.documentElement.dataset.scheme = colorSchemeItem == "dark" || colorSchemeItem === "auto" && supportDarkMode ? "dark" : "light";
+        document.documentElement.dataset.bg = backgroundEnabled ? "on" : "off";
+    })();
+</script>
+<script>
+    (function () {
+        var root = document.documentElement;
+        var arriving = false;
+        try {
+            var glassRaw = sessionStorage.getItem("site-glass-arrival");
+            if (glassRaw) {
+                var glass = JSON.parse(glassRaw);
+                if (glass && glass.to === location.pathname && Date.now() - Number(glass.time) < 15000) {
+                    arriving = true;
+                    root.dataset.glassArrival = "true";
+                    if (root.dataset.experience === "true" && typeof glass.snapshot === "string" && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(glass.snapshot) && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                        window.__glassEntry = glass;
+                        root.dataset.glassHandoff = "true";
+                        root.dataset.glassReveal = "true";
+                        root.style.setProperty("--glass-snapshot", 'url("' + glass.snapshot + '")');
+                        if(typeof glass.cracks === "string" && /^data:image\/svg\+xml;base64,[A-Za-z0-9+/=]+$/.test(glass.cracks)){
+                            root.style.setProperty("--glass-cracks", 'url("' + glass.cracks + '")');
+                            root.style.setProperty("--glass-x", (Number(glass.pointerX)/Number(glass.width)*100)+"%");
+                            root.style.setProperty("--glass-y", (Number(glass.pointerY)/Number(glass.height)*100)+"%");
+                            root.style.setProperty("--glass-radius", Math.hypot(innerWidth,innerHeight)+"px");
+                            root.style.setProperty("--glass-crack-delay", (-Math.max(0,Date.now()-Number(glass.startedAt||glass.time))/1000)+"s");
+                        }
+                        window.setTimeout(function(){
+                            delete root.dataset.glassHandoff;
+                            if (!root.dataset.expReady) {
+                                delete root.dataset.glassReveal;
+                                root.style.removeProperty("--glass-snapshot");
+                            }
+                        }, 8000);
+                    }
+                }
+                sessionStorage.removeItem("site-glass-arrival");
+            }
+            var raw = sessionStorage.getItem("site-vt-arrival");
+            if (raw) {
+                var record = JSON.parse(raw);
+                var stamp = Number(record && (record.time || record.t) || 0);
+                arriving = arriving || Boolean(record) && stamp > 0 && Date.now() - stamp < 15000;
+                sessionStorage.removeItem("site-vt-arrival");
+            }
+        } catch (_) {}
+        if (!arriving && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            root.dataset.motionBoot = "1";
+        }
     })();
 </script>
 <style>
+    html[data-glass-handoff="true"]::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 2147483000;
+        background: var(--glass-snapshot) center / 100% 100% no-repeat;
+        filter: blur(7px);
+        pointer-events: auto;
+    }
     html,
     body {
         min-height: 100%;

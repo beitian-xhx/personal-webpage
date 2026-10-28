@@ -14,4 +14,11 @@
   --accent-color: {{ $pageAccent }};
   --accent-color-darker: color-mix(in srgb, {{ $pageAccent }}, #000 20%);
 }
+html[data-experience="true"][data-bg="on"],
+html[data-experience="true"][data-bg="on"] body {
+  background-image: var(--bg-image);
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
 </style>

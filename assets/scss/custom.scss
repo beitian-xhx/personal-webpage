@@ -737,22 +737,21 @@ body.is-arriving-from-home:not(.home-profile-layout) {
         flex-direction: column;
         align-items: center;
         transform-origin: center top;
-        animation: home-profile-enter 0.58s cubic-bezier(0.22, 1, 0.36, 1) both;
         transition: opacity 0.22s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), filter 0.22s ease;
     }
 
     .home-profile__avatar,
     .home-profile__copy,
     .home-profile__social {
-        animation: home-profile-item-enter 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation: none;
     }
 
     .home-profile__copy {
-        animation-delay: 0.06s;
+        animation-delay: 0s;
     }
 
     .home-profile__social {
-        animation-delay: 0.12s;
+        animation-delay: 0s;
     }
 
     .home-profile__avatar {
@@ -1117,7 +1116,6 @@ body.is-arriving-from-home:not(.home-profile-layout) {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 16px;
-    animation: home-profile-item-enter 0.52s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .home-feature-card {
@@ -1377,7 +1375,6 @@ body.app-preview-open {
     backdrop-filter: blur(30px) saturate(0.88);
     -webkit-backdrop-filter: blur(30px) saturate(0.88);
     overflow: hidden;
-    animation: home-profile-item-enter 0.52s 0.08s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .apps-launchpad__demo-note {
@@ -1648,7 +1645,7 @@ body.app-preview-open {
 .article-list article {
     transform-origin: center;
     transition: box-shadow 0.28s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-    will-change: transform;
+    will-change: auto;
 
     &:hover,
     &:focus-within {
@@ -2290,19 +2287,6 @@ body.app-preview-open {
     mask: var(--hm-icon-url) center / contain no-repeat;
     -webkit-mask: var(--hm-icon-url) center / contain no-repeat;
     vertical-align: -0.125em;
-}
-
-.page-navigation-veil {
-    position: fixed;
-    inset: 0;
-    z-index: 2147483647;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.08s linear;
-
-    &.is-visible {
-        opacity: 1;
-    }
 }
 
 .article-share {
@@ -4213,54 +4197,6 @@ button.article-share__button {
     --card-grad-a: #2563eb;
     --card-grad-b: #60a5fa;
     position: relative;
-
-    /* 右上角光晕：与封面同色，浮在封面图上方 */
-    &::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: 3;
-        pointer-events: none;
-        background:
-            radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--card-grad-a) 24%, transparent) 0%, transparent 48%);
-        opacity: 0.9;
-        transition: opacity 0.3s ease;
-    }
-
-    /* 左下角互补光晕：与封面同族，位于内容文字下方 */
-    &::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        background:
-            radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--card-grad-b) 13%, transparent) 0%, transparent 44%);
-        opacity: 0.9;
-        transition: opacity 0.3s ease;
-    }
-
-    &:hover {
-        &::after,
-        &::before {
-            opacity: 1;
-        }
-    }
-
-    .article-header {
-        position: relative;
-        z-index: 2;
-    }
-}
-
-html[data-scheme="dark"] .article-list > article::after {
-    background:
-        radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--card-grad-a) 32%, transparent) 0%, transparent 48%);
-}
-
-html[data-scheme="dark"] .article-list > article::before {
-    background:
-        radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--card-grad-b) 18%, transparent) 0%, transparent 44%);
 }
 
 
@@ -4785,3 +4721,8 @@ html[data-scheme="dark"] .home-profile-layout .home-profile__avatar {
 
 /* ===== Background system ===== */
 @import "_background-system.scss";
+@import "_visual-foundation.scss";
+@import "_motion.scss";
+@import "_experience.scss";
+@import "_portal.scss";
+@import "_ambient-flow.scss";

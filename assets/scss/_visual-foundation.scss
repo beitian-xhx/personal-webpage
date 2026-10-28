@@ -1,0 +1,213 @@
+/* ===== Visual foundation =====
+ * Static surface details only: borders, shadows, focus rings, spacing and the
+ * two-corner content glow. Motion, transitions and parallax are owned by the
+ * motion layer and intentionally live elsewhere.
+ */
+
+.article-list article,
+.article-list--compact article,
+.article-list--tile article,
+.main-article {
+    --vf-hairline: color-mix(in srgb, var(--card-separator-color) 62%, transparent);
+    --vf-focus-ring: color-mix(in srgb, var(--accent-color) 72%, transparent);
+}
+
+.article-list > article,
+.article-list--compact,
+.main-article {
+    border: 1px solid var(--vf-hairline, color-mix(in srgb, var(--card-separator-color) 62%, transparent));
+    box-shadow:
+        0 16px 38px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+
+/* Compact and tile cards read the palette from the card root. */
+.article-list--compact article,
+.article-list--tile article {
+    --card-grad-a: #2563eb;
+    --card-grad-b: #60a5fa;
+}
+
+.article-list--tile article {
+    border: 1px solid var(--vf-hairline, color-mix(in srgb, var(--card-separator-color) 62%, transparent));
+}
+
+html[data-scheme="dark"] .article-list > article,
+html[data-scheme="dark"] .article-list--compact,
+html[data-scheme="dark"] .main-article {
+    box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.article-list > article:focus-within,
+.article-list--compact:focus-within,
+.main-article:focus-within {
+    border-color: color-mix(in srgb, var(--accent-color) 34%, var(--card-separator-color));
+}
+
+.article-list > article a:focus-visible,
+.article-list--compact a:focus-visible,
+.article-list--tile a:focus-visible,
+.main-article a:focus-visible {
+    outline: 2px solid var(--vf-focus-ring, color-mix(in srgb, var(--accent-color) 72%, transparent));
+    outline-offset: 3px;
+}
+
+/* Cover wrapper: keeps the shared transition target clipped and on its own layer. */
+.article-header .article-image {
+    position: relative;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--card-background-selected) 72%, transparent);
+}
+
+/* Content surface: two-corner glow using the same palette variables as the cover. */
+.article-list > article .article-details,
+.article-list--compact .article-details,
+.article-page .article-details {
+    position: relative;
+    isolation: isolate;
+}
+
+/* A single pseudo-element carries both corner glows so the motion layer keeps
+ * .article-details::after free for its pointer gloss.
+ */
+.article-list > article .article-details::before,
+.article-list--compact .article-details::before,
+.article-page .article-details::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+        radial-gradient(
+            circle at 100% 0%,
+            color-mix(in srgb, var(--card-grad-a) 20%, transparent) 0%,
+            transparent 46%
+        ),
+        radial-gradient(
+            circle at 0% 100%,
+            color-mix(in srgb, var(--card-grad-b) 12%, transparent) 0%,
+            transparent 42%
+        );
+}
+
+html[data-scheme="dark"] .article-list > article .article-details::before,
+html[data-scheme="dark"] .article-list--compact .article-details::before,
+html[data-scheme="dark"] .article-page .article-details::before {
+    background:
+        radial-gradient(
+            circle at 100% 0%,
+            color-mix(in srgb, var(--card-grad-a) 28%, transparent) 0%,
+            transparent 48%
+        ),
+        radial-gradient(
+            circle at 0% 100%,
+            color-mix(in srgb, var(--card-grad-b) 18%, transparent) 0%,
+            transparent 44%
+        );
+}
+
+.article-list > article .article-details > *,
+.article-list--compact .article-details > *,
+.article-page .article-details > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Tile cards use the same palette for their text scrim instead of image colors. */
+.article-list--tile .article-details {
+    background: linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--card-grad-a) 66%, transparent) 0%,
+        color-mix(in srgb, var(--card-grad-b) 38%, transparent) 100%
+    );
+}
+
+/* Normalize breathing room without changing the three-column layout. */
+.article-list > article .article-details {
+    padding-block-end: calc(var(--card-padding) + 2px);
+}
+
+.article-page .article-details {
+    padding-block-start: calc(var(--card-padding) + 2px);
+}
+
+/* Homepage photo teaser: three photos stay as one static, overlapping stack.
+ * Placement uses left/top + the independent rotate property, so a motion layer
+ * can add hover translation or scaling without resetting the stack offsets.
+ */
+.home-gallery-teaser__stack {
+    position: relative;
+    width: unquote("clamp(210px, 26vw, 300px)");
+    max-width: 100%;
+    height: 126px;
+    min-height: 0;
+    flex: 0 0 auto;
+    display: block;
+    padding: 0;
+    overflow: visible;
+
+    img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 96px;
+        height: 74px;
+        margin: -37px 0 0 -48px;
+        object-fit: cover;
+        border: 5px solid #fff;
+        border-radius: 3px;
+        background: #fff;
+        box-shadow: 0 14px 26px rgba(0, 0, 0, 0.16);
+        transform-origin: center;
+    }
+
+    img:nth-child(1) {
+        left: 24%;
+        rotate: -7deg;
+        z-index: 1;
+    }
+
+    img:nth-child(2) {
+        left: 50%;
+        margin-top: -41px;
+        rotate: 1.5deg;
+        z-index: 2;
+    }
+
+    img:nth-child(3) {
+        left: 76%;
+        rotate: 8deg;
+        z-index: 3;
+    }
+}
+
+@media (max-width: 720px) {
+    .home-gallery-teaser__stack {
+        width: 100%;
+        height: 108px;
+
+        img {
+            width: 78px;
+            height: 60px;
+            margin: -30px 0 0 -39px;
+            border-width: 4px;
+        }
+
+        img:nth-child(1) {
+            left: 26%;
+        }
+
+        img:nth-child(2) {
+            left: 50%;
+            margin-top: -33px;
+        }
+
+        img:nth-child(3) {
+            left: 74%;
+        }
+    }
+}
+

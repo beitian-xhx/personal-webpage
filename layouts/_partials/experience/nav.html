@@ -1,0 +1,14 @@
+<header class="experience-nav" data-exp-nav>
+    {{ if .IsHome }}<a class="experience-nav__skip" href="#exp-content">跳到文章</a>{{ end }}
+    <a class="experience-nav__brand" href="{{ .Site.Home.RelPermalink }}" aria-label="{{ .Site.Title }}主页"><span class="experience-nav__mark" aria-hidden="true">{{ partial "helper/icon" "home" }}</span><span>{{ .Site.Title }}</span></a>
+    <nav class="experience-nav__links" id="experience-menu" aria-label="主导航">
+        {{ range .Site.Menus.main }}
+        {{ $active := or (eq $.RelPermalink .URL) (or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .)) }}
+        <a href="{{ .URL }}"{{ if $active }} aria-current="page"{{ end }}{{ if .Params.newTab }} target="_blank" rel="noopener noreferrer"{{ end }}>
+            <span class="experience-nav__icon" aria-hidden="true">{{ with .Params.icon }}{{ partial "helper/icon" . }}{{ end }}</span>
+            <span>{{ if or (eq .Identifier "home") (eq .Name "Home") }}主页{{ else }}{{ .Name }}{{ end }}</span>
+        </a>
+        {{ end }}
+    </nav>
+    <div class="experience-nav__tools"><button type="button" data-exp-theme aria-label="切换浅色与深色" title="切换浅色与深色" data-exp-magnet>◐</button><button type="button" data-exp-replay aria-label="重看全息入场" title="重看全息入场" data-exp-magnet>✧</button><button class="experience-nav__menu" type="button" data-exp-menu aria-controls="experience-menu" aria-expanded="false" aria-label="打开导航">☰</button></div>
+</header>
