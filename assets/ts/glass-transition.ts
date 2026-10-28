@@ -133,21 +133,8 @@ export async function glassDeparture(pointerX: number, pointerY: number, signal?
         ? await Promise.all([warmLibrary(), snapshot.decode().then(() => snapshot)])
         : await warmGlass();
     if (signal?.aborted) return;
-    if (prepared) {
-        const visibleImages = [...document.images].filter(img => {
-            const box = img.getBoundingClientRect();
-            return box.width > 0 && box.height > 0 && box.bottom > 0 && box.top < innerHeight;
-        });
-        let timeout = 0;
-        try {
-            await Promise.race([
-                Promise.all([document.fonts.ready, ...visibleImages.map(img => img.decode().catch(() => undefined)),
-                    Promise.resolve().then(currentWallpaper).catch(() => undefined)]),
-                new Promise(resolve => { timeout = window.setTimeout(resolve, 2000); }),
-            ]);
-        } finally { clearTimeout(timeout); }
-        if (signal?.aborted) return;
-    }
+    // The page is already rendered behind the shards. Do not hold the entire
+    // transition for external fonts or article images on slow connections.
     const width = innerWidth, height = innerHeight, diagonal = Math.hypot(width, height);
     const impact = { x: Math.max(1, Math.min(width - 1, pointerX)), y: Math.max(1, Math.min(height - 1, pointerY)) };
     const backdropFilter = getComputedStyle(document.querySelector('.global-glass-backdrop')!).filter;
@@ -162,9 +149,10 @@ export async function glassDeparture(pointerX: number, pointerY: number, signal?
     camera.position.z=height/(2*Math.tan(Math.PI/12));
     const texture=new T.CanvasTexture(photographCanvas); texture.colorSpace=T.SRGBColorSpace;
     const pieces:any[]=[],geometries:any[]=[],materials:any[]=[];
-    const carriedAge=prepared?.startedAt?Math.max(0,(Date.now()-prepared.startedAt)/1000):0;
+    // Begin the visible crack only after the target document is ready.
+    const carriedAge=0;
     const crackRadius={value:Math.min(1,carriedAge/.26)*diagonal};
-    const leadIn=prepared?Math.min(.20,carriedAge):0;
+    const leadIn=0;
     const thickness=Math.max(2.5,Math.min(width,height)*.005);
     const cells=prepared?.cells?prepared.cells.map(cell=>({site:{x:cell.site.x*width/prepared.width,y:cell.site.y*height/prepared.height},
         polygon:cell.polygon.map(p=>({x:p.x*width/prepared.width,y:p.y*height/prepared.height}))})):fracture(width,height,impact);

@@ -1,0 +1,20 @@
+{{- $math := index hugo.Data.external "KaTeX" -}}
+{{- range $math }}{{ if eq .type "style" }}<link rel="stylesheet" href="{{ .src }}" integrity="{{ .integrity }}" crossorigin="anonymous" media="print" onload="this.media='all'">{{ end }}{{ end -}}
+<script>
+(function(){
+    function load(src, integrity) {
+        return new Promise(function(resolve, reject) {
+            var script=document.createElement('script'); script.src=src; script.integrity=integrity;
+            script.crossOrigin='anonymous'; script.onload=resolve; script.onerror=reject; document.head.appendChild(script);
+        });
+    }
+    var scripts=[{{ range $math }}{{ if eq .type "script" }}{src:{{ .src | jsonify | safeJS }},integrity:{{ .integrity | jsonify | safeJS }}},{{ end }}{{ end }}];
+    var ready=document.readyState==='loading'?new Promise(function(resolve){document.addEventListener('DOMContentLoaded',resolve,{once:true});}):Promise.resolve();
+    scripts.reduce(function(chain,script){return chain.then(function(){return load(script.src,script.integrity);});},Promise.resolve())
+        .then(function(){return ready;}).then(function(){
+            ['.main-article','.widget--toc'].forEach(function(selector){var element=document.querySelector(selector);if(element)renderMathInElement(element,{
+                delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false},{left:'\\[',right:'\\]',display:true}],ignoredClasses:['gist']
+            });});
+        }).catch(function(error){console.warn('Math rendering unavailable',error);});
+})();
+</script>

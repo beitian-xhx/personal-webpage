@@ -33,17 +33,6 @@ html[data-bg="on"][data-experience="true"][data-glass-preparing="true"] .global-
     filter: blur(7px);
     transform: scale(1.02);
 }
-html[data-experience="true"][data-glass-preparing="true"]::before,
-html[data-experience="true"][data-glass-handoff="true"]::before {
-    content: ""; position: fixed; inset: 0; z-index: 2147483001; pointer-events: none;
-    background: var(--glass-cracks, none) center / 100% 100% no-repeat;
-    animation: glass-crack-carry .26s linear both;
-    animation-delay: var(--glass-crack-delay, 0s);
-}
-@keyframes glass-crack-carry {
-    from { clip-path: circle(0px at var(--glass-x, 50%) var(--glass-y, 50%)); }
-    to { clip-path: circle(var(--glass-radius, 150vmax) at var(--glass-x, 50%) var(--glass-y, 50%)); }
-}
 .bg-switch .bg-switch-state {
     font-weight: 700;
     color: var(--accent-color);

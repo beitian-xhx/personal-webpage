@@ -149,10 +149,18 @@ export function initExperience() {
     });
     const filters = [...document.querySelectorAll<HTMLButtonElement>("[data-exp-filter]")];
     const rows = [...document.querySelectorAll<HTMLAnchorElement>("[data-exp-row]")];
-    rows.forEach(row => row.addEventListener("pointerenter", () => { if (!reduced.matches) void warmGlass().catch(() => undefined); }, { once: true }));
-    document.querySelectorAll<HTMLAnchorElement>(".right-sidebar a.recent-project").forEach(link => link.addEventListener("pointerenter", () => {
+    const prefetched = new Set<string>();
+    const warmArticle = (link: HTMLAnchorElement) => {
         if (!reduced.matches) void warmGlass().catch(() => undefined);
-    }, { once: true }));
+        if (prefetched.has(link.href)) return;
+        prefetched.add(link.href);
+        const hint = document.createElement("link"); hint.rel = "prefetch"; hint.href = link.href; hint.as = "document"; document.head.append(hint);
+    };
+    [...rows,...document.querySelectorAll<HTMLAnchorElement>(".right-sidebar a.recent-project")].forEach(link => {
+        link.addEventListener("pointerenter", () => warmArticle(link), { once: true });
+        link.addEventListener("focus", () => warmArticle(link), { once: true });
+        link.addEventListener("touchstart", () => warmArticle(link), { once: true, passive: true });
+    });
     filters.forEach(button => button.addEventListener("click", () => {
         const filter = button.dataset.expFilter || "";
         filters.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
