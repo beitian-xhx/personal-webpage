@@ -1,5 +1,6 @@
 import { initMotion } from "./motion";
 import { initExperience } from "./experience";
+import { initSiteAudio } from "./site-audio";
 
 const copyText = async (text: string): Promise<void> => {
     if (navigator.clipboard && window.isSecureContext) {
@@ -1728,7 +1729,7 @@ const initCustomScripts = () => {
     [initStorageSafeColorScheme, initSiteLanguageExperience, initLocalizedArticleDates,
         initArticleShare, initHomeSocialHover, initSidebarMenuHover, initHomeProfile,
         initAppLaunchpad, initPhotoGallery, initWorldClocks, initSiteRuntime, initDashboard,
-        initDashboardAdminGesture, initSidebarManagementMenu, initRocketGestures, initMotion, initExperience,
+        initDashboardAdminGesture, initSidebarManagementMenu, initRocketGestures, initMotion, initExperience, initSiteAudio,
     ].forEach(initialize => {
         try {
             initialize();

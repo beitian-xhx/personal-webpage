@@ -9,109 +9,114 @@ export function initExperience() {
     const fine = matchMedia("(hover: hover) and (pointer: fine)");
     const nav = document.querySelector<HTMLElement>("[data-exp-nav]");
     const portal = document.querySelector<HTMLElement>(".hologram-portal");
-    const portrait = portal?.querySelector<HTMLCanvasElement>("canvas");
-    const contentLayers=[...document.querySelectorAll<HTMLElement>(".main-container,.experience-nav")];
-    let contentRestoreFrame=0;
+    const portrait = portal?.querySelector<HTMLCanvasElement>("canvas[data-portrait]");
+    const contentLayers = [...document.querySelectorAll<HTMLElement>(".main-container,.experience-nav")];
     let portraitDispose: (() => void) | undefined, portalGeneration = 0;
-    let leaving = false, fluidDispose: (() => void) | undefined;
-    let pageSuspended = document.hidden, portalExitFrame = 0, portalExitElapsed = 0, portalExitLast = 0;
+    let portraitRunning = false, portalScrollActive = false, portalScrollFrame = 0;
+    let fluidDispose: (() => void) | undefined;
+    let pageSuspended = document.hidden;
     const canAnimate = () => !pageSuspended && !document.hidden && !reduced.matches;
     const notifyPortal = () => document.dispatchEvent(new Event("site:portal"));
     const inertContent = (value: boolean) => {
         contentLayers.forEach(element => { element.inert = value; });
     };
-    const stopPortalExit = () => { cancelAnimationFrame(portalExitFrame); portalExitFrame = 0; portalExitLast = 0; };
-    const restoreContentTransitions=()=>{cancelAnimationFrame(contentRestoreFrame);contentRestoreFrame=0;contentLayers.forEach(element=>element.style.removeProperty("transition"));};
-    const clearPortalBlend = (restoreTransitions=true) => {
-        delete root.dataset.portalLeaving;
-        delete root.dataset.portalMotion;
-        contentLayers.forEach(element=>element.style.removeProperty("opacity"));
-        portal?.style.removeProperty("--portal-fade");
-        portal?.style.removeProperty("--portal-progress");
-        portal?.style.removeProperty("--portal-bloom");
-        if(restoreTransitions)restoreContentTransitions();
-    };
+    const stopPortalScroll = () => { cancelAnimationFrame(portalScrollFrame); portalScrollFrame = 0; };
     const smooth = (from: number, to: number, value: number) => {
         const t = Math.max(0, Math.min(1, (value - from) / (to - from)));
         return t * t * (3 - 2 * t);
     };
-    const startPortrait = (generation: number) => {
-        if (!portrait) return;
+    const stopPortrait = () => {
+        ++portalGeneration; portraitRunning = false;
+        portraitDispose?.(); portraitDispose = undefined;
+    };
+    const startPortrait = () => {
+        if (!portrait || portraitRunning) return;
+        portraitRunning = true;
+        const generation = ++portalGeneration;
         void mountHologram(portrait, reduced.matches).then(dispose => {
-            if (generation !== portalGeneration || portal.hidden) dispose?.();
+            if (generation !== portalGeneration || portal?.hidden) dispose?.();
             else portraitDispose = dispose;
         }).catch(() => {
-            if (generation !== portalGeneration || portal.hidden) return;
+            if (generation !== portalGeneration || portal?.hidden) return;
             portrait.dataset.renderer = "image-fallback";
             portrait.style.background = `url("${portrait.dataset.portrait}") center/auto 80% no-repeat`;
             portrait.style.imageRendering = "pixelated";
             portrait.style.filter = "grayscale(1)";
         });
     };
-    const finishPortalExit = () => {
-        if (!portal || portal.hidden) return;
-        stopPortalExit();
-        portal.hidden = true; delete root.dataset.portal; delete portal.dataset.leaving;
-        clearPortalBlend(false);
-        if (portrait) delete portrait.dataset.exit;
-        ++portalGeneration; inertContent(false); portraitDispose?.(); portraitDispose = undefined;
-        leaving = false; portalExitElapsed = 0; notifyPortal();
-        contentRestoreFrame=requestAnimationFrame(()=>{contentRestoreFrame=0;if(portal.hidden)restoreContentTransitions();});
-        document.querySelector<HTMLElement>(".exp-hero h1, main h1, .main")?.focus({ preventScroll: true });
+    // Keep the intro's document height after exit, so scrolling back can restore it.
+    const paintPortalScroll = () => {
+        portalScrollFrame = 0;
+        if (!portal || !portalScrollActive) return;
+        if (reduced.matches) {
+            portal.hidden = true;
+            delete root.dataset.portal; delete root.dataset.portalLeaving; delete root.dataset.portalMotion;
+            delete root.dataset.portalScroll;
+            portal.removeAttribute("aria-hidden");
+            contentLayers.forEach(element => element.style.removeProperty("opacity"));
+            inertContent(false); stopPortrait(); notifyPortal();
+            return;
+        }
+        portal.hidden = false;
+        root.dataset.portalScroll = "true";
+        const t = Math.max(0, Math.min(1, scrollY / Math.max(1, portal.offsetHeight)));
+        const wasOpen = root.dataset.portal === "open";
+        const motion = t >= .30 && t < 1;
+        const motionChanged = (root.dataset.portalMotion === "true") !== motion;
+        if (t < 1) root.dataset.portal = "open";
+        else delete root.dataset.portal;
+        if (motion) root.dataset.portalMotion = "true";
+        else delete root.dataset.portalMotion;
+        if (t > 0 && t < 1) root.dataset.portalLeaving = "true";
+        else delete root.dataset.portalLeaving;
+        portal.dataset.leaving = String(t > 0);
+        portal.dataset.complete = String(t >= 1);
+        portal.setAttribute("aria-hidden", String(t >= 1));
+        portal.inert = t >= 1;
+        if (portrait) portrait.dataset.exit = String(smooth(0, .80, t));
+        portal.style.setProperty("--portal-fade", String(smooth(.05, 1, t)));
+        portal.style.setProperty("--portal-progress", String(t));
+        portal.style.setProperty("--portal-blue", String(smooth(.05, .85, t)));
+        portal.style.setProperty("--portal-bloom", String(Math.sin(Math.PI * t) * .28));
+        const homeOpacity = smooth(.12, .94, t);
+        portal.style.setProperty("--portal-home-opacity", String(homeOpacity));
+        contentLayers.forEach(element => {
+            if (t >= 1) element.style.removeProperty("opacity");
+            else element.style.setProperty("opacity", String(homeOpacity));
+        });
+        inertContent(t < 1);
+        if (t >= 1) {
+            if (wasOpen) {
+                try { sessionStorage.setItem("beitian-entry-v1", "entered"); } catch (_) {}
+            }
+            if (portraitRunning) stopPortrait();
+        } else if (!pageSuspended && !document.hidden) startPortrait();
+        if (wasOpen !== (t < 1) || motionChanged) notifyPortal();
     };
-    const resumePortalExit = () => {
-        if (!leaving || !portal || portal.hidden || portalExitFrame || !canAnimate()) return;
-        portalExitLast = 0;
-        const dissolve = (now: number) => {
-            portalExitFrame = 0;
-            if (!leaving || portal.hidden || !canAnimate()) return;
-            if (portalExitLast) portalExitElapsed += now - portalExitLast;
-            portalExitLast = now;
-            const t = Math.min(1, portalExitElapsed / 820);
-            if (portrait) portrait.dataset.exit = String(smooth(0, .74, t));
-            portal.style.setProperty("--portal-fade", String(smooth(0, 1, t)));
-            portal.style.setProperty("--portal-progress", String(t));
-            portal.style.setProperty("--portal-bloom", String(Math.sin(Math.PI * smooth(0,.90,t)) * .28));
-            const contentOpacity=String(smooth(.12,.94,t));
-            contentLayers.forEach(element=>element.style.setProperty("opacity",contentOpacity));
-            if(t>=.30&&root.dataset.portalMotion!=="true"){root.dataset.portalMotion="true";notifyPortal();}
-            if (t >= 1) finishPortalExit();
-            else portalExitFrame = requestAnimationFrame(dissolve);
-        };
-        portalExitFrame = requestAnimationFrame(dissolve);
+    const queuePortalScroll = () => {
+        if (portalScrollActive && !portalScrollFrame && !pageSuspended && !document.hidden) {
+            portalScrollFrame = requestAnimationFrame(paintPortalScroll);
+        }
     };
-    const showPortal = () => {
+    const showPortal = (replay = false) => {
         if (!portal || !portrait) return;
-        stopPortalExit();
-        clearPortalBlend();
-        const generation = ++portalGeneration;
-        leaving = false; portalExitElapsed = 0; portal.hidden = false; portal.dataset.ready = "true";
-        delete portal.dataset.leaving; delete portrait.dataset.exit;
-        root.dataset.portal = "open"; inertContent(true); notifyPortal();
-        portraitDispose?.(); portraitDispose = undefined;
-        startPortrait(generation);
-        portal.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
+        portalScrollActive = true;
+        portal.dataset.ready = "true";
+        if (replay) {
+            // Override CSS smooth scrolling: replay must start at the real document top.
+            window.scrollTo({ top: 0, behavior: "instant" });
+        }
+        paintPortalScroll();
+        notifyPortal();
     };
-    const refreshPortrait = () => {
-        if (!portal || portal.hidden || !portrait) return;
-        const generation = ++portalGeneration;
-        portraitDispose?.(); portraitDispose = undefined;
-        startPortrait(generation);
-    };
-    const enter = () => {
-        if (!portal || portal.hidden || leaving) return;
-        leaving = true; portal.dataset.leaving = "true"; portalExitElapsed = 0;
-        root.dataset.portalLeaving = "true";
-        contentLayers.forEach(element=>{element.style.setProperty("transition","none");element.style.setProperty("opacity","0");});
-        try { sessionStorage.setItem("beitian-entry-v1", "entered"); } catch (_) {}
-        if (reduced.matches) finishPortalExit();
-        else resumePortalExit();
-    };
-    portal?.addEventListener("click", enter);
-    portal?.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " " || event.key === "Escape") { event.preventDefault(); enter(); }
+    document.querySelector("[data-exp-replay]")?.addEventListener("click", () => showPortal(true));
+    // Only the explicit prompt is a shortcut. Portal/player clicks and native keys stay native.
+    portal?.querySelector("[data-portal-enter]")?.addEventListener("click", () => {
+        if (!portalScrollActive || !portal) return;
+        window.scrollTo({ top: portal.offsetHeight, behavior: reduced.matches ? "instant" : "smooth" });
     });
-    document.querySelector("[data-exp-replay]")?.addEventListener("click", showPortal);
+    window.addEventListener("scroll", queuePortalScroll, { passive: true });
+    window.addEventListener("resize", queuePortalScroll, { passive: true });
     if (root.dataset.portal === "open") showPortal();
     const initFluid = (restart = false) => {
         if (fluidDispose && !restart) return;
@@ -142,9 +147,9 @@ export function initExperience() {
     const observer = new IntersectionObserver(entries => entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         (entry.target as HTMLElement).dataset.visible = "true"; observer.unobserve(entry.target);
-    }), { rootMargin: "0px 0px 60px 0px", threshold: .05 });
+    }), { rootMargin: "0px 0px -24px 0px", threshold: .08 });
     reveals.forEach(element => {
-        if (reduced.matches || element.getBoundingClientRect().top < innerHeight) element.dataset.visible = "true";
+        if (reduced.matches) element.dataset.visible = "true";
         else observer.observe(element);
     });
     const filters = [...document.querySelectorAll<HTMLButtonElement>("[data-exp-filter]")];
@@ -167,7 +172,7 @@ export function initExperience() {
         let count = 0;
         rows.forEach(row => {
             row.hidden = Boolean(filter && !row.dataset.categories?.split("|").includes(filter));
-            if (!row.hidden) { count++; row.dataset.visible = "true"; }
+            if (!row.hidden) { count++; if (reduced.matches) row.dataset.visible = "true"; else if (row.dataset.visible !== "true") observer.observe(row); }
         });
         const output = document.querySelector("[data-exp-count]"); if (output) output.textContent = String(count);
         const menu = button.closest("details"); if (menu) menu.open = false;
@@ -292,7 +297,7 @@ export function initExperience() {
     const wipe = document.querySelector<HTMLElement>(".experience-transition");
     let glassNavigating = false;
     document.addEventListener("click", event => {
-        if (reduced.matches || root.dataset.portal === "open") return;
+        if (reduced.matches || root.dataset.portal === "open" || (event.target instanceof Element && event.target.closest(".site-audio,audio,video"))) return;
         const target = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>("a[href]") : null;
         if (target && !event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && !target.download && (!target.target || target.target === "_self")) {
             const url = new URL(target.href);
@@ -336,13 +341,13 @@ export function initExperience() {
         rowRafControls.forEach(control => control.pause());
         cancelAnimationFrame(cursorFrame); cursorFrame = 0;
         cancelAnimationFrame(scrollFrame); scrollFrame = 0;
-        stopPortalExit(); clearPointerEffects();
+        stopPortalScroll(); clearPointerEffects();
     };
     const resumeMotion = () => {
         if (document.hidden) { suspendMotion(); return; }
         pageSuspended = false;
         rowRafControls.forEach(control => control.resume());
-        paintScroll(); resumePortalExit();
+        paintScroll(); paintPortalScroll();
     };
     document.addEventListener("visibilitychange", () => {
         if (document.hidden) suspendMotion();
@@ -359,18 +364,18 @@ export function initExperience() {
         suspendMotion(); fluidDispose?.(); fluidDispose = undefined;
     });
     reduced.addEventListener("change", () => {
-        initFluid(true); reveals.forEach(element => element.dataset.visible = "true");
+        initFluid(true); if (reduced.matches) reveals.forEach(element => element.dataset.visible = "true");
         if (reduced.matches) {
             rowRafControls.forEach(control => control.pause());
             cancelAnimationFrame(cursorFrame); cursorFrame = 0;
             cancelAnimationFrame(scrollFrame); scrollFrame = 0;
             clearPointerEffects(); paintScroll();
-            if (leaving) finishPortalExit();
+            paintPortalScroll();
         } else {
             rowRafControls.forEach(control => control.resume());
             paintScroll();
         }
-        if (root.dataset.portal === "open") refreshPortrait();
+        if (!reduced.matches) paintPortalScroll();
     });
     root.dataset.expReady = "true";
     const entryWindow = window as Window & { __glassEntry?: GlassEntry };

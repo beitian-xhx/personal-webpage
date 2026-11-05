@@ -1,15 +1,18 @@
 .hologram-portal {
     --portal-floor: 85%;
     --portal-span: 70vh;
-    position: fixed; inset: 0; z-index: 10000; overflow: hidden;
+    // One real viewport of document flow; it stays in place during the scroll dissolve.
+    position: sticky; top: 0; width: 100%; height: 100vh; height: 100svh;
+    z-index: 10000; overflow: hidden; flex-shrink: 0;
     background: radial-gradient(ellipse at 50% 44%, #141414 0%, #090909 40%, #030303 78%);
-    color: #ededed; cursor: pointer; isolation: isolate;
+    color: #ededed; isolation: isolate;
     font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
     &[hidden] { display: none !important; }
     &[data-leaving="true"] { opacity: calc(1 - var(--portal-fade, 0)); pointer-events: none; will-change: opacity; }
+    &[data-complete="true"] { visibility: hidden; pointer-events: none; }
     &::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
-        background: radial-gradient(ellipse at 50% 76%, #b8d8ff 0%, #3666b5 24%, transparent 66%); }
-    &[data-leaving="true"]::after { opacity: var(--portal-bloom, 0); }
+        background: radial-gradient(ellipse at 50% 76%, #3469ab 0%, #17355f 45%, #102344 100%); }
+    &[data-leaving="true"]::after { opacity: var(--portal-blue, 0); }
     &[data-leaving="true"] &__identity, &[data-leaving="true"] &__label, &[data-leaving="true"] &__enter {
         opacity: calc(1 - var(--portal-progress, 0) * 3);
     }
@@ -30,7 +33,7 @@
     &__identity { position: absolute; top: 35px; left: 4.5vw; display: flex; align-items: center; gap: 13px; z-index: 5; font-size: 16px; letter-spacing: .18em; }
     &__star { width: 8px; height: 8px; border: 1px solid #d8d8d8; border-radius: 50%; box-shadow: 0 0 12px #ffffff30; }
     &__label { position: absolute; right: 4.5vw; top: 39px; margin: 0; font-size: 11px; letter-spacing: .45em; color: #898989; }
-    &__canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; }
+    &__canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; }
     &__baseline {
         position: absolute; top: var(--portal-floor); left: 50%;
         width: calc(var(--portal-span) * .8); height: 50px;
@@ -57,11 +60,9 @@
         &-dot { width: 4px; height: 4px; border-radius: 50%; background: #eee; box-shadow: 0 0 9px #ffffff70; animation: portal-beacon 3.4s ease-in-out infinite; }
     }
 }
-html[data-portal="open"] { overflow: hidden; body > :not(.hologram-portal):not(script) { visibility: hidden; } }
-html[data-portal="open"][data-portal-leaving="true"] {
-    body > :not(.hologram-portal):not(script) { visibility: visible; }
+html[data-portal-scroll="true"] body.experience-enabled { background: #142d56; }
+html[data-portal="open"] {
     body.experience-enabled .main-container, body.experience-enabled .experience-nav {
-        opacity: 0;
         transition: none;
         will-change: opacity;
     }
@@ -90,6 +91,7 @@ html[data-experience="true"] body.experience-enabled .hologram-portal {
     }
 }
 @media (prefers-reduced-motion: reduce) {
-    .hologram-portal { transition-duration: .01ms; &__enter-dot, &__field i, &__orbits i, &__scan { animation: none; } }
+    .hologram-portal { display: none; &__enter-dot, &__field i, &__orbits i, &__scan { animation: none; } }
 }
+@media print { .hologram-portal { display: none !important; } }
 

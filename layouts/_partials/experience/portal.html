@@ -1,5 +1,8 @@
 <section class="hologram-portal" id="hologram-portal" aria-label="北天的个人网站，全息入场" hidden>
+    <img class="portal-blackhole" src="{{ "img/experience/blackhole.webp" | relURL }}" alt="" aria-hidden="true" decoding="async" fetchpriority="high">
     <div class="hologram-portal__noise" aria-hidden="true"></div>
+    <canvas class="portal-audio-field" data-audio-field aria-hidden="true"></canvas>
+    <div class="portal-welcome"><span>WELCOME TO</span><h1>北天的博客</h1><p>让思绪，在星海中漫步。</p></div>
     <div class="hologram-portal__field" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="hologram-portal__orbits" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="hologram-portal__scan" aria-hidden="true"></div>
@@ -8,5 +11,5 @@
     <canvas class="hologram-portal__canvas" data-portrait="{{ "img/experience/portrait.png" | relURL }}" aria-hidden="true"></canvas>
     <div class="hologram-portal__baseline" aria-hidden="true"></div>
     <div class="hologram-portal__beam" aria-hidden="true"></div>
-    <button class="hologram-portal__enter" type="button" data-portal-enter><span class="hologram-portal__enter-dot" aria-hidden="true"></span><span>点击任意位置进入</span><span aria-hidden="true">↗</span></button>
+    <button class="hologram-portal__enter" type="button" data-portal-enter><span class="hologram-portal__enter-dot" aria-hidden="true"></span><span>向下滚动，进入我的世界</span><span aria-hidden="true">↓</span></button>
 </section>

@@ -29,11 +29,11 @@
         </div>
         {{ with .Site.Menus.social }}<ol class="home-profile__social" aria-label="社交链接" data-exp-reveal>{{ range . }}<li><a href="{{ .URL }}" aria-label="{{ .Name }}" title="{{ .Name }}"{{ if .Params.newTab }} target="_blank" rel="noopener noreferrer"{{ end }} data-exp-magnet>{{ partial "helper/icon" .Params.icon }}</a></li>{{ end }}</ol>{{ end }}
     </section>
-    <section class="home-feature-grid exp-home-features" aria-label="主页快捷入口" data-exp-reveal>
-        {{ with .Site.GetPage "/page/apps" }}<a class="home-feature-card home-feature-card--launchpad" href="{{ .RelPermalink }}"><h2>资源导航</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "list-tree" }}</span></a>{{ end }}
-        {{ with .Site.GetPage "/page/about" }}<a class="home-feature-card home-feature-card--resume" href="{{ .RelPermalink }}"><h2>关于我</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "user" }}</span></a>{{ end }}
-        {{ with .Site.GetPage "/page/dashboard" }}<a class="home-feature-card home-feature-card--dashboard" href="{{ .RelPermalink }}"><h2>站点数据</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "dashboard" }}</span></a>{{ end }}
-        {{ with .Site.GetPage "/page/pictures" }}<a class="home-feature-card home-feature-card--gallery" href="{{ .RelPermalink }}"><h2>照片墙</h2><div class="home-gallery-teaser__stack" aria-hidden="true">{{ range first 3 $pictures }}<img src="{{ strings.TrimPrefix "/" .image | relURL }}" alt="" loading="lazy" decoding="async">{{ else }}{{ partial "helper/icon" "pictures" }}{{ end }}</div></a>{{ end }}
+    <section class="home-feature-grid exp-home-features" aria-label="主页快捷入口">
+        {{ with .Site.GetPage "/page/apps" }}<a class="home-feature-card home-feature-card--launchpad" data-exp-reveal href="{{ .RelPermalink }}"><h2>资源导航</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "list-tree" }}</span></a>{{ end }}
+        {{ with .Site.GetPage "/page/about" }}<a class="home-feature-card home-feature-card--resume" data-exp-reveal href="{{ .RelPermalink }}"><h2>关于我</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "user" }}</span></a>{{ end }}
+        {{ with .Site.GetPage "/page/dashboard" }}<a class="home-feature-card home-feature-card--dashboard" data-exp-reveal href="{{ .RelPermalink }}"><h2>站点数据</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "dashboard" }}</span></a>{{ end }}
+        {{ with .Site.GetPage "/page/pictures" }}<a class="home-feature-card home-feature-card--gallery" data-exp-reveal href="{{ .RelPermalink }}"><h2>照片墙</h2><div class="home-gallery-teaser__stack" aria-hidden="true">{{ range first 3 $pictures }}<img src="{{ strings.TrimPrefix "/" .image | relURL }}" alt="" loading="lazy" decoding="async">{{ else }}{{ partial "helper/icon" "pictures" }}{{ end }}</div></a>{{ end }}
     </section>
     <section class="exp-index" id="exp-content" tabindex="-1" aria-labelledby="exp-index-title">
         <header class="exp-index__heading" data-exp-reveal><h2 id="exp-index-title">最近文章</h2><span class="exp-index__count" aria-live="polite" aria-atomic="true"><span data-exp-count>{{ len $pages }}</span> 篇</span></header>
