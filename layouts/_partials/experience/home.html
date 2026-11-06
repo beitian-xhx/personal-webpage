@@ -1,7 +1,5 @@
 {{ $pages := where (where .Site.RegularPages "Type" "in" .Site.Params.mainSections) "Params.hidden" "ne" true }}
-{{ $pictures := slice }}
-{{ with index hugo.Data "photo-wall" }}{{ range . }}{{ if fileExists (printf "static/%s" (strings.TrimPrefix "/" .image)) }}{{ $pictures = $pictures | append . }}{{ end }}{{ end }}{{ end }}
-{{ $pictures = sort $pictures "order" }}
+{{ $pictures := where (partialCached "helper/photo-wall-data.html" . .Language.Lang) "LocalPath" "ne" "" }}
 <div class="exp-home">
     <section class="exp-hero home-profile" aria-labelledby="exp-title">
         <div class="exp-hero__orb" aria-hidden="true"></div>
@@ -33,7 +31,7 @@
         {{ with .Site.GetPage "/page/apps" }}<a class="home-feature-card home-feature-card--launchpad" data-exp-reveal href="{{ .RelPermalink }}"><h2>资源导航</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "list-tree" }}</span></a>{{ end }}
         {{ with .Site.GetPage "/page/about" }}<a class="home-feature-card home-feature-card--resume" data-exp-reveal href="{{ .RelPermalink }}"><h2>关于我</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "user" }}</span></a>{{ end }}
         {{ with .Site.GetPage "/page/dashboard" }}<a class="home-feature-card home-feature-card--dashboard" data-exp-reveal href="{{ .RelPermalink }}"><h2>站点数据</h2><span class="exp-home-feature__icon" aria-hidden="true">{{ partial "helper/icon" "dashboard" }}</span></a>{{ end }}
-        {{ with .Site.GetPage "/page/pictures" }}<a class="home-feature-card home-feature-card--gallery" data-exp-reveal href="{{ .RelPermalink }}"><h2>照片墙</h2><div class="home-gallery-teaser__stack" aria-hidden="true">{{ range first 3 $pictures }}<img src="{{ strings.TrimPrefix "/" .image | relURL }}" alt="" loading="lazy" decoding="async">{{ else }}{{ partial "helper/icon" "pictures" }}{{ end }}</div></a>{{ end }}
+        {{ with .Site.GetPage "/page/pictures" }}<a class="home-feature-card home-feature-card--gallery" data-exp-reveal href="{{ .RelPermalink }}"><h2>照片墙</h2><div class="home-gallery-teaser__stack" aria-hidden="true">{{ range first 3 $pictures }}{{ $image := partialCached "helper/responsive-photo.html" . .ImagePermalink }}<img src="{{ $image.Src }}"{{ with $image.Srcset }} srcset="{{ . }}" sizes="88px"{{ end }} alt="" loading="lazy" decoding="async">{{ else }}{{ partial "helper/icon" "pictures" }}{{ end }}</div></a>{{ end }}
     </section>
     <section class="exp-index" id="exp-content" tabindex="-1" aria-labelledby="exp-index-title">
         <header class="exp-index__heading" data-exp-reveal><h2 id="exp-index-title">最近文章</h2><span class="exp-index__count" aria-live="polite" aria-atomic="true"><span data-exp-count>{{ len $pages }}</span> 篇</span></header>

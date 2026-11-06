@@ -1,0 +1,21 @@
+{{- $isChinese := hasPrefix .Language.Lang "zh" -}}
+{{- $configured := slice -}}
+{{- with index hugo.Data "photo-wall" -}}{{- range . -}}{{- $configured = $configured | append . -}}{{- end -}}{{- end -}}
+{{- $photos := slice -}}
+{{- range $index, $picture := sort $configured "order" -}}
+    {{- with $picture.image -}}
+        {{- $path := strings.TrimPrefix "/" . -}}
+        {{- $remote := in (slice "http" "https") (urls.Parse .).Scheme -}}
+        {{- $permalink := cond $remote . (relURL $path) -}}
+        {{- $localPath := "" -}}
+        {{- if and (not $remote) (fileExists (printf "static/%s" $path)) -}}{{- $localPath = printf "static/%s" $path -}}{{- end -}}
+        {{- $title := default (printf "Photo %d" (add $index 1)) $picture.title -}}
+        {{- $description := default "" $picture.description -}}
+        {{- if $isChinese -}}
+            {{- $title = default $title $picture.titleZh -}}
+            {{- $description = default $description $picture.descriptionZh -}}
+        {{- end -}}
+        {{- $photos = $photos | append (dict "Id" (default (printf "picture-%d" $index) $picture.id) "Title" $title "Description" $description "Date" (default "" $picture.date) "Link" (default "" $picture.link) "ImagePermalink" $permalink "LocalPath" $localPath) -}}
+    {{- end -}}
+{{- end -}}
+{{- return $photos -}}

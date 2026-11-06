@@ -91,7 +91,19 @@ export async function prepareGlassEntry(pointerX: number, pointerY: number, sign
     if (signal?.aborted) return;
     const image = await currentWallpaper();
     if (signal?.aborted) return;
-    return { snapshot: photograph(image, innerWidth, innerHeight).toDataURL('image/jpeg', .9),
+    const surface = photograph(image, innerWidth, innerHeight);
+    const blob = await new Promise<Blob>((resolve, reject) => {
+        surface.toBlob(value => value ? resolve(value) : reject(new Error('Glass snapshot encoding failed')), 'image/jpeg', .9);
+    });
+    if (signal?.aborted) return;
+    const snapshot = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+    });
+    if (signal?.aborted) return;
+    return { snapshot,
         width, height, pointerX:impact.x, pointerY:impact.y, startedAt, cracks, cells };
 }
 /** Viewport cells change with click position and viewport; no preset marketing layout. */

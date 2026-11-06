@@ -763,6 +763,15 @@ const initPhotoGallery = () => {
 
         gallery.dataset.galleryReady = "true";
 
+        const storageKeys = new Map<HTMLElement, string>();
+        const galleryImages = new Map<HTMLElement, HTMLImageElement | null>();
+        items.forEach((item) => {
+            storageKeys.set(item, `photo-gallery-offset:${item.dataset.galleryId || ""}`);
+            galleryImages.set(item, item.querySelector<HTMLImageElement>("img"));
+        });
+        const storageKey = (item: HTMLElement) => storageKeys.get(item) as string;
+        const galleryImage = (item: HTMLElement) => galleryImages.get(item) ?? null;
+
         const localeParts = (value: string) => {
             const parts = value.trim().replace(/_/g, "-").split("-").filter(Boolean);
             const language = (parts[0] || "").toLowerCase();
@@ -832,9 +841,11 @@ const initPhotoGallery = () => {
             moved: boolean;
         } | null = null;
 
-        const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const canDrag = () => !prefersReducedMotion() && window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 721px)").matches;
-        const storageKey = (item: HTMLElement) => `photo-gallery-offset:${item.dataset.galleryId || ""}`;
+        const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const finePointerQuery = window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 721px)");
+        const compactQuery = window.matchMedia("(max-width: 720px)");
+        const prefersReducedMotion = () => reducedMotionQuery.matches;
+        const canDrag = () => !prefersReducedMotion() && finePointerQuery.matches;
 
         const hashString = (value: string) => {
             let hash = 0;
@@ -876,10 +887,10 @@ const initPhotoGallery = () => {
         };
 
         const applyImageShape = (item: HTMLElement) => {
-            const image = item.querySelector<HTMLImageElement>("img");
+            const image = galleryImage(item);
             if (!image || image.naturalWidth === 0 || image.naturalHeight === 0) return;
 
-            const ratio = image.naturalWidth / image.naturalHeight;
+            const ratio = Number(image.dataset.imageRatio) || image.naturalWidth / image.naturalHeight;
             item.classList.toggle("is-portrait", ratio < 0.86);
             item.classList.toggle("is-wide", ratio > 1.28);
 
@@ -893,7 +904,7 @@ const initPhotoGallery = () => {
             const rect = gallery.getBoundingClientRect();
             const width = Math.max(rect.width, 320);
 
-            if (window.matchMedia("(max-width: 720px)").matches || prefersReducedMotion()) {
+            if (compactQuery.matches || prefersReducedMotion()) {
                 gallery.style.removeProperty("height");
                 gallery.classList.remove("is-enhanced");
                 gallery.classList.add("is-ready");
@@ -1087,6 +1098,30 @@ const initPhotoGallery = () => {
             clone.style.willChange = "transform, opacity";
 
             document.body.appendChild(clone);
+
+            const cloneImage = clone.querySelector<HTMLImageElement>("img");
+            if (cloneImage) {
+                clone.querySelectorAll<HTMLElement>("[srcset], [sizes]").forEach((source) => {
+                    source.removeAttribute("srcset");
+                    source.removeAttribute("sizes");
+                });
+
+                const originalImage = galleryImage(item);
+                const fullSrc = originalImage?.dataset.fullSrc;
+                const fallbackSrc = originalImage?.currentSrc || originalImage?.src || cloneImage.src;
+                cloneImage.src = fallbackSrc;
+
+                if (fullSrc && fullSrc !== fallbackSrc) {
+                    const highResImage = new Image();
+                    const useFullSource = () => {
+                        if (clone.isConnected) cloneImage.src = fullSrc;
+                    };
+                    highResImage.addEventListener("load", useFullSource, { once: true });
+                    highResImage.addEventListener("error", () => console.warn("Photo original failed to load", fullSrc), { once: true });
+                    highResImage.src = fullSrc;
+                }
+            }
+
             showBackdrop();
             const finalRect = clone.getBoundingClientRect();
             clone.style.width = `${finalRect.width}px`;
@@ -1125,15 +1160,15 @@ const initPhotoGallery = () => {
         };
 
         items.forEach((item) => {
+            const image = galleryImage(item);
             item.tabIndex = 0;
             item.setAttribute("role", "button");
             item.setAttribute("aria-haspopup", "dialog");
             item.setAttribute("aria-expanded", "false");
-            item.setAttribute("aria-label", `放大照片：${item.dataset.galleryTitle || item.querySelector("img")?.alt || "照片"}`);
+            item.setAttribute("aria-label", `放大照片：${item.dataset.galleryTitle || image?.alt || "照片"}`);
             applyOffset(item, readOffset(item));
             applyImageShape(item);
 
-            const image = item.querySelector<HTMLImageElement>("img");
             image?.addEventListener("load", () => {
                 applyImageShape(item);
                 scheduleLayout();
@@ -1252,7 +1287,7 @@ const initPhotoGallery = () => {
         window.addEventListener("pagehide", resetGallery);
         window.addEventListener("site:motion-reset", resetGallery);
         document.addEventListener("visibilitychange", () => { if (document.hidden) resetGallery(); });
-        window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => {
+        reducedMotionQuery.addEventListener("change", () => {
             resetGallery();
             scheduleLayout();
         });
@@ -1274,19 +1309,7 @@ type ClockParts = {
     second: number;
 };
 
-const getClockParts = (date: Date, timeZone: string): ClockParts => {
-    const formatter = new Intl.DateTimeFormat("en-GB", {
-        timeZone,
-        calendar: "gregory",
-        numberingSystem: "latn",
-        hourCycle: "h23",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
+const getClockParts = (date: Date, formatter: Intl.DateTimeFormat): ClockParts => {
     const values: Partial<ClockParts> = {};
 
     formatter.formatToParts(date).forEach((part) => {
@@ -1300,48 +1323,72 @@ const getClockParts = (date: Date, timeZone: string): ClockParts => {
 
 const initWorldClocks = () => {
     document.querySelectorAll<HTMLElement>("[data-world-clock]").forEach((widget) => {
-        const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
         const localClock = widget.querySelector<HTMLElement>('[data-clock="local"]');
         if (!localClock) return;
 
-        const paintClock = (
-            clock: HTMLElement,
-            now: Date,
-            timeZone: string,
-        ) => {
-            const parts = getClockParts(now, timeZone);
+        const formatter = new Intl.DateTimeFormat("en-GB", {
+            calendar: "gregory",
+            numberingSystem: "latn",
+            hourCycle: "h23",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        });
+        const hourHand = localClock.querySelector<HTMLElement>(".world-clock-widget__hand--hour");
+        const minuteHand = localClock.querySelector<HTMLElement>(".world-clock-widget__hand--minute");
+        const secondHand = localClock.querySelector<HTMLElement>(".world-clock-widget__hand--second");
+        const dial = localClock.querySelector<HTMLElement>(".world-clock-widget__dial");
+        const label = localClock.querySelector<HTMLElement>(".world-clock-widget__label")?.textContent?.trim() || "";
+
+        const paintClock = (now: Date) => {
+            const parts = getClockParts(now, formatter);
             const minuteAngle = parts.minute * 6;
             const hourAngle = (parts.hour % 12) * 30 + minuteAngle / 12;
             const secondAngle = parts.second * 6;
 
-            clock
-                .querySelector<HTMLElement>(".world-clock-widget__hand--hour")
-                ?.style.setProperty("--clock-rotation", `${hourAngle}deg`);
-            clock
-                .querySelector<HTMLElement>(".world-clock-widget__hand--minute")
-                ?.style.setProperty("--clock-rotation", `${minuteAngle}deg`);
-            clock
-                .querySelector<HTMLElement>(".world-clock-widget__hand--second")
-                ?.style.setProperty("--clock-rotation", `${secondAngle}deg`);
+            hourHand?.style.setProperty("--clock-rotation", `${hourAngle}deg`);
+            minuteHand?.style.setProperty("--clock-rotation", `${minuteAngle}deg`);
+            secondHand?.style.setProperty("--clock-rotation", `${secondAngle}deg`);
 
-            const label = clock.querySelector<HTMLElement>(".world-clock-widget__label")?.textContent?.trim() || "";
             const time = [parts.hour, parts.minute, parts.second]
                 .map((part) => String(part).padStart(2, "0"))
                 .join(":");
             const accessibleLabel = `${label}: ${time}`;
-            const dial = clock.querySelector<HTMLElement>(".world-clock-widget__dial");
             dial?.classList.toggle("is-night", parts.hour < 7 || parts.hour >= 19);
             dial?.setAttribute("aria-label", accessibleLabel);
-            clock.title = accessibleLabel;
+            localClock.title = accessibleLabel;
         };
 
-        const tick = () => {
-            const now = new Date();
-            paintClock(localClock, now, localZone);
+        let timer = 0;
+        const scheduleTick = () => {
+            timer = window.setTimeout(() => {
+                timer = 0;
+                if (document.hidden) return;
+                paintClock(new Date());
+                scheduleTick();
+            }, 1000 - (Date.now() % 1000));
+        };
+        const startClock = () => {
+            if (timer || document.hidden) return;
+            paintClock(new Date());
+            scheduleTick();
+        };
+        const stopClock = () => {
+            window.clearTimeout(timer);
+            timer = 0;
         };
 
-        tick();
-        window.setInterval(tick, 1000);
+        window.addEventListener("pagehide", stopClock);
+        window.addEventListener("pageshow", startClock);
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) stopClock();
+            else startClock();
+        });
+
+        startClock();
     });
 };
 

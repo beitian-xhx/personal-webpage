@@ -1,0 +1,22 @@
+{{- $result := dict "Src" .ImagePermalink "FullSrc" .ImagePermalink "Srcset" "" "Ratio" 0 -}}
+{{- if and .LocalPath (in (slice ".png" ".jpg" ".jpeg" ".webp") (lower (path.Ext .LocalPath))) -}}
+    {{- $target := printf "img/photo-wall/%s" (strings.TrimPrefix "static/" .LocalPath) -}}
+    {{- $content := os.ReadFile .LocalPath -}}
+    {{- /* Some existing .png uploads contain WebP data. Give derivatives the actual format. */ -}}
+    {{- if hasPrefix $content "RIFF" -}}{{- $target = replaceRE "\\.[^.]+$" ".webp" $target -}}{{- end -}}
+    {{- $image := resources.Copy $target (resources.FromString $target $content) -}}
+    {{- $sources := slice -}}
+    {{- $seen := dict -}}
+    {{- $src := "" -}}
+    {{- range slice 240 480 960 -}}
+        {{- $width := math.Min . $image.Width | int -}}
+        {{- if not (isset $seen (string $width)) -}}
+            {{- $seen = merge $seen (dict (string $width) true) -}}
+            {{- $variant := $image.Resize (printf "%dx" $width) -}}
+            {{- if not $src -}}{{- $src = $variant.RelPermalink -}}{{- end -}}
+            {{- $sources = $sources | append (printf "%s %dw" $variant.RelPermalink $variant.Width) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $result = merge $result (dict "Src" $src "Srcset" (delimit $sources ", ") "Ratio" (div (float $image.Width) $image.Height)) -}}
+{{- end -}}
+{{- return $result -}}

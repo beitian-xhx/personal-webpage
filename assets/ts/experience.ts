@@ -154,6 +154,8 @@ export function initExperience() {
     });
     const filters = [...document.querySelectorAll<HTMLButtonElement>("[data-exp-filter]")];
     const rows = [...document.querySelectorAll<HTMLAnchorElement>("[data-exp-row]")];
+    const categoriesByRow = new Map(rows.map(row => [row, new Set((row.dataset.categories || "").split("|").filter(Boolean))]));
+    const countOutput = document.querySelector("[data-exp-count]");
     const prefetched = new Set<string>();
     const warmArticle = (link: HTMLAnchorElement) => {
         if (!reduced.matches) void warmGlass().catch(() => undefined);
@@ -171,10 +173,10 @@ export function initExperience() {
         filters.forEach(item => item.setAttribute("aria-pressed", String(item === button)));
         let count = 0;
         rows.forEach(row => {
-            row.hidden = Boolean(filter && !row.dataset.categories?.split("|").includes(filter));
+            row.hidden = Boolean(filter && !categoriesByRow.get(row)!.has(filter));
             if (!row.hidden) { count++; if (reduced.matches) row.dataset.visible = "true"; else if (row.dataset.visible !== "true") observer.observe(row); }
         });
-        const output = document.querySelector("[data-exp-count]"); if (output) output.textContent = String(count);
+        if (countOutput) countOutput.textContent = String(count);
         const menu = button.closest("details"); if (menu) menu.open = false;
     }));
     const rowRafControls: Array<{ pause: () => void; resume: () => void }> = [];
