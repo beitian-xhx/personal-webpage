@@ -242,7 +242,7 @@
         </div>
     </article>
 
-    <script id="dashboard-data" type="application/json">{{ jsonify $dashboardData | safeHTML }}</script>
+    <script id="dashboard-data" type="application/json">{{ jsonify $dashboardData | safeJS }}</script>
     {{ partial "footer/footer" . }}
 {{ end }}
 

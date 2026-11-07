@@ -1,9 +1,10 @@
 {{- $opts := dict "minify" hugo.IsProduction "format" "esm" -}}
 {{- $galleryScript := resources.Get "ts/gallery.ts" | js.Build $opts -}}
 
-{{ $style := "vendor/photoswipe/photoswipe.css" | relURL }}
-{{ $core := "vendor/photoswipe/photoswipe.esm.min.js" | relURL }}
-{{ $lightbox := "vendor/photoswipe/photoswipe-lightbox.esm.min.js" | relURL }}
+{{ $photoswipe := hugo.Data.external.PhotoSwipe }}
+{{ $style := $photoswipe.Style | relURL }}
+{{ $core := $photoswipe.Core | relURL }}
+{{ $lightbox := $photoswipe.Lightbox | relURL }}
 
 <script type="module">
     import gallery from '{{ $galleryScript.RelPermalink }}';
