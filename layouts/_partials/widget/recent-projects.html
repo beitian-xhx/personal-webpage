@@ -1,6 +1,6 @@
 ﻿{{- $context := .Context -}}
 {{- $limit := default 3 .Params.limit -}}
-{{- $pages := partial "helper/pages.html" $context.Site.Home -}}
+{{- $pages := partialCached "helper/pages.html" $context.Site.Home $context.Site.Home.RelPermalink -}}
 {{- $recent := first $limit $pages -}}
 {{- if $recent -}}
     <section class="widget recent-projects">

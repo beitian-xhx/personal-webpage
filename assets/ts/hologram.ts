@@ -8,18 +8,19 @@ export async function mountHologram(canvas: HTMLCanvasElement, reduced: boolean)
     image.src = canvas.dataset.portrait || "";
     await image.decode();
     const fallback = () => {
-        canvas.style.background = 'url("' + image.src + '") center 46% / auto 72% no-repeat';
+        canvas.style.background = 'url("' + (canvas.dataset.portraitOriginal || image.src) + '") center 46% / auto 72% no-repeat';
         canvas.style.filter = "grayscale(1)";
         canvas.dataset.renderer = "static-fallback";
         return () => { canvas.style.removeProperty("background"); canvas.style.removeProperty("filter"); };
     };
     const crop = { x: .16, y: 0, width: .84, height: 1 };
-    const aspect = image.width * crop.width / (image.height * crop.height);
+    const aspect = Number(canvas.dataset.portraitAspect) || image.width * crop.width / (image.height * crop.height);
     const sample = document.createElement("canvas");
     sample.height = 880; sample.width = Math.round(sample.height * aspect);
     const context = sample.getContext("2d", { willReadFrequently: true });
     if (!context) return fallback();
-    context.drawImage(image, image.width*crop.x, 0, image.width*crop.width, image.height*crop.height, 0, 0, sample.width, sample.height);
+    if (canvas.dataset.portraitPrepared === "true") context.drawImage(image, 0, 0, sample.width, sample.height);
+    else context.drawImage(image, image.width*crop.x, 0, image.width*crop.width, image.height*crop.height, 0, 0, sample.width, sample.height);
     const pixels = context.getImageData(0, 0, sample.width, sample.height).data;
     const read = (x: number, y: number, channel: number) => {
         if (x < 0 || y < 0 || x >= sample.width || y >= sample.height) return 0;

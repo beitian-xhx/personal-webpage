@@ -14,6 +14,7 @@ export function initSiteAudio() {
     let data: Uint8Array<ArrayBuffer> | undefined, sampledAt: number | null = null;
     let dispose: (() => void) | undefined, energyFrame = 0, lastEnergy = 0;
     let waitingGesture = false, wantsPlay = true, starting = false, suspended = false, attempt = 0;
+    let clearEntryListeners: (() => void) | undefined;
     let lastPositionSave = 0;
 
     const restorePreference = () => {
@@ -32,10 +33,9 @@ export function initSiteAudio() {
         try { sessionStorage.setItem('beitian-audio-position', String(audio.currentTime)); } catch (_) {}
     };
     const restorePosition = () => {
-        if (!audio.readyState) return;
         try {
             const position = Number(sessionStorage.getItem('beitian-audio-position'));
-            if (Number.isFinite(position) && position > 0 && position < audio.duration) audio.currentTime = position;
+            if (Number.isFinite(position) && position > 0 && (!Number.isFinite(audio.duration) || position < audio.duration)) audio.currentTime = position;
         } catch (_) {}
     };
     const sync = () => {
@@ -122,6 +122,7 @@ export function initSiteAudio() {
         } finally { if (currentAttempt === attempt) starting = false; }
     };
     play.addEventListener('click', () => {
+        clearEntryListeners?.();
         if (wantsPlay && (!audio.paused || starting) && !waitingGesture) {
             wantsPlay = false; waitingGesture = false; starting = false; ++attempt;
             audio.pause(); persistPosition(); sync();
@@ -132,8 +133,10 @@ export function initSiteAudio() {
         persistPreference();
     });
     const unlock = (event: Event) => {
-        if (!waitingGesture || !wantsPlay || host.contains(event.target as Node)) return;
+        const entryPending = Boolean(clearEntryListeners);
+        if ((!waitingGesture && !entryPending) || !wantsPlay || host.contains(event.target as Node)) return;
         if (event instanceof KeyboardEvent && !['Enter', ' '].includes(event.key)) return;
+        clearEntryListeners?.();
         void start();
     };
     document.addEventListener('pointerdown', unlock, { passive: true });
@@ -168,5 +171,20 @@ export function initSiteAudio() {
         if (wantsPlay) void start();
     });
     restorePreference(); restorePosition(); mount(); sync();
-    if (wantsPlay) void start();
+    // Give the visible portrait first use of the connection. Explicit Play stays immediate.
+    const portrait = document.querySelector<HTMLElement>('[data-portrait]');
+    if (document.documentElement.dataset.portal === 'open' && portrait && !portrait.dataset.renderer) {
+        const begin = () => {
+            clearEntryListeners?.();
+            if (wantsPlay && audio.paused) void start();
+        };
+        const enteredContent = () => { if (document.documentElement.dataset.portal !== 'open') begin(); };
+        clearEntryListeners = () => {
+            clearEntryListeners = undefined;
+            document.removeEventListener('site:portrait-ready', begin);
+            document.removeEventListener('site:portal', enteredContent);
+        };
+        document.addEventListener('site:portrait-ready', begin, { once: true });
+        document.addEventListener('site:portal', enteredContent);
+    } else if (wantsPlay) void start();
 }

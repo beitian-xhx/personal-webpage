@@ -1,9 +1,12 @@
-interface pageData {
+interface SearchDocument {
     title: string,
     date: string,
     permalink: string,
     content: string,
-    image?: string,
+    image?: string
+}
+
+interface SearchResult extends SearchDocument {
     preview: string,
     matchCount: number
 }
@@ -39,7 +42,7 @@ function escapeRegExp(string: string) {
 }
 
 class Search {
-    private dataPromise?: Promise<pageData[]>;
+    private dataPromise?: Promise<SearchDocument[]>;
     private composing = false;
     private lastSearch = '';
     private searchSequence = 0;
@@ -149,7 +152,7 @@ class Search {
 
     private async searchKeywords(keywords: string[]) {
         const rawData = await this.getData();
-        const results: pageData[] = [];
+        const results: SearchResult[] = [];
 
         const regex = new RegExp(keywords.filter((v, index, arr) => {
             arr[index] = escapeRegExp(v);
@@ -160,11 +163,11 @@ class Search {
             const titleMatches: match[] = [],
                 contentMatches: match[] = [];
 
-            let result = {
+            const result: SearchResult = {
                 ...item,
                 preview: '',
                 matchCount: 0
-            }
+            };
 
             const contentMatchAll = item.content.matchAll(regex);
             for (const match of Array.from(contentMatchAll)) {
@@ -238,15 +241,6 @@ class Search {
                 .then(res => {
                     if (!res.ok) throw new Error(`Failed to load search data: ${res.status} ${res.statusText}`);
                     return res.json();
-                })
-                .then((data: pageData[]) => {
-                    const parser = new DOMParser();
-
-                    for (const item of data) {
-                        item.content = parser.parseFromString(item.content, 'text/html').body.innerText;
-                    }
-
-                    return data;
                 })
                 .catch(error => {
                     this.dataPromise = undefined;
@@ -338,7 +332,7 @@ class Search {
         }
     }
 
-    public static render(item: pageData) {
+    public static render(item: SearchResult) {
         return (
             <article>
                 <a href={item.permalink}>

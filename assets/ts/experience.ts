@@ -36,12 +36,14 @@ export function initExperience() {
         void mountHologram(portrait, reduced.matches).then(dispose => {
             if (generation !== portalGeneration || portal?.hidden) dispose?.();
             else portraitDispose = dispose;
+            requestAnimationFrame(() => document.dispatchEvent(new Event("site:portrait-ready")));
         }).catch(() => {
             if (generation !== portalGeneration || portal?.hidden) return;
             portrait.dataset.renderer = "image-fallback";
-            portrait.style.background = `url("${portrait.dataset.portrait}") center/auto 80% no-repeat`;
+            portrait.style.background = `url("${portrait.dataset.portraitOriginal || portrait.dataset.portrait}") center/auto 80% no-repeat`;
             portrait.style.imageRendering = "pixelated";
             portrait.style.filter = "grayscale(1)";
+            document.dispatchEvent(new Event("site:portrait-ready"));
         });
     };
     // Keep the intro's document height after exit, so scrolling back can restore it.

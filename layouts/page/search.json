@@ -1,0 +1,17 @@
+{{- $pages := partial "helper/pages.html" .Site.Home -}}
+{{- $result := slice -}}
+
+{{- range $pages -}}
+    {{- $content := replaceRE "\\r\\n?" "\n" (htmlUnescape .Plain) -}}
+    {{- $content = replaceRE "^[\\t\\n\\f\\r ]+" "" $content -}}
+    {{- $data := dict "title" .Title "date" .Date "permalink" .RelPermalink "content" $content -}}
+
+    {{- $image := partial "helper/image" (dict "Image" .Params.image "Resources" .Resources "Context" .) -}}
+    {{- if $image -}}
+        {{- $data = merge $data (dict "image" $image.Permalink) -}}
+    {{- end -}}
+
+    {{- $result = $result | append $data -}}
+{{- end -}}
+
+{{ jsonify $result }}

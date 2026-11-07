@@ -1,5 +1,5 @@
 <aside class="site-audio" aria-label="背景音乐播放器" data-site-audio>
-    <audio data-site-track src="{{ "audio/space-walk.mp3" | relURL }}" preload="metadata" loop></audio>
+    <audio data-site-track src="{{ "audio/space-walk.mp3" | relURL }}" preload="none" loop></audio>
     <button type="button" data-audio-play aria-label="播放背景音乐" aria-pressed="false">▶</button>
     <div class="site-audio__track"><span>SPACE WALK</span><small data-audio-status role="status" aria-live="polite">太空漫步 · 点击播放</small></div>
     <label class="site-audio__volume"><span aria-hidden="true">♪</span><span class="audio-sr-only">音量</span><input data-audio-volume type="range" min="0" max="1" step="0.01" value="0.45" aria-label="背景音乐音量"></label>

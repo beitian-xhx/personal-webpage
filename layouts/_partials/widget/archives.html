@@ -13,7 +13,7 @@
             </a>
         </h2>
 
-        {{ $pages := partial "helper/pages.html" $context.Site.Home }}
+        {{ $pages := partialCached "helper/pages.html" $context.Site.Home $context.Site.Home.RelPermalink }}
         {{ $archives := $pages.GroupByDate "2006" }}
 
         <div class="widget-archive--list">
