@@ -95,3 +95,35 @@ html[data-experience="true"] body.experience-enabled .hologram-portal {
 }
 @media print { .hologram-portal { display: none !important; } }
 
+
+// Cube owns the opening composition; audio playback and welcome copy stay intact.
+html[data-experience="true"] .hologram-portal {
+    background: radial-gradient(ellipse at 50% 55%, #111 0%, #070707 48%, #030303 85%);
+    touch-action: pan-y;
+    .hologram-portal__canvas { translate: none; transform: none; filter: none; }
+    .portal-audio-field { display: block; opacity: .95; }
+    .portal-blackhole,
+    .hologram-portal__noise, .hologram-portal__field, .hologram-portal__orbits,
+    .hologram-portal__scan, .hologram-portal__baseline, .hologram-portal__beam { display: none; }
+    .portal-welcome {
+        top: 11%; left: 50%; right: auto; width: max-content; max-width: 90%;
+        transform: translateX(-50%); text-align: center;
+        > span { font-size: 9px; letter-spacing: .48em; color: #777; }
+        h1 { margin: 10px 0 8px; font-size: clamp(24px, 2.5vw, 34px); font-weight: 400; letter-spacing: .16em; }
+        p { margin: 0; color: #777; font-size: 11px; letter-spacing: .16em; }
+    }
+    &[data-cube-dragging="true"] { cursor: grabbing; user-select: none; }
+    .hologram-portal__enter { bottom: 3%; }
+}
+@media (max-width: 700px) {
+    html[data-experience="true"] .hologram-portal {
+        .portal-welcome { top: 15%; left: 50%; max-width: 90%; width: max-content; text-align: center; }
+        .hologram-portal__enter { bottom: 8%; }
+    }
+}
+@media (max-height: 500px) and (min-width: 701px) {
+    html[data-experience="true"] .hologram-portal .portal-welcome {
+        left: 5%; top: 37%; max-width: 23%; transform: none; text-align: left;
+        h1 { font-size: 22px; } p { display: none; }
+    }
+}

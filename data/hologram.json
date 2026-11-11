@@ -1,9 +1,14 @@
 {
   "blackhole": "/img/experience/blackhole.webp",
-  "image": "/img/experience/portrait.webp",
-  "original": "/img/experience/portrait.png",
-  "prepared": true,
-  "width": 683,
-  "height": 880,
-  "aspect": 0.7762758620689655
+  "image": "/img/experience/cube/avatar.webp",
+  "original": "/img/uploads/b_22cb441f64208eaff55e9670d85922ab.jpg",
+  "prepared": false,
+  "width": 512,
+  "height": 512,
+  "aspect": 1,
+  "faces": [
+    "/img/experience/cube/avatar.webp",
+    "/img/experience/cube/portrait-a.webp",
+    "/img/experience/cube/portrait-b.webp"
+  ]
 }

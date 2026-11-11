@@ -1,10 +1,7 @@
 type Bands = { bass: number; mid: number; treble: number; level: number; playing: boolean };
-
 const tau = Math.PI * 2;
-const unit = (v: number) => Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 0;
-const ease = (v: number) => { const t = unit(v); return t * t * (3 - 2 * t); };
-
-// Geometry only: resizing retains the same stars. All audio envelopes come from read().
+const unit = (v: number) => Math.max(0, Math.min(1, v));
+const smooth = (a: number, b: number, v: number) => { const t = unit((v - a) / (b - a)); return t * t * (3 - 2 * t); };
 function grain(i: number, salt: number) {
     let n = Math.imul(i + 1, 0x45d9f3b) ^ salt;
     n = Math.imul(n ^ (n >>> 16), 0x27d4eb2d);
@@ -12,129 +9,108 @@ function grain(i: number, salt: number) {
 }
 
 export function mountAudioField(canvas: HTMLCanvasElement, read: () => Bands, reduced: boolean): () => void {
-    const ctx = canvas.getContext("2d", { alpha: true });
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return () => {};
-    let w = 0, h = 0, floor = 0, span = 0, frame = 0, disposed = false;
-    let last = -1, time = 0, bass = 0, mid = 0, treble = 0, level = 0, bassBed = 0;
-    const portal=canvas.closest<HTMLElement>('.hologram-portal');
-    const visible=()=>!portal||(!portal.hidden&&portal.dataset.complete!=='true');
-    const stars: { x: number; y: number; phase: number; light: number; size: number; side: number }[] = [];
-    const rings: { x: number; y: number; radius: number; light: number; size: number }[] = [];
+    const portal = canvas.closest<HTMLElement>('.hologram-portal');
+    let w = 0, h = 0, span = 0, frame = 0, disposed = false, last = 0, time = 0;
+    let bass = 0, mid = 0, treble = 0, level = 0;
+    let targetX = 0, targetY = 0, mouseX = 0, mouseY = 0;
+    const dust: { x: number; y: number; z: number; phase: number; size: number }[] = [];
+    const ribbons: { lane: number; angle: number; offset: number; depth: number; phase: number; size: number }[] = [];
+    const visible = () => !portal || (!portal.hidden && portal.dataset.complete !== 'true');
+    const wake = () => { if (!frame && !disposed && !document.hidden && visible() && w && h) frame = requestAnimationFrame(draw); };
+    const stop = () => { cancelAnimationFrame(frame); frame = 0; last = 0; };
+    const visibility = () => { if (document.hidden || !visible()) stop(); else wake(); };
     function resize() {
-        if (disposed) return;
         const box = canvas.getBoundingClientRect();
         w = box.width; h = box.height;
         if (!w || !h) { stop(); return; }
-        const dpr = Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(1450000 / (w * h)));
-        const px = Math.max(1, Math.round(w * dpr)), py = Math.max(1, Math.round(h * dpr));
-        if (canvas.width !== px) canvas.width = px;
-        if (canvas.height !== py) canvas.height = py;
-        ctx!.setTransform(px / w, 0, 0, py / h, 0, 0);
-        // Match the projected portrait height and foot line in hologram.ts (cropped aspect ~0.78).
-        span = Math.min(h * .88, w * .93 / .78);
-        floor = h * .4775 + span * .49 * Math.cos(.12);
-        const count = Math.round(Math.min(3200, Math.max(1000, w * h / 450)));
-        stars.length = rings.length = 0;
-        for (let i = 0; i < count; i++) {
-            const t = grain(i, 177), depth = grain(i, 21291), side = i % 2 ? 1 : -1;
-            const lane = (i >> 1) % 4;
-            // Three loose, curved filaments per side, interspersed with distant dust.
-            const distance = lane === 3 ? .22 + .8 * depth :
-                .28 + .15 * lane + .23 * Math.sin(t * 3.6 + lane * .6) + .18 * depth;
-            stars.push({ x: side * w * .5 * distance, y: h * (.07 + t * .89),
-                phase: tau * grain(i, 39383), light: .16 + depth * .45,
-                size: .8 + 1.5 * depth * depth, side });
-        }
-        const steps = Math.min(180, Math.max(88, Math.round(w / 8)));
-        for (let lane = 0; lane < 14; lane++) {
-            const radius = .18 + lane * .060;
-            for (let j = 0; j < steps; j++) {
-                const seed = lane * steps + j;
-                const a = tau * (j + .38 * lane + grain(seed, 37) * .24) / steps;
-                const r = radius + (grain(seed, 4237) - .5) * .009;
-                rings.push({ x: w * .59 * r * Math.cos(a),
-                    y: Math.min(h * .16, w * .14) * r * Math.sin(a),
-                    radius, light: .14 + .32 * grain(seed, 5851) + .13 * Math.sin(a),
-                    size: .75 + .65 * grain(seed, 9217) });
-            }
-        }
-        canvas.dataset.pointCount=String(stars.length+rings.length);
+        const dpr = Math.min(devicePixelRatio || 1, 1.5, Math.sqrt(1450000 / (w * h)));
+        canvas.width = Math.max(1, Math.round(w * dpr)); canvas.height = Math.max(1, Math.round(h * dpr));
+        ctx!.setTransform(canvas.width / w, 0, 0, canvas.height / h, 0, 0);
+        // Same perspective scale as the relief cube; the quiet center follows its size.
+        span = h * Math.min(2.05, w / h * 2.42) / 4.6;
+        dust.length = ribbons.length = 0;
+        const count = Math.round(Math.min(1100, Math.max(420, w * h / 1300)));
+        for (let i = 0; i < count; i++) dust.push({ x: grain(i, 17), y: grain(i, 79), z: grain(i, 135), phase: grain(i, 91) * tau, size: .55 + grain(i, 269) ** 3 * 1.3 });
+        const flowCount = w < 700 ? 1500 : 2500;
+        for (let i = 0; i < flowCount; i++) ribbons.push({ lane: i % 3, angle: grain(i, 25) * tau, offset: (grain(i, 472) - .5), depth: grain(i, 395), phase: grain(i, 851) * tau, size: .55 + grain(i, 267) ** 2 * 1.1 });
+        canvas.dataset.pointCount = String(dust.length + ribbons.length);
+        canvas.dataset.fieldStyle = 'layered-particle-streams';
         wake();
     }
     function draw(now: number) {
         frame = 0;
-        if (disposed || document.hidden || !w || !h) return;
-        const interval = reduced ? 100 : 1000 / 30;
-        if (last >= 0 && now - last < interval - 1) { wake(); return; }
-        const dt = last < 0 ? interval / 1000 : Math.min(.12, (now - last) / 1000);
-        last = now;
-        const s = read();
-        const attack = 1 - Math.exp(-dt / .035), release = 1 - Math.exp(-dt / .20);
-        const follow = (old: number, input: number) => {
-            const target = s.playing ? unit(input) : 0;
-            return old + (target - old) * (target > old ? attack : release);
-        };
-        // Lift quieter passages without replacing the real analyser input.
-        const energy=(v:number,gain:number)=>Math.pow(unit((v-.012)*gain),.78);
-        bass = follow(bass, energy(s.bass,1.8)); mid = follow(mid,energy(s.mid,2.7));
-        treble = follow(treble,energy(s.treble,4)); level = follow(level,energy(s.level,2.5));
-        bassBed+=(bass-bassBed)*(1-Math.exp(-dt/.55));
+        if (disposed || document.hidden || !visible() || !w || !h) return;
+        if (last && now - last < 1000 / 30 - 1) { wake(); return; }
+        const dt = last ? Math.min(.08, (now - last) / 1000) : 1 / 30; last = now;
+        const sound = read();
+        const follow = (old: number, value: number) => old + ((sound.playing ? unit(value) : 0) - old) * (1 - Math.exp(-dt * (value > old ? 12 : 4)));
+        bass = follow(bass, Math.pow(unit(sound.bass * 1.6), .8)); mid = follow(mid, unit(sound.mid * 2.4));
+        treble = follow(treble, unit(sound.treble * 3.6)); level = follow(level, unit(sound.level * 2));
+        mouseX += (targetX - mouseX) * (1 - Math.exp(-dt * 3)); mouseY += (targetY - mouseY) * (1 - Math.exp(-dt * 3));
         if (!reduced) time += dt;
-        const pulse=unit(bass*.45+Math.max(0,bass-bassBed)*4.8);
-        const spread = reduced ? 0 : unit(bass*.45+pulse*.75);
-        const lift = reduced ? 0 : mid * Math.min(84, h * .095);
-        const halfGap = Math.min(span * .245, w * .28);
-        const feather = Math.max(12, Math.min(span * .10, w * .08));
-        ctx!.clearRect(0, 0, w, h);
-        ctx!.fillStyle = "#fff";
+        const entrance = reduced ? 1 : smooth(0, .85, time);
+        ctx!.clearRect(0, 0, w, h); ctx!.fillStyle = '#fff';
+        const cx = w * .5, cy = h * .55;
+        const quietX = span * .51, quietY = span * .55;
         function pixel(x: number, y: number, size: number, light: number) {
-            // Feather around the torso. Let the front orbits meet again below the feet.
-            const silhouette = ease((Math.abs(x) - halfGap) / feather);
-            const below = ease((y - floor) / Math.max(10, h * .036));
-            const alpha = light * (silhouette + below * (1 - silhouette));
-            if (alpha < .022 || Math.abs(x) > w * .5 + 2 || y < 0 || y > h) return;
-            const centerX=w*(w>700?.4:.5);
-            const rightQuiet=w>700&&centerX+x>w*.66?.32:1;
-            const titleQuiet=w>700&&centerX+x<w*.27&&y<h*.32?.24:1;
-            ctx!.globalAlpha = Math.min(1, alpha)*rightQuiet*titleQuiet;
-            ctx!.fillRect(centerX + x - size / 2, y - size / 2, size, size);
+            const ellipse = Math.hypot((x - cx) / quietX, (y - cy) / quietY);
+            const centerQuiet = smooth(.87, 1.35, ellipse);
+            const titleDistance = Math.hypot((x - cx) / Math.min(250, w * .4), (y - h * .16) / (h * .095));
+            const titleQuiet = .12 + .88 * smooth(.8, 1.7, titleDistance);
+            const edge = smooth(0, 35, Math.min(x, w - x, y, h - y));
+            const alpha = light * centerQuiet * titleQuiet * edge * entrance * 1.18;
+            if (alpha < .015) return;
+            ctx!.globalAlpha = Math.min(.78, alpha);
+            ctx!.fillRect(x - size / 2, y - size / 2, size, size);
         }
-        for (const p of rings) {
-            const expansion = 1 + spread * (.65 - p.radius * .16);
-            // A bright annulus travels from the inner tracks to the rim as bass rises.
-            const band = Math.max(0, 1 - Math.abs(p.radius - (.18 + bass * .70)) * 9);
-            pixel(p.x * expansion, floor + p.y * (1 + spread * .95),
-                p.size + 1.7 * bass * band, p.light * (.75 + level * 1.15) + pulse * (.25 + .7 * band));
+        for (const p of dust) {
+            const drift = reduced ? 0 : time * (.0015 + p.z * .0015);
+            const x = ((p.x + drift) % 1) * w + mouseX * p.z * 14;
+            const y = p.y * h + (reduced ? 0 : Math.sin(time * .22 + p.phase) * 7) + mouseY * p.z * 10;
+            const glint = reduced ? .5 : .5 + .5 * Math.sin(time * .7 + p.phase);
+            pixel(x, y, p.size + treble * .6 * p.z, (.055 + p.z * .23) * (.65 + glint * .6 + level * .4));
         }
-        for (const p of stars) {
-            const drift = Math.sin(time * .5 + p.phase);
-            const wave=reduced?0:Math.sin(p.y*.018-time*1.3+p.phase*.2)*lift;
-            const glint = reduced ? .45 : .5 + .5 * Math.cos(time * 2.7 + p.phase);
-            pixel(p.x * (1 + .22 * spread) + p.side * wave,
-                p.y + (reduced ? 0 : drift * 3) - lift * p.light + wave*.5,
-                p.size + 1.5 * treble * glint + pulse*.75,
-                p.light * (.6 + level * 1.1 + .45 * mid) + treble * glint ** 3 * .9);
+        for (const p of ribbons) {
+            const direction = p.lane === 1 ? -1 : 1;
+            const a = p.angle + time * (.035 + p.depth * .012) * direction;
+            const width = span * (.72 + p.lane * .15) * (1 + bass * .035);
+            const height = span * (.48 + p.lane * .13);
+            const tilt = [-.48, .57, -.16][p.lane];
+            const band = p.offset * (14 + 21 * p.depth);
+            const rx = Math.cos(a) * (width + band), ry = Math.sin(a) * (height + band);
+            const x = cx + rx * Math.cos(tilt) - ry * Math.sin(tilt) + mouseX * (8 + p.depth * 14);
+            const y = cy + rx * Math.sin(tilt) + ry * Math.cos(tilt) + mouseY * (6 + p.depth * 10);
+            const cloud = .25 + .75 * Math.pow(.5 + .5 * Math.cos(a * 2 - time * .18 + p.lane * 1.6), 2);
+            const depth = .48 + .52 * (.5 + .5 * Math.sin(a + p.lane));
+            const glint = reduced ? 0 : Math.pow(.5 + .5 * Math.sin(time * 1.1 + p.phase), 10);
+            pixel(x, y, p.size * (.75 + depth * .4) + treble * glint * .7,
+                (.13 + .33 * p.depth) * cloud * depth * (1 + mid * .5 + level * .4) + glint * (.035 + treble * .1));
         }
         ctx!.globalAlpha = 1;
-        wake();
+        const audioActive = String(sound.playing);
+        if (canvas.dataset.audioActive !== audioActive) canvas.dataset.audioActive = audioActive;
+        if (!reduced) wake();
     }
-    function wake() {
-        if (!frame && !disposed && !document.hidden && visible() && w && h) frame = requestAnimationFrame(draw);
-    }
-    function stop() { cancelAnimationFrame(frame); frame = 0; last = -1; }
-    function visibility() { if (document.hidden||!visible()) stop(); else wake(); }
-    const portalObserver=new MutationObserver(visibility);
-    if(portal)portalObserver.observe(portal,{attributes:true,attributeFilter:['hidden','data-complete']});
-    const observer = new ResizeObserver(resize);
-    observer.observe(canvas);
-    window.addEventListener("resize", resize);
-    document.addEventListener("visibilitychange", visibility);
+    const pointer = (event: PointerEvent) => {
+        if (event.pointerType === 'touch' || event.target instanceof Element && event.target.closest('a,button,input,.site-audio')) return;
+        const box = canvas.getBoundingClientRect();
+        targetX = unit((event.clientX - box.left) / Math.max(1, w)) * 2 - 1;
+        targetY = unit((event.clientY - box.top) / Math.max(1, h)) * 2 - 1;
+    };
+    const leave = () => { targetX = targetY = 0; };
+    const portalObserver = new MutationObserver(visibility);
+    if (portal) portalObserver.observe(portal, { attributes: true, attributeFilter: ['hidden', 'data-complete'] });
+    const observer = new ResizeObserver(resize); observer.observe(canvas);
+    window.addEventListener('pointermove', pointer, { passive: true }); document.documentElement.addEventListener('pointerleave', leave);
+    window.addEventListener('resize', resize); document.addEventListener('visibilitychange', visibility);
     resize();
     return () => {
         if (disposed) return;
-        disposed = true; stop(); observer.disconnect();portalObserver.disconnect();
-        window.removeEventListener("resize", resize);
-        document.removeEventListener("visibilitychange", visibility);
-        ctx.clearRect(0, 0, w, h);
+        disposed = true; stop(); observer.disconnect(); portalObserver.disconnect();
+        window.removeEventListener('pointermove', pointer); document.documentElement.removeEventListener('pointerleave', leave);
+        window.removeEventListener('resize', resize); document.removeEventListener('visibilitychange', visibility);
+        ctx!.clearRect(0, 0, w, h);
     };
 }

@@ -2,6 +2,10 @@
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 {{ if .Site.Params.experience.enabled }}
 {{- $hologram := hugo.Data.hologram -}}
+{{- $cubeImages := slice -}}
+{{- range $hologram.faces -}}
+    {{- $cubeImages = $cubeImages | append (strings.TrimPrefix "/" . | relURL) -}}
+{{- end -}}
 <script type="importmap">{"imports":{"three":"{{ "vendor/three/three.module.js" | relURL }}"}}</script>
 <script>
 (function(){
@@ -12,10 +16,7 @@
     if(new URLSearchParams(location.search).has('skipintro'))show=false;
     if(show){
         root.dataset.portal='open';
-        [
-            {{ strings.TrimPrefix "/" $hologram.blackhole | relURL | jsonify | safeJS }},
-            {{ strings.TrimPrefix "/" $hologram.image | relURL | jsonify | safeJS }}
-        ].forEach(function(href){
+        {{ $cubeImages | jsonify | safeJS }}.forEach(function(href){
             var hint=document.createElement('link');
             hint.rel='preload';hint.as='image';hint.setAttribute('fetchpriority','high');hint.href=href;
             document.head.appendChild(hint);
