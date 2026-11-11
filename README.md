@@ -167,12 +167,11 @@ git revert <需要回退的提交哈希>
 git push origin main
 ```
 
-`params.experience.enabled` 可以关闭增强体验入口，使用保留的普通首页分支；这是功能开关，不等同于回退所有样式和文件。旧版快照的本机恢复工具见历史维护文档，不能代替当前提交的版本管理。
+`params.experience.enabled` 可以关闭增强体验入口，使用保留的普通首页分支；这是功能开关，不等同于回退所有样式和文件。
 
 ## 维护与许可
 
-- [代码结构审查与维护边界](docs/architecture-review-2026-11-07.md)
-- [早期视觉升级与回退记录](docs/2026-10-27-visual-upgrade-guide.md)
+- [三图点阵开屏与维护入口](docs/2026-11-11-particle-cube.md)
 - [React Bits 相关许可](docs/third-party/REACT-BITS-LICENSE.md)
 - [人物素材生成记录](docs/third-party/portrait-generation.md)
 
